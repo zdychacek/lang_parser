@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Expression Parser</title>
+</head>
+<body>
+  <script src="lib/traceur-runtime.min.js"></script>
+  <script src="lib/es6-module-loader.min.js"></script>
+  <script src="lib/system.js"></script>
+  <script src="lib/es6-shim.js"></script>
+
+  <input id="source" value="x   = a+b* 9^  5^6^y(8, 9)"/>
+  <button id="do">Do</button>
+
+  <h3>AST</h3>
+  <pre id="ast"></pre>
+
+  <h3>Tokens</h3>
+  <pre id="tokens"></pre>
+
+  <script>
+    (function (prodMode) {
+      if (prodMode) {
+        System.paths['app'] = 'dist/all.min.js';
+        System.bundles['app'] = ['app/main'];
+      }
+      else {
+        System.paths['app/*'] = 'dist/*.js';
+      }
+
+      System.import('app/main')
+        .catch(console.error.bind(console));
+    })(false);
+  </script>
+</body>
+</html>
