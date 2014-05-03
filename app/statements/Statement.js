@@ -1,5 +1,5 @@
 export default class Statement {
-  parse (parser, token) {
+  parse (parser) {
     throw new Error('Not implemented.');
   }
 }

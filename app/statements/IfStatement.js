@@ -3,30 +3,40 @@ import { TokenType, Keyword } from '../Lexer';
 
 class IfStatement extends Statement {
   parse (parser) {
-    var statement = {
-      type: 'If'
-    };
+    var testExpression, thenArm, elseArm = null;
 
     parser.consume(TokenType.LEFT_PAREN);
-    statement.testExpression = parser.parseExpression();
+    testExpression = parser.parseExpression();
     parser.consume(TokenType.RIGHT_PAREN);
-    statement.thenArm = parser.parseBlock();
+
+    thenArm = this._parseArm(parser);
 
     if (parser.match(Keyword.ELSE)) {
       parser.consume(Keyword.ELSE);
 
       if (parser.match(Keyword.IF)) {
-        statement.elseArm = parser.parseStatement();
+        elseArm = parser.parseStatement();
       }
       else {
-        statement.elseArm = parser.parseBlock();
+        elseArm = this._parseArm(parser);
       }
     }
-    else {
-      statement.elseArm = null;
-    }
 
-    return statement;
+    return {
+      type: 'If',
+      testExpression,
+      thenArm,
+      elseArm
+    };
+  }
+
+  _parseArm (parser) {
+    if (parser.match(TokenType.LEFT_CURLY)) {
+      return parser.parseBlock();
+    }
+    else {
+      return parser.parseStatement();
+    }
   }
 }
 

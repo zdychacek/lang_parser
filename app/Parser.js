@@ -54,8 +54,6 @@ export default class Parser {
     var statements = [];
 
     while (true) {
-      let token = this.peek();
-
       if (this.match(TokenType.RIGHT_CURLY) || this.match(TokenType.EOF)) {
         break;
       }
@@ -98,23 +96,19 @@ export default class Parser {
   matchAndConsume (expected) {
     var token = this.peek();
 
-    if (token.type != expected && token.value != expected) {
-      return false;
+    if (token.type == TokenType.KEYWORD && token.value == expected || token.type == expected) {
+      this.consume();
+
+      return true;
     }
 
-    this.consume();
-
-    return true;
+    return false;
   }
 
   match (expected) {
     var token = this.peek();
 
-    if (token.type != expected && token.value != expected) {
-      return false;
-    }
-
-    return true;
+    return token.type == TokenType.KEYWORD && token.value == expected || token.type == expected;
   }
 
   consume (expected) {
