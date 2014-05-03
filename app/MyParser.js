@@ -23,24 +23,48 @@ export default class MyParser extends Parser {
     super(lexer);
 
     this.register(TokenType.IDENTIFIER, new IdentifierParselet());
-    this.register(TokenType.LITERAL,    new LiteralParselet());
-    this.register(TokenType.ASSIGN,     new AssignmentParselet());
-    this.register(TokenType.QUESTION,   new ConditionalParselet());
+    this.register(TokenType.LITERAL, new LiteralParselet());
+    this.register(TokenType.QUESTION, new ConditionalParselet());
     this.register(TokenType.LEFT_PAREN, new GroupParselet());
     this.register(TokenType.LEFT_PAREN, new CallParselet());
 
-    this.prefix(TokenType.PLUS,         Precedence.PREFIX);
-    this.prefix(TokenType.MINUS,        Precedence.PREFIX);
-    this.prefix(TokenType.TILDE,        Precedence.PREFIX);
-    this.prefix(TokenType.BANG,         Precedence.PREFIX);
+    [
+      TokenType.ASSIGN,
+      TokenType.PLUS_ASSIGN,
+      TokenType.MINUS_ASSIGN,
+      TokenType.ASTERISK_ASSIGN,
+      TokenType.SLASH_ASSIGN,
+      TokenType.CARET_ASSIGN
+    ].forEach(function (tokenType) {
+      this.register(tokenType, new AssignmentParselet())
+    }, this);
 
-    this.postfix(TokenType.BANG,        Precedence.POSTFIX);
+    this.prefix(TokenType.PLUS, Precedence.PREFIX);
+    this.prefix(TokenType.MINUS, Precedence.PREFIX);
+    this.prefix(TokenType.TILDE, Precedence.PREFIX);
+    this.prefix(TokenType.BANG, Precedence.PREFIX);
 
-    this.infixLeft(TokenType.PLUS,      Precedence.SUM);
-    this.infixLeft(TokenType.MINUS,     Precedence.SUM);
-    this.infixLeft(TokenType.ASTERISK,  Precedence.PRODUCT);
-    this.infixLeft(TokenType.SLASH,     Precedence.PRODUCT);
-    this.infixRight(TokenType.CARET,    Precedence.EXPONENT);
+    this.postfix(TokenType.BANG, Precedence.POSTFIX);
+
+    this.infixLeft(TokenType.PLUS, Precedence.SUM);
+    this.infixLeft(TokenType.MINUS, Precedence.SUM);
+    this.infixLeft(TokenType.ASTERISK, Precedence.PRODUCT);
+    this.infixLeft(TokenType.SLASH, Precedence.PRODUCT);
+
+    // relational
+    this.infixLeft(TokenType.EQUAL, Precedence.RELATION);
+    this.infixLeft(TokenType.NOT_EQUAL, Precedence.RELATION);
+    this.infixLeft(TokenType.GREATER, Precedence.RELATION);
+    this.infixLeft(TokenType.LESS, Precedence.RELATION);
+    this.infixLeft(TokenType.GREATER_OR_EQUAL, Precedence.RELATION);
+    this.infixLeft(TokenType.LESS_OR_EQUAL, Precedence.RELATION);
+
+    // logical
+    this.infixLeft(TokenType.LOGICAL_AND, Precedence.LOGICAL_AND);
+    this.infixLeft(TokenType.LOGICAL_OR, Precedence.LOGICAL_OR);
+
+    // right associativity
+    this.infixRight(TokenType.CARET, Precedence.EXPONENT);
 
     // statements
     this.registerStatement(Keyword.IF, new IfStatement());

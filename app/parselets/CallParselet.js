@@ -16,8 +16,8 @@ export default class CallParselet extends InfixParselet {
     }
 
     return {
-      type: 'Call',
-      name: left,
+      type: 'CallExpression',
+      callee: left,
       args
     };
   }

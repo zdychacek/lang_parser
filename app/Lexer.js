@@ -5,6 +5,19 @@ export var TokenType = {
   RIGHT_CURLY: '}',
   COMMA: ',',
   ASSIGN: '=',
+  PLUS_ASSIGN: '+=',
+  MINUS_ASSIGN: '-=',
+  ASTERISK_ASSIGN: '*=',
+  SLASH_ASSIGN: '/=',
+  CARET_ASSIGN: '^=',
+  EQUAL: '==',
+  NOT_EQUAL: '!=',
+  GREATER: '>',
+  GREATER_OR_EQUAL: '>=',
+  LESS: '<',
+  LESS_OR_EQUAL: '<=',
+  LOGICAL_AND: '&&',
+  LOGICAL_OR: '||',
   PLUS: '+',
   MINUS: '-',
   ASTERISK: '*',
@@ -40,13 +53,6 @@ export class Lexer {
     this._index = 0;
     this._text = text;
     this._marker = 0;
-    this._puctuators = [];
-
-    for (let type in TokenType) {
-      if (TokenType.hasOwnProperty(type) && ['IDENTIFIER', 'LITERAL', 'KEYWORD', 'EOF'].indexOf(type) == -1) {
-        this._puctuators.push(TokenType[type]);
-      }
-    }
   }
 
   next () {
@@ -96,6 +102,7 @@ export class Lexer {
 
       dump.push(token);
     }
+
 
     this._index = idx;
 
@@ -206,12 +213,65 @@ export class Lexer {
   }
 
   _scanOperator () {
-    var char = this._peekNextChar();
+    var nextToken = this._peekNextChar(), prevToken;
+    var operator = '';
 
-    if (this._puctuators.indexOf(char) > -1) {
-      var operator = this._getNextChar();
+    switch (nextToken) {
+      case '&':
+      case '|':
+        // & and | can only be duplicated
+        prevToken = nextToken;
+        operator = this._getNextChar();
+        nextToken = this._peekNextChar();
 
-      return this._createToken(char, operator);
+        if (nextToken == prevToken) {
+          operator += this._getNextChar();
+        }
+
+        break;
+      case '+':
+      case '-':
+      case '=':
+      case '<':
+      case '>':
+        // these can be combined with itself or with equal sign
+        prevToken = nextToken;
+        operator = this._getNextChar();
+        nextToken = this._peekNextChar();
+
+        if (nextToken == prevToken || nextToken == '=') {
+          operator += this._getNextChar();
+        }
+
+        break;
+      case '*':
+      case '/':
+      case '^':
+      case '!':
+        // these be combined only with equal sign
+        operator = this._getNextChar();
+        nextToken = this._peekNextChar();
+
+        if (nextToken == '=') {
+          operator += this._getNextChar();
+        }
+
+        break;
+      case '?':
+      case '~':
+      case ':':
+      case ';':
+      case '(':
+      case ')':
+      case '{':
+      case '}':
+        // one char operators
+        operator += this._getNextChar();
+        break;
+    }
+
+    if (operator) {
+      return this._createToken(operator);
     }
   }
 
@@ -243,8 +303,8 @@ export class Lexer {
     return char;
   }
 
-  _peekNextChar () {
-    return this._text[this._index];
+  _peekNextChar (distance = 0) {
+    return this._text[this._index + distance];
   }
 
   _skipWhitespaces () {
@@ -269,7 +329,7 @@ export class Lexer {
     return this._isIdentifierStart(char) || this._isDigit(char);
   }
 
-  _createToken (type, value) {
+  _createToken (type, value = type) {
     return new Token({
       type,
       value,

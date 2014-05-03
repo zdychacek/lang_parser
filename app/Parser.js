@@ -23,9 +23,7 @@ export default class Parser {
     this._statementsParselets.set(token, statementParselet);
   }
 
-  parseExpression (precedence) {
-    precedence = precedence || 0;
-
+  parseExpression (precedence = 0) {
     var token = this.consume();
     var prefix = this._prefixParselets.get(token.type);
 

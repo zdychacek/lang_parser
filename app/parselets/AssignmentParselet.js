@@ -11,7 +11,8 @@ export default class AssignmentParselet extends InfixParselet {
 
     return {
       type: 'AssignmentExpression',
-      name: left.name,
+      operator: token.type,
+      left,
       right
     };
   }
