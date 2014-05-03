@@ -124,12 +124,9 @@ export default class Parser {
       if (token.type != expected && token.value != expected) {
         throw new SyntaxError('Expected token ' + expected + ' and found ' + token.type);
       }
+    }
 
-      return this._lexer.next();
-    }
-    else {
-      return this._lexer.next();
-    }
+    return this._lexer.next();
   }
 
   peek () {
