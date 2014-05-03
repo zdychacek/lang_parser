@@ -1,22 +1,19 @@
 import InfixParselet from './InfixParselet';
 import Precedence from '../Precedence';
 
-export default class AssignParselet extends InfixParselet {
+export default class AssignmentParselet extends InfixParselet {
   parse (parser, left, token) {
     var right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
     // TODO:
-    if (!left.Identifier) {
-      throw new Error('The left-hand side of an assignment must be a name.');
+    if (!left.type == 'Identifier') {
+      throw new SyntaxError('The left-hand side of an assignment must be an identifier.');
     }
 
-    var name = left.Identifier.name;
-
     return {
-      'AssignExpression': {
-        name,
-        right
-      }
+      type: 'Assignment',
+      name: left.name,
+      right
     };
   }
 

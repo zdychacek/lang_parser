@@ -1,6 +1,6 @@
 import PrefixParselet from './PrefixParselet';
 
-export default class PrefixOperatorParselet extends PrefixParselet {
+class PrefixOperatorParselet extends PrefixParselet {
   constructor (precedence) {
     this._precedence = precedence;
   }
@@ -9,10 +9,9 @@ export default class PrefixOperatorParselet extends PrefixParselet {
     var right = parser.parseExpression(this._precedence);
 
     return {
-      'PrefixExpression': {
-        operator: token.type,
-        right
-      }
+      type: 'PrefixExpression',
+      operator: token.type,
+      right
     };
   }
 
@@ -20,3 +19,5 @@ export default class PrefixOperatorParselet extends PrefixParselet {
     return this._precedence;
   }
 }
+
+export default PrefixOperatorParselet;

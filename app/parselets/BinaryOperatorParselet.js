@@ -10,11 +10,10 @@ export default class BinaryOperatorParselet extends InfixParselet {
     var right = parser.parseExpression(this._precedence - (this._isRight ? 1 : 0));
 
     return {
-      'OperatorExpression': {
-        left,
-        operator: token.type,
-        right
-      }
+      type: 'Operator',
+      left,
+      operator: token.type,
+      right
     };
   }
 

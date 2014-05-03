@@ -7,10 +7,9 @@ export default class PostfixOperatorParselet extends InfixParselet {
 
   parse (parser, left, token) {
     return {
-      'PostfixExpression': {
-        left,
-        operator: token.type
-      }
+      type: 'PostfixExpression',
+      operator: token.type,
+      left
     };
   }
 

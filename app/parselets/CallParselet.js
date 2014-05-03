@@ -7,19 +7,18 @@ export default class CallParselet extends InfixParselet {
     var args = [];
 
     // There may be no arguments at all.
-    if (!parser.match(TokenType.RIGHT_PAREN)) {
+    if (!parser.matchAndConsume(TokenType.RIGHT_PAREN)) {
       do {
         args.push(parser.parseExpression());
-      } while (parser.match(TokenType.COMMA));
+      } while (parser.matchAndConsume(TokenType.COMMA));
 
       parser.consume(TokenType.RIGHT_PAREN);
     }
 
     return {
-      'CallExpression': {
-        function: left,
-        args
-      }
+      type: 'Call',
+      name: left,
+      args
     };
   }
 

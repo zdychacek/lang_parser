@@ -1,4 +1,5 @@
 import InfixParselet from './InfixParselet';
+import { TokenType } from '../Lexer';
 import Precedence from '../Precedence';
 
 export default class ConditionalParselet extends InfixParselet {
@@ -8,11 +9,10 @@ export default class ConditionalParselet extends InfixParselet {
     var elseArm = parser.parseExpression(Precedence.CONDITIONAL - 1);
 
     return {
-      'ConditionalExpression': {
-        condition: left,
-        thenArm: thenArm,
-        elseArm: elseArm
-      }
+      type: 'Conditional',
+      condition: left,
+      thenArm: thenArm,
+      elseArm: elseArm
     };
   }
 

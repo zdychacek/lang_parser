@@ -1,6 +1,8 @@
 export var TokenType = {
   LEFT_PAREN: '(',
   RIGHT_PAREN: ')',
+  LEFT_CURLY: '{',
+  RIGHT_CURLY: '}',
   COMMA: ',',
   ASSIGN: '=',
   PLUS: '+',
@@ -12,10 +14,17 @@ export var TokenType = {
   BANG: '!',
   QUESTION: '?',
   COLON: ':',
+  SEMICOLON: ';',
   IDENTIFIER: '(identifier)',
   NUMBER: '(number)',
   STRING: '(string)',
+  KEYWORD: '(keyword)',
   EOF: '(eof)'
+};
+
+export var Keyword = {
+  IF: 'if',
+  ELSE: 'else'
 };
 
 export class Token {
@@ -53,13 +62,16 @@ export class Lexer {
     var token = this._scanOperator();
     if (token) return token;
 
+    token = this._scanString();
+    if (token) return token;
+
     token = this._scanNumber();
     if (token) return token;
 
     token = this._scanIdentifier();
     if (token) return token;
 
-    throw new SyntaxError('Unexpected token \'' + nextChar + '\'.');
+    throw new SyntaxError('Unexpected token \'' + this._peekNextChar() + '\'.');
   }
 
   peek () {
@@ -71,8 +83,68 @@ export class Lexer {
     return token;
   }
 
-  _scanString () {
+  dump () {
+    var dump = [];
+    var idx = this._index;
+    var token;
 
+    while (true) {
+      token = this.next();
+
+      if (token.type == TokenType.EOF) {
+        break;
+      }
+
+      dump.push(token);
+    }
+
+    this._index = idx;
+
+    return dump;
+  }
+
+  _isKeyword (identifier) {
+    for (let kw in Keyword) {
+      if (Keyword[kw] == identifier) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  _scanString () {
+    var str = null;
+    var char = this._peekNextChar();
+
+    if (char == '\'' || char == '"') {
+      let beginChar = char;
+
+      this._getNextChar();
+      char = this._peekNextChar();
+
+      if (char != beginChar) {
+        str = '';
+
+        do {
+          str += this._getNextChar();
+          char = this._peekNextChar();
+
+          if (!char) {
+            throw new SyntaxError('Unterminated string (misssing: ' + beginChar + ').');
+          }
+        } while (char != beginChar);
+
+        this._getNextChar();
+      }
+      else {
+        str = '';
+      }
+    }
+
+    if (str) {
+      return this._createToken(TokenType.STRING, str);
+    }
   }
 
   _scanNumber () {
@@ -99,27 +171,29 @@ export class Lexer {
       char = this._peekNextChar();
     }
 
-    char = this._peekNextChar();
-
-    // exponential notation
-    if (char == 'e' || char == 'E') {
-      number += this._getNextChar();
+    if (number) {
       char = this._peekNextChar();
 
-      if (this._isDigit(char) || char == '+' || char == '-') {
+      // exponential notation
+      if (char == 'e' || char == 'E') {
         number += this._getNextChar();
+        char = this._peekNextChar();
 
-        while (true) {
-          char = this._peekNextChar();
-
-          if (!this._isDigit(char)) {
-              break;
-          }
+        if (this._isDigit(char) || char == '+' || char == '-') {
           number += this._getNextChar();
+
+          while (true) {
+            char = this._peekNextChar();
+
+            if (!this._isDigit(char)) {
+                break;
+            }
+            number += this._getNextChar();
+          }
         }
-      }
-      else {
-        throw new SyntaxError('Unexpected character after the exponent sign.');
+        else {
+          throw new SyntaxError('Unexpected character after the exponent sign.');
+        }
       }
     }
 
@@ -158,7 +232,7 @@ export class Lexer {
     }
 
     if (identifier) {
-      return this._createToken(TokenType.IDENTIFIER, identifier);
+      return this._createToken(this._isKeyword(identifier)? TokenType.KEYWORD : TokenType.IDENTIFIER, identifier);
     }
   }
 
