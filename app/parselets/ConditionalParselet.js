@@ -4,15 +4,15 @@ import Precedence from '../Precedence';
 
 export default class ConditionalParselet extends InfixParselet {
   parse (parser, left, token) {
-    var thenArm = parser.parseExpression();
+    var consequent = parser.parseExpression();
     parser.consume(TokenType.COLON);
-    var elseArm = parser.parseExpression(Precedence.CONDITIONAL - 1);
+    var alternate = parser.parseExpression(Precedence.CONDITIONAL - 1);
 
     return {
-      type: 'Conditional',
-      condition: left,
-      thenArm: thenArm,
-      elseArm: elseArm
+      type: 'ConditionalExpression',
+      test: left,
+      consequent,
+      alternate
     };
   }
 
