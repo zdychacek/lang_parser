@@ -16,8 +16,7 @@ export var TokenType = {
   COLON: ':',
   SEMICOLON: ';',
   IDENTIFIER: '(identifier)',
-  NUMBER: '(number)',
-  STRING: '(string)',
+  LITERAL: '(literal)',
   KEYWORD: '(keyword)',
   EOF: '(eof)'
 };
@@ -44,7 +43,7 @@ export class Lexer {
     this._puctuators = [];
 
     for (let type in TokenType) {
-      if (TokenType.hasOwnProperty(type) && ['IDENTIFIER', 'NUMBER', 'STRING', 'EOF'].indexOf(type) == -1) {
+      if (TokenType.hasOwnProperty(type) && ['IDENTIFIER', 'LITERAL', 'KEYWORD', 'EOF'].indexOf(type) == -1) {
         this._puctuators.push(TokenType[type]);
       }
     }
@@ -143,7 +142,7 @@ export class Lexer {
     }
 
     if (str) {
-      return this._createToken(TokenType.STRING, str);
+      return this._createToken(TokenType.LITERAL, str);
     }
   }
 
@@ -202,7 +201,7 @@ export class Lexer {
     }
 
     if (number) {
-      return this._createToken(TokenType.NUMBER, parseFloat(number));
+      return this._createToken(TokenType.LITERAL, parseFloat(number));
     }
   }
 

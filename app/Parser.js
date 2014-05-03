@@ -74,13 +74,17 @@ export default class Parser {
 
     if (statementParselet) {
         this.consume();
+
         return statementParselet.parse(this);
     }
     else {
       let expr = this.parseExpression();
       this.consume(TokenType.SEMICOLON);
 
-      return expr;
+      return {
+        type: 'ExpressionStatement',
+        expression: expr
+      };
     }
   }
 
@@ -91,6 +95,13 @@ export default class Parser {
     this.consume(TokenType.LEFT_CURLY);
 
     return statementParselet.parse(this);
+  }
+
+  parseProgram () {
+    return {
+      type: 'Program',
+      body: this.parseStatements()
+    };
   }
 
   matchAndConsume (expected) {

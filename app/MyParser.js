@@ -4,8 +4,7 @@ import { TokenType, Keyword } from './Lexer';
 
 ///// Operators
 import IdentifierParselet from './parselets/IdentifierParselet';
-import NumberParselet from './parselets/NumberParselet';
-import StringParselet from './parselets/StringParselet';
+import LiteralParselet from './parselets/LiteralParselet';
 import AssignmentParselet from './parselets/AssignmentParselet';
 import ConditionalParselet from './parselets/ConditionalParselet';
 import GroupParselet from './parselets/GroupParselet';
@@ -24,8 +23,7 @@ export default class MyParser extends Parser {
     super(lexer);
 
     this.register(TokenType.IDENTIFIER, new IdentifierParselet());
-    this.register(TokenType.NUMBER,     new NumberParselet());
-    this.register(TokenType.STRING,     new StringParselet());
+    this.register(TokenType.LITERAL,    new LiteralParselet());
     this.register(TokenType.ASSIGN,     new AssignmentParselet());
     this.register(TokenType.QUESTION,   new ConditionalParselet());
     this.register(TokenType.LEFT_PAREN, new GroupParselet());

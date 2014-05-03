@@ -12,8 +12,7 @@ function _do () {
 
   var parser = new MyParser(lexer);
 
-  //ast = parser.parseExpression();
-  ast = parser.parseStatements();
+  ast = parser.parseProgram();
   preAST.innerHTML = JSON.stringify(ast, null, 3);
 }
 

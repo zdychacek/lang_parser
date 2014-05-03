@@ -10,7 +10,7 @@ export default class AssignmentParselet extends InfixParselet {
     }
 
     return {
-      type: 'Assignment',
+      type: 'AssignmentExpression',
       name: left.name,
       right
     };

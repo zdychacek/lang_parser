@@ -1,9 +1,9 @@
 import PrefixParselet from './PrefixParselet';
 
-export default class StringParselet extends PrefixParselet {
+export default class LiteralParselet extends PrefixParselet {
   parse (parser, token) {
     return {
-      type: 'String',
+      type: 'Literal',
       value: token.value
     };
   }
