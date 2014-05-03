@@ -92,7 +92,10 @@ export default class Parser {
 
     this.consume(TokenType.LEFT_CURLY);
 
-    return statementParselet.parse(this);
+    return {
+      type: 'BlockStatement',
+      body: statementParselet.parse(this)
+    };
   }
 
   parseProgram () {
