@@ -1,6 +1,6 @@
-import InfixParselet from './InfixParselet';
+import InfixExpression from './InfixExpression';
 
-export default class BinaryOperatorParselet extends InfixParselet {
+export default class BinaryOperatorExpression extends InfixExpression {
   constructor (precedence, isRight) {
     this._precedence = precedence;
     this._isRight = isRight;

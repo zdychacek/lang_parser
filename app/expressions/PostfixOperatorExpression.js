@@ -1,6 +1,6 @@
-import InfixParselet from './InfixParselet';
+import InfixExpression from './InfixExpression';
 
-export default class PostfixOperatorParselet extends InfixParselet {
+export default class PostfixOperatorExpression extends InfixExpression {
   constructor (precedence) {
     this._precedence = precedence;
   }

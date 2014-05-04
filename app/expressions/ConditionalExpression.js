@@ -1,8 +1,8 @@
-import InfixParselet from './InfixParselet';
+import InfixExpression from './InfixExpression';
 import { TokenType } from '../Lexer';
 import Precedence from '../Precedence';
 
-export default class ConditionalParselet extends InfixParselet {
+export default class ConditionalExpression extends InfixExpression {
   parse (parser, left, token) {
     var consequent = parser.parseExpression();
     parser.consume(TokenType.COLON);

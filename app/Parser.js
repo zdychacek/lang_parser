@@ -1,32 +1,35 @@
 import { TokenType } from './Lexer';
-import PrefixParselet from './parselets/PrefixParselet';
-import Statement from './statements/Statement';
 
 export default class Parser {
 
   constructor (lexer) {
     this._lexer = lexer;
-    this._prefixParselets = new Map();
-    this._infixParselets = new Map();
-    this._statementsParselets = new Map();
+    this._prefixExpressions = new Map();
+    this._infixExpressions = new Map();
+    this._statements = new Map();
   }
 
-  register (token, parselet) {
-    if (parselet instanceof PrefixParselet) {
-      this._prefixParselets.set(token, parselet);
-    }
-    else {
-      this._infixParselets.set(token, parselet);
-    }
+  registerPrefix (token, expression) {
+    this._prefixExpressions.set(token, expression);
   }
 
-  registerStatement (token, statementParselet) {
-    this._statementsParselets.set(token, statementParselet);
+  registerInfix (token, expression) {
+    this._infixExpressions.set(token, expression);
+  }
+
+  registerStatement (token, statementExpression) {
+    this._statements.set(token, statementExpression);
   }
 
   parseExpression (precedence = 0) {
     var token = this.consume();
-    var prefix = this._prefixParselets.get(token.type);
+    var key = token.type;
+
+    if (key == TokenType.KEYWORD) {
+      key = token.value;
+    }
+
+    var prefix = this._prefixExpressions.get(key);
 
     if (token.type == TokenType.EOF) {
       token.error('Unexpected end of file.', false);
@@ -41,7 +44,7 @@ export default class Parser {
     while (precedence < this.getPrecedence()) {
       token = this.consume();
 
-      var infix = this._infixParselets.get(token.type);
+      var infix = this._infixExpressions.get(token.type);
 
       left = infix.parse(this, left, token);
     }
@@ -69,12 +72,12 @@ export default class Parser {
 
   parseStatement () {
     var token = this.peek();
-    var statementParselet = this._statementsParselets.get(token.value);
+    var statementExpression = this._statements.get(token.value);
 
-    if (statementParselet) {
+    if (statementExpression) {
         let statementToken = this.consume();
 
-        return statementParselet.parse(this, statementToken);
+        return statementExpression.parse(this, statementToken);
     }
     else {
       let expr = this.parseExpression();
@@ -89,13 +92,13 @@ export default class Parser {
 
   parseBlock () {
     var token = this.peek();
-    var statementParselet = this._statementsParselets.get(token.value);
+    var statementExpression = this._statements.get(token.value);
 
     this.consume(TokenType.LEFT_CURLY);
 
     return {
       type: 'BlockStatement',
-      body: statementParselet.parse(this)
+      body: statementExpression.parse(this)
     };
   }
 
@@ -142,7 +145,7 @@ export default class Parser {
 
   getPrecedence () {
     var next = this.peek();
-    var parser = this._infixParselets.get(next.type);
+    var parser = this._infixExpressions.get(next.type);
 
     if (parser) {
       return parser.getPrecedence();

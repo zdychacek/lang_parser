@@ -1,8 +1,8 @@
-import InfixParselet from './InfixParselet';
+import InfixExpression from './InfixExpression';
 import Precedence from '../Precedence';
 import { TokenType } from '../Lexer';
 
-export default class CallParselet extends InfixParselet {
+export default class CallExpression extends InfixExpression {
   parse (parser, left, token) {
     var args = [];
 

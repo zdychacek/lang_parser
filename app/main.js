@@ -6,14 +6,17 @@ var btnDo = document.getElementById('do');
 var preTokens = document.getElementById('tokens');
 var preAST = document.getElementById('ast');
 
-function _do () {
-  var lexer = new Lexer(sourceInput.value);
-  //console.log(lexer.dump());return;
+var lexer = new Lexer();
+var parser = new MyParser(lexer);
 
-  var parser = new MyParser(lexer);
+function _do () {
+  lexer.source = sourceInput.value;
+  //console.log(lexer.dump());return;
 
   ast = parser.parseProgram();
   preAST.innerHTML = JSON.stringify(ast, null, 3);
 }
 
 btnDo.addEventListener('click', _do, false);
+
+_do();

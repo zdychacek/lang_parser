@@ -40,7 +40,8 @@ export var Keyword = {
   IF: 'if',
   ELSE: 'else',
   VAR: 'var',
-  LET: 'let'
+  LET: 'let',
+  FUNCTION: 'function'
 };
 
 export class Token {
@@ -58,10 +59,8 @@ export class Token {
 }
 
 export class Lexer {
-  constructor (text) {
-    this._index = 0;
-    this._text = text;
-    this._marker = 0;
+  constructor (text = '') {
+    this.source = text;
   }
 
   next () {
@@ -95,6 +94,20 @@ export class Lexer {
     this._index = idx;
 
     return token;
+  }
+
+  reset () {
+    this._index = 0;
+    this._marker = 0;
+  }
+
+  set source (src) {
+    this.reset();
+    this._text = src;
+  }
+
+  get source () {
+    return this._text;
   }
 
   dump () {

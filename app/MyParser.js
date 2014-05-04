@@ -3,15 +3,16 @@ import Precedence from './Precedence';
 import { TokenType, Keyword } from './Lexer';
 
 ///// Operators
-import IdentifierParselet from './parselets/IdentifierParselet';
-import LiteralParselet from './parselets/LiteralParselet';
-import AssignmentParselet from './parselets/AssignmentParselet';
-import ConditionalParselet from './parselets/ConditionalParselet';
-import GroupParselet from './parselets/GroupParselet';
-import CallParselet from './parselets/CallParselet';
-import PrefixOperatorParselet from './parselets/PrefixOperatorParselet';
-import PostfixOperatorParselet from './parselets/PostfixOperatorParselet';
-import BinaryOperatorParselet from './parselets/BinaryOperatorParselet';
+import IdentifierExpression from './expressions/IdentifierExpression';
+import LiteralExpression from './expressions/LiteralExpression';
+import AssignmentExpression from './expressions/AssignmentExpression';
+import ConditionalExpression from './expressions/ConditionalExpression';
+import GroupExpression from './expressions/GroupExpression';
+import CallExpression from './expressions/CallExpression';
+import PrefixOperatorExpression from './expressions/PrefixOperatorExpression';
+import PostfixOperatorExpression from './expressions/PostfixOperatorExpression';
+import BinaryOperatorExpression from './expressions/BinaryOperatorExpression';
+import FunctionExpression from './expressions/FunctionExpression';
 
 ///// Statements
 import Statement from './statements/Statement';
@@ -23,12 +24,15 @@ export default class MyParser extends Parser {
   constructor (lexer) {
     super(lexer);
 
-    this.register(TokenType.IDENTIFIER, new IdentifierParselet());
-    this.register(TokenType.LITERAL, new LiteralParselet());
-    this.register(TokenType.QUESTION, new ConditionalParselet());
-    this.register(TokenType.LEFT_PAREN, new GroupParselet());
-    this.register(TokenType.LEFT_PAREN, new CallParselet());
+    this.registerPrefix(TokenType.IDENTIFIER, new IdentifierExpression());
+    this.registerPrefix(TokenType.LITERAL, new LiteralExpression());
+    this.registerPrefix(TokenType.LEFT_PAREN, new GroupExpression());
+    this.registerPrefix(Keyword.FUNCTION, new FunctionExpression());
 
+    this.registerInfix(TokenType.QUESTION, new ConditionalExpression());
+    this.registerInfix(TokenType.LEFT_PAREN, new CallExpression());
+
+    // assignments
     [
       TokenType.ASSIGN,
       TokenType.PLUS_ASSIGN,
@@ -37,35 +41,35 @@ export default class MyParser extends Parser {
       TokenType.SLASH_ASSIGN,
       TokenType.CARET_ASSIGN
     ].forEach(function (tokenType) {
-      this.register(tokenType, new AssignmentParselet())
+      this.registerInfix(tokenType, new AssignmentExpression())
     }, this);
 
-    this.prefix(TokenType.PLUS, Precedence.PREFIX);
-    this.prefix(TokenType.MINUS, Precedence.PREFIX);
-    this.prefix(TokenType.TILDE, Precedence.PREFIX);
-    this.prefix(TokenType.BANG, Precedence.PREFIX);
+    this.registerPrefixGeneric(TokenType.PLUS, Precedence.PREFIX);
+    this.registerPrefixGeneric(TokenType.MINUS, Precedence.PREFIX);
+    this.registerPrefixGeneric(TokenType.TILDE, Precedence.PREFIX);
+    this.registerPrefixGeneric(TokenType.BANG, Precedence.PREFIX);
 
-    this.postfix(TokenType.BANG, Precedence.POSTFIX);
+    this.registerPostfixGeneric(TokenType.BANG, Precedence.POSTFIX);
 
-    this.infixLeft(TokenType.PLUS, Precedence.SUM);
-    this.infixLeft(TokenType.MINUS, Precedence.SUM);
-    this.infixLeft(TokenType.ASTERISK, Precedence.PRODUCT);
-    this.infixLeft(TokenType.SLASH, Precedence.PRODUCT);
+    this.registerInfixLeftGeneric(TokenType.PLUS, Precedence.SUM);
+    this.registerInfixLeftGeneric(TokenType.MINUS, Precedence.SUM);
+    this.registerInfixLeftGeneric(TokenType.ASTERISK, Precedence.PRODUCT);
+    this.registerInfixLeftGeneric(TokenType.SLASH, Precedence.PRODUCT);
 
     // relational
-    this.infixLeft(TokenType.EQUAL, Precedence.RELATION);
-    this.infixLeft(TokenType.NOT_EQUAL, Precedence.RELATION);
-    this.infixLeft(TokenType.GREATER, Precedence.RELATION);
-    this.infixLeft(TokenType.LESS, Precedence.RELATION);
-    this.infixLeft(TokenType.GREATER_OR_EQUAL, Precedence.RELATION);
-    this.infixLeft(TokenType.LESS_OR_EQUAL, Precedence.RELATION);
+    this.registerInfixLeftGeneric(TokenType.EQUAL, Precedence.RELATION);
+    this.registerInfixLeftGeneric(TokenType.NOT_EQUAL, Precedence.RELATION);
+    this.registerInfixLeftGeneric(TokenType.GREATER, Precedence.RELATION);
+    this.registerInfixLeftGeneric(TokenType.LESS, Precedence.RELATION);
+    this.registerInfixLeftGeneric(TokenType.GREATER_OR_EQUAL, Precedence.RELATION);
+    this.registerInfixLeftGeneric(TokenType.LESS_OR_EQUAL, Precedence.RELATION);
 
     // logical
-    this.infixLeft(TokenType.LOGICAL_AND, Precedence.LOGICAL_AND);
-    this.infixLeft(TokenType.LOGICAL_OR, Precedence.LOGICAL_OR);
+    this.registerInfixLeftGeneric(TokenType.LOGICAL_AND, Precedence.LOGICAL_AND);
+    this.registerInfixLeftGeneric(TokenType.LOGICAL_OR, Precedence.LOGICAL_OR);
 
     // right associativity
-    this.infixRight(TokenType.CARET, Precedence.EXPONENT);
+    this.registerInfixRightGeneric(TokenType.CARET, Precedence.EXPONENT);
 
     // statements
     this.registerStatement(Keyword.IF, new IfStatement());
@@ -74,19 +78,19 @@ export default class MyParser extends Parser {
     this.registerStatement(TokenType.LEFT_CURLY, new LeftCurlyStatement());
   }
 
-  postfix (token, precedence) {
-    this.register(token, new PostfixOperatorParselet(precedence));
+  registerPostfixGeneric (token, precedence) {
+    this.registerInfix(token, new PostfixOperatorExpression(precedence));
   }
 
-  prefix (token, precedence) {
-    this.register(token, new PrefixOperatorParselet(precedence));
+  registerPrefixGeneric (token, precedence) {
+    this.registerPrefix(token, new PrefixOperatorExpression(precedence));
   }
 
-  infixLeft (token, precedence) {
-    this.register(token, new BinaryOperatorParselet(precedence, false));
+  registerInfixLeftGeneric (token, precedence) {
+    this.registerInfix(token, new BinaryOperatorExpression(precedence, false));
   }
 
-  infixRight (token, precedence) {
-    this.register(token, new BinaryOperatorParselet(precedence, true));
+  registerInfixRightGeneric (token, precedence) {
+    this.registerInfix(token, new BinaryOperatorExpression(precedence, true));
   }
 }

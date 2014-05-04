@@ -1,6 +1,6 @@
-import PrefixParselet from './PrefixParselet';
+import PrefixExpression from './PrefixExpression';
 
-class PrefixOperatorParselet extends PrefixParselet {
+class PrefixOperatorExpression extends PrefixExpression {
   constructor (precedence) {
     this._precedence = precedence;
   }
@@ -20,4 +20,4 @@ class PrefixOperatorParselet extends PrefixParselet {
   }
 }
 
-export default PrefixOperatorParselet;
+export default PrefixOperatorExpression;
