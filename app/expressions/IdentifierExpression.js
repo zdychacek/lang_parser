@@ -7,8 +7,4 @@ export default class IdentifierExpression extends PrefixExpression {
       name: token.value
     };
   }
-
-  static parse (parser, token) {
-    return new this().parse(parser, token);
-  }
 }

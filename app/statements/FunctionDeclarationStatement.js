@@ -4,23 +4,24 @@ import { TokenType, Keyword } from '../Lexer';
 
 class FunctionDeclarationStatement extends Statement {
   parse (parser, token) {
-    var id = parser.consume(TokenType.IDENTIFIER);
+    //
+    var tokenId = parser.consume(TokenType.IDENTIFIER);
     var params = [];
     var body;
 
-    id = IdentifierExpression.parse(parser, id);
+    var id = IdentifierExpression.parse(parser, tokenId);
 
     parser.consume(TokenType.LEFT_PAREN);
 
     if (!parser.match(TokenType.RIGHT_PAREN)) {
       while (true) {
-        let param = parser.consume();
+        let paramToken = parser.consume();
 
-        if (param.type != TokenType.IDENTIFIER) {
+        if (paramToken.type != TokenType.IDENTIFIER) {
           throw new SyntaxError('Unexpected token ILLEGAL.');
         }
 
-        params.push(IdentifierExpression.parse(parser, param));
+        params.push(IdentifierExpression.parse(parser, paramToken));
 
         if (!parser.match(TokenType.COMMA)) {
           break;
@@ -33,6 +34,11 @@ class FunctionDeclarationStatement extends Statement {
     parser.consume(TokenType.RIGHT_PAREN);
 
     body = parser.parseBlock();
+
+    // optional semicolon after function declaration
+    if (parser.match(TokenType.SEMICOLON)) {
+      parser.consume(TokenType.SEMICOLON);
+    }
 
     return {
       type: 'FunctionDeclaration',

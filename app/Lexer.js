@@ -30,10 +30,10 @@ export var TokenType = {
   QUESTION: '?',
   COLON: ':',
   SEMICOLON: ';',
-  IDENTIFIER: 'Identifier',
-  LITERAL: 'Literal',
-  KEYWORD: 'Keyword',
-  EOF: 'EOF'
+  IDENTIFIER: '(identifier)',
+  LITERAL: '(literal)',
+  KEYWORD: '(keyword)',
+  EOF: '(EOF)'
 };
 
 export var Keyword = {
@@ -158,7 +158,7 @@ export class Lexer {
           char = this._peekNextChar();
 
           if (!char) {
-            throw new SyntaxError('Unterminated string (misssing: ' + beginChar + ').');
+            throw new SyntaxError('Unterminated string.');
           }
         } while (char != beginChar);
 

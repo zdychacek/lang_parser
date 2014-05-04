@@ -132,7 +132,7 @@ export default class Parser {
       var token = this.peek();
 
       if (token.type != expected && token.value != expected) {
-        token.error(`Expected token "${expected}".`);
+        token.error(`Unexpected token ${token.value}, got ${expected}.`, false);
       }
     }
 

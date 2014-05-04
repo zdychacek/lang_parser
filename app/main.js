@@ -9,14 +9,25 @@ var preAST = document.getElementById('ast');
 var lexer = new Lexer();
 var parser = new MyParser(lexer);
 
+sourceInput.value =
+
+`var fn = function (a,b,c) {
+  a = '';
+};`;
+
 function _do () {
   lexer.source = sourceInput.value;
-  //console.log(lexer.dump());return;
 
-  ast = parser.parseProgram();
-  preAST.innerHTML = JSON.stringify(ast, null, 3);
+  try {
+    ast = parser.parseProgram();
+    preAST.innerHTML = JSON.stringify(ast, null, 3);
+  }
+  catch (ex) {
+    preAST.innerHTML = ex.message;
+    console.log(ex);
+  }
 }
 
-btnDo.addEventListener('click', _do, false);
+sourceInput.addEventListener('keyup', _do, false);
 
 _do();

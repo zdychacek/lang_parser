@@ -6,8 +6,8 @@ export default class AssignmentExpression extends InfixExpression {
   parse (parser, left, token) {
     var right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
-    if (left.type != TokenType.IDENTIFIER) {
-      left.error('The left-hand side of an assignment must be an identifier.');
+    if (left.type != 'Identifier') {
+      throw new Error('The left-hand side of an assignment must be an identifier.');
     }
 
     return {
