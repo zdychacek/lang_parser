@@ -1,5 +1,5 @@
 import Statement from './Statement';
-import IdentifierParselet from '../parselets/IdentifierParselet';
+import IdentifierExpression from '../expressions/IdentifierExpression';
 import { TokenType, Keyword } from '../Lexer';
 
 class DeclarationStatement extends Statement {
@@ -36,7 +36,7 @@ class DeclarationStatement extends Statement {
   }
 
   _makeDeclarator (parser, id, init) {
-    id = new IdentifierParselet().parse(parser, id);
+    id = IdentifierExpression.parse(parser, id);
 
     return {
       type: 'VariableDeclarator',

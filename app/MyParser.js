@@ -19,6 +19,7 @@ import Statement from './statements/Statement';
 import IfStatement from './statements/IfStatement';
 import LeftCurlyStatement from './statements/LeftCurlyStatement';
 import DeclarationStatement from './statements/DeclarationStatement';
+import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -72,10 +73,11 @@ export default class MyParser extends Parser {
     this.registerInfixRightGeneric(TokenType.CARET, Precedence.EXPONENT);
 
     // statements
+    this.registerStatement(TokenType.LEFT_CURLY, new LeftCurlyStatement());
     this.registerStatement(Keyword.IF, new IfStatement());
     this.registerStatement(Keyword.VAR, new DeclarationStatement());
     this.registerStatement(Keyword.LET, new DeclarationStatement());
-    this.registerStatement(TokenType.LEFT_CURLY, new LeftCurlyStatement());
+    this.registerStatement(Keyword.FUNCTION, new FunctionDeclarationStatement());
   }
 
   registerPostfixGeneric (token, precedence) {

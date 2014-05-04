@@ -3,7 +3,7 @@ export default class InfixExpression {
     throw new Error('Not implemented.');
   }
 
-  getPrecedence () {
+  get precedence () {
     throw new Error('Not implemented.');
   }
 }

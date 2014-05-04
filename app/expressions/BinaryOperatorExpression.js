@@ -17,7 +17,7 @@ export default class BinaryOperatorExpression extends InfixExpression {
     };
   }
 
-  getPrecedence () {
+  get precedence () {
     return this._precedence;
   }
 }

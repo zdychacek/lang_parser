@@ -145,10 +145,10 @@ export default class Parser {
 
   getPrecedence () {
     var next = this.peek();
-    var parser = this._infixExpressions.get(next.type);
+    var exprParser = this._infixExpressions.get(next.type);
 
-    if (parser) {
-      return parser.getPrecedence();
+    if (exprParser) {
+      return exprParser.precedence;
     }
     else {
       return 0;

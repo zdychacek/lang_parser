@@ -146,9 +146,8 @@ export class Lexer {
     var char = this._peekNextChar();
 
     if (char == '\'' || char == '"') {
-      let beginChar = char;
+      let beginChar = this._getNextChar();
 
-      this._getNextChar();
       char = this._peekNextChar();
 
       if (char != beginChar) {
@@ -167,10 +166,12 @@ export class Lexer {
       }
       else {
         str = '';
+
+        this._getNextChar();
       }
     }
 
-    if (str) {
+    if (str !== null) {
       return this._createToken(TokenType.LITERAL, str);
     }
   }

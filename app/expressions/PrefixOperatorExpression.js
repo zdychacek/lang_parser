@@ -15,7 +15,7 @@ class PrefixOperatorExpression extends PrefixExpression {
     };
   }
 
-  getPrecedence () {
+  get precedence () {
     return this._precedence;
   }
 }

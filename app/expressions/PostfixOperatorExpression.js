@@ -13,7 +13,7 @@ export default class PostfixOperatorExpression extends InfixExpression {
     };
   }
 
-  getPrecedence () {
+  get precedence () {
     return this._precedence;
   }
 }

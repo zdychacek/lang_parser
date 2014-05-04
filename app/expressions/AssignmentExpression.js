@@ -18,7 +18,7 @@ export default class AssignmentExpression extends InfixExpression {
     };
   }
 
-  getPrecedence () {
+  get precedence () {
     return Precedence.ASSIGNMENT;
   }
 }

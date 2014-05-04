@@ -6,7 +6,6 @@ export default class CallExpression extends InfixExpression {
   parse (parser, left, token) {
     var args = [];
 
-    // There may be no arguments at all.
     if (!parser.matchAndConsume(TokenType.RIGHT_PAREN)) {
       do {
         args.push(parser.parseExpression());
@@ -22,7 +21,7 @@ export default class CallExpression extends InfixExpression {
     };
   }
 
-  getPrecedence () {
+  get precedence () {
     return Precedence.CALL;
   }
 }

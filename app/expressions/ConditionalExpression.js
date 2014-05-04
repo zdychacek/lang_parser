@@ -16,7 +16,7 @@ export default class ConditionalExpression extends InfixExpression {
     };
   }
 
-  getPrecedence () {
+  get precedence () {
     return Precedence.CONDITIONAL;
   }
 }
