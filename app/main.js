@@ -12,7 +12,9 @@ var parser = new MyParser(lexer);
 sourceInput.value =
 
 `var fn = function (a,b,c) {
-  a = '';
+  a = 'ahoj';
+
+  return a;
 };`;
 
 function _do () {

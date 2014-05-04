@@ -2,7 +2,7 @@ import Parser from './Parser';
 import Precedence from './Precedence';
 import { TokenType, Keyword } from './Lexer';
 
-///// Operators
+///// Expressions
 import IdentifierExpression from './expressions/IdentifierExpression';
 import LiteralExpression from './expressions/LiteralExpression';
 import AssignmentExpression from './expressions/AssignmentExpression';
@@ -20,6 +20,7 @@ import IfStatement from './statements/IfStatement';
 import LeftCurlyStatement from './statements/LeftCurlyStatement';
 import DeclarationStatement from './statements/DeclarationStatement';
 import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
+import ReturnStatement from './statements/ReturnStatement';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -78,6 +79,7 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.VAR, new DeclarationStatement());
     this.registerStatement(Keyword.LET, new DeclarationStatement());
     this.registerStatement(Keyword.FUNCTION, new FunctionDeclarationStatement());
+    this.registerStatement(Keyword.RETURN, new ReturnStatement());
   }
 
   registerPostfixGeneric (token, precedence) {

@@ -41,7 +41,8 @@ export var Keyword = {
   ELSE: 'else',
   VAR: 'var',
   LET: 'let',
-  FUNCTION: 'function'
+  FUNCTION: 'function',
+  RETURN: 'return'
 };
 
 export class Token {
