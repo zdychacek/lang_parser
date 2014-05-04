@@ -11,10 +11,25 @@ var parser = new MyParser(lexer);
 
 sourceInput.value =
 
-`var fn = function (a,b,c) {
-  a = 'ahoj';
+`var b = 5;
 
-  return a;
+var fn = function (a,b,c) {
+  let a = 'ahoj';
+
+  b += 14 + 28 * 3;
+
+  var a = 1 + 2, b = 3;
+
+  let c = 'ahoj';
+
+  if (a == 28) {
+    a = 14;
+
+    b += a;
+  }
+  else f(a >= 5 && b < 12);
+
+  return b || a && 28;
 };`;
 
 function _do () {
