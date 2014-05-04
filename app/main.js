@@ -22,7 +22,7 @@ function _do () {
 
   try {
     ast = parser.parseProgram();
-    preAST.innerHTML = JSON.stringify(ast, null, 3);
+    $(preAST).JSONView(ast);
   }
   catch (ex) {
     preAST.innerHTML = ex.message;
