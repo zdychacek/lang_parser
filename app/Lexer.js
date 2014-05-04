@@ -17,6 +17,8 @@ export var TokenType = {
   LESS: '<',
   LESS_OR_EQUAL: '<=',
   LOGICAL_AND: '&&',
+  AMPERSAND: '&',
+  PIPE: '|',
   LOGICAL_OR: '||',
   PLUS: '+',
   MINUS: '-',
@@ -28,23 +30,30 @@ export var TokenType = {
   QUESTION: '?',
   COLON: ':',
   SEMICOLON: ';',
-  IDENTIFIER: '(identifier)',
-  LITERAL: '(literal)',
-  KEYWORD: '(keyword)',
-  EOF: '(eof)'
+  IDENTIFIER: 'Identifier',
+  LITERAL: 'Literal',
+  KEYWORD: 'Keyword',
+  EOF: 'EOF'
 };
 
 export var Keyword = {
   IF: 'if',
-  ELSE: 'else'
+  ELSE: 'else',
+  VAR: 'var',
+  LET: 'let'
 };
 
 export class Token {
+
   constructor ({ type, value, start, end }) {
     this.type = type;
     this.value = value;
     this.start = start;
     this.end = end;
+  }
+
+  error (msg, printInfo = true) {
+    throw new SyntaxError(msg + (printInfo? ` (value: "${this.value}", start: ${this.start}, end: ${this.end})` : ''));
   }
 }
 
@@ -61,7 +70,7 @@ export class Lexer {
     this._marker = this._index;
 
     if (this._index >= this._text.length) {
-      return this._createToken(TokenType.EOF, '');
+      return this._createToken(TokenType.EOF, TokenType.EOF);
     }
 
     var token = this._scanOperator();
@@ -217,8 +226,9 @@ export class Lexer {
     var operator = '';
 
     switch (nextToken) {
-      case '&':
-      case '|':
+      case TokenType.AMPERSAND:
+      case TokenType.PIPE:
+
         // & and | can only be duplicated
         prevToken = nextToken;
         operator = this._getNextChar();
@@ -229,11 +239,11 @@ export class Lexer {
         }
 
         break;
-      case '+':
-      case '-':
-      case '=':
-      case '<':
-      case '>':
+      case TokenType.PLUS:
+      case TokenType.MINUS:
+      case TokenType.ASSIGN:
+      case TokenType.LESS:
+      case TokenType.GREATER:
         // these can be combined with itself or with equal sign
         prevToken = nextToken;
         operator = this._getNextChar();
@@ -244,10 +254,10 @@ export class Lexer {
         }
 
         break;
-      case '*':
-      case '/':
-      case '^':
-      case '!':
+      case TokenType.ASTERISK:
+      case TokenType.SLASH:
+      case TokenType.CARET:
+      case TokenType.BANG:
         // these be combined only with equal sign
         operator = this._getNextChar();
         nextToken = this._peekNextChar();
@@ -257,14 +267,15 @@ export class Lexer {
         }
 
         break;
-      case '?':
-      case '~':
-      case ':':
-      case ';':
-      case '(':
-      case ')':
-      case '{':
-      case '}':
+      case TokenType.QUESTION:
+      case TokenType.TILDE:
+      case TokenType.COLON:
+      case TokenType.SEMICOLON:
+      case TokenType.LEFT_PAREN:
+      case TokenType.RIGHT_PAREN:
+      case TokenType.LEFT_CURLY:
+      case TokenType.RIGHT_CURLY:
+      case TokenType.COMMA:
         // one char operators
         operator += this._getNextChar();
         break;

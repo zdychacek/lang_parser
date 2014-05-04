@@ -17,6 +17,7 @@ import BinaryOperatorParselet from './parselets/BinaryOperatorParselet';
 import Statement from './statements/Statement';
 import IfStatement from './statements/IfStatement';
 import LeftCurlyStatement from './statements/LeftCurlyStatement';
+import DeclarationStatement from './statements/DeclarationStatement';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -68,6 +69,8 @@ export default class MyParser extends Parser {
 
     // statements
     this.registerStatement(Keyword.IF, new IfStatement());
+    this.registerStatement(Keyword.VAR, new DeclarationStatement());
+    this.registerStatement(Keyword.LET, new DeclarationStatement());
     this.registerStatement(TokenType.LEFT_CURLY, new LeftCurlyStatement());
   }
 
@@ -85,9 +88,5 @@ export default class MyParser extends Parser {
 
   infixRight (token, precedence) {
     this.register(token, new BinaryOperatorParselet(precedence, true));
-  }
-
-  stmt (token, statementParselet) {
-    this.registerStatement(token, statementParselet);
   }
 }

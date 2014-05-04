@@ -3,6 +3,7 @@ import PrefixParselet from './parselets/PrefixParselet';
 import Statement from './statements/Statement';
 
 export default class Parser {
+
   constructor (lexer) {
     this._lexer = lexer;
     this._prefixParselets = new Map();
@@ -28,11 +29,11 @@ export default class Parser {
     var prefix = this._prefixParselets.get(token.type);
 
     if (token.type == TokenType.EOF) {
-      throw new SyntaxError('Unexpected end of file.');
+      token.error('Unexpected end of file.', false);
     }
 
     if (prefix == null) {
-      throw new SyntaxError('Could not parse \'' + token.value + '\'.');
+      token.error('Could not parse.');
     }
 
     var left = prefix.parse(this, token);
@@ -71,9 +72,9 @@ export default class Parser {
     var statementParselet = this._statementsParselets.get(token.value);
 
     if (statementParselet) {
-        this.consume();
+        let statementToken = this.consume();
 
-        return statementParselet.parse(this);
+        return statementParselet.parse(this, statementToken);
     }
     else {
       let expr = this.parseExpression();
@@ -128,7 +129,7 @@ export default class Parser {
       var token = this.peek();
 
       if (token.type != expected && token.value != expected) {
-        throw new SyntaxError('Expected token ' + expected + ' and found ' + token.type);
+        token.error(`Expected token "${expected}".`);
       }
     }
 

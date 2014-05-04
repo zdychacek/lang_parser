@@ -48,7 +48,7 @@ gulp.task('build', function() {
 
 gulp.task('serve', function() {
   return connect.server({
-    root: [ __dirname ],
+    root: __dirname,
     port: 8000,
     livereload: true
   });
@@ -60,7 +60,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('watch', function() {
-  return gulp.watch(srcFolder + '/*.js', ['scripts']);
+  return gulp.watch(srcFolder + '/**/*.js', ['scripts']);
 });
 
 gulp.task('default', ['scripts', 'serve', 'watch']);
