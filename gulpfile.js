@@ -1,19 +1,12 @@
 var gulp = require('gulp');
-var http = require('http');
-var ecstatic = require('ecstatic');
 var traceur = require('gulp-traceur');
 var rjs = require('gulp-requirejs');
 var uglify = require('gulp-uglify');
-var refresh = require('gulp-livereload');
 var clean = require('gulp-clean');
 var gutil = require('gulp-util');
 var plumber = require('gulp-plumber');
 var changed = require('gulp-changed');
-var lr = require('tiny-lr');
-var lrserver = lr();
-
-var livereloadport = 35729;
-var serverport = 8000;
+var connect = require('gulp-connect');
 
 var srcFolder = 'app';
 var distFolder = 'dist';
@@ -36,38 +29,38 @@ gulp.task('scripts', function() {
       })
     )
     .pipe(gulp.dest(distFolder))
-    .pipe(refresh(lrserver));
+    .pipe(connect.reload());
 });
 
 gulp.task('build', function() {
-    rjs({
-      baseUrl: '.',
-      out: distFolder + '/all.min.js',
-      name: srcFolder + '/main',
-      paths: {
-        app: 'dist'
-      }
-    })
-    .pipe(uglify())
-    .pipe(gulp.dest('.'))
-    .pipe(refresh(lrserver));
+  return rjs({
+    baseUrl: '.',
+    out: distFolder + '/all.min.js',
+    name: srcFolder + '/main',
+    paths: {
+      app: 'dist'
+    }
+  })
+  .pipe(uglify())
+  .pipe(gulp.dest('.'))
+  .pipe(connect.reload());
 });
 
 gulp.task('serve', function() {
-  http.createServer(ecstatic({
-    root: __dirname,
-    cache: -1
-  })).listen(serverport);
-  lrserver.listen(livereloadport);
+  return connect.server({
+    root: [ __dirname ],
+    port: 8000,
+    livereload: true
+  });
 });
 
 gulp.task('clean', function() {
-  gulp.src(distFolder, {force: true})
+  return gulp.src(distFolder, {force: true})
     .pipe(clean());
 });
 
 gulp.task('watch', function() {
-  gulp.watch(srcFolder + '/*.js', ['scripts']);
+  return gulp.watch(srcFolder + '/*.js', ['scripts']);
 });
 
 gulp.task('default', ['scripts', 'serve', 'watch']);
