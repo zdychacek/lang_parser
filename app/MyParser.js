@@ -1,37 +1,35 @@
 import Parser from './Parser';
-import Precedence from './Precedence';
 import { TokenType, Keyword, Punctuator, Precedence } from './Lexer';
 
 ///// Expressions
-import IdentifierExpression from './expressions/IdentifierExpression';
-import LiteralExpression from './expressions/LiteralExpression';
-import AssignmentExpression from './expressions/AssignmentExpression';
-import ConditionalExpression from './expressions/ConditionalExpression';
-import GroupExpression from './expressions/GroupExpression';
-import CallExpression from './expressions/CallExpression';
-import PrefixOperatorExpression from './expressions/PrefixOperatorExpression';
-import PostfixOperatorExpression from './expressions/PostfixOperatorExpression';
-import BinaryOperatorExpression from './expressions/BinaryOperatorExpression';
-import FunctionExpression from './expressions/FunctionExpression';
+import IdentifierExpressionParser from './expressions/parsers/IdentifierExpressionParser';
+import LiteralExpression from './expressions/parsers/LiteralExpression';
+import AssignmentExpressionParser from './expressions/parsers/AssignmentExpressionParser';
+import ConditionalExpressionParser from './expressions/parsers/ConditionalExpressionParser';
+import GroupExpressionParser from './expressions/parsers/GroupExpressionParser';
+import CallExpression from './expressions/parsers/CallExpression';
+import PrefixOperatorExpressionParser from './expressions/parsers/PrefixOperatorExpressionParser';
+import PostfixOperatorExpressionParser from './expressions/parsers/PostfixOperatorExpressionParser';
+import BinaryOperatorExpressionParser from './expressions/parsers/BinaryOperatorExpressionParser';
+import FunctionExpressionParser from './expressions/parsers/FunctionExpressionParser';
 
 ///// Statements
-import Statement from './statements/Statement';
-import IfStatement from './statements/IfStatement';
-import LeftCurlyStatement from './statements/LeftCurlyStatement';
-import DeclarationStatement from './statements/DeclarationStatement';
-import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
-import ReturnStatement from './statements/ReturnStatement';
+import IfStatementParser from './statements/parsers/IfStatementParser';
+import LeftCurlyStatementParser from './statements/parsers/LeftCurlyStatementParser';
+import DeclarationStatementParser from './statements/parsers/DeclarationStatementParser';
+import FunctionDeclarationStatementParser from './statements/parsers/FunctionDeclarationStatementParser';
+import ReturnStatementParser from './statements/parsers/ReturnStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
     super(lexer);
 
-    this.registerPrefix(TokenType.Identifier, new IdentifierExpression());
+    this.registerPrefix(TokenType.Identifier, new IdentifierExpressionParser());
     this.registerPrefix(TokenType.Literal, new LiteralExpression());
-    this.registerPrefix(Punctuator.LeftParen, new GroupExpression());
-    this.registerPrefix(Keyword.Function, new FunctionExpression());
+    this.registerPrefix(Punctuator.LeftParen, new GroupExpressionParser());
+    this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
 
-    this.registerInfix(Punctuator.Question, new ConditionalExpression());
+    this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
     this.registerInfix(Punctuator.LeftParen, new CallExpression());
 
     // assignments
@@ -43,7 +41,7 @@ export default class MyParser extends Parser {
       Punctuator.SlashAssign,
       Punctuator.CaretAssign
     ].forEach(function (tokenType) {
-      this.registerInfix(tokenType, new AssignmentExpression())
+      this.registerInfix(tokenType, new AssignmentExpressionParser())
     }, this);
 
     this.registerPrefixGeneric(Punctuator.Plus, Precedence.Prefix);
@@ -74,27 +72,27 @@ export default class MyParser extends Parser {
     this.registerInfixRightGeneric(Punctuator.Caret, Precedence.Exponent);
 
     // statements
-    this.registerStatement(Punctuator.LeftCurly, new LeftCurlyStatement());
-    this.registerStatement(Keyword.If, new IfStatement());
-    this.registerStatement(Keyword.Var, new DeclarationStatement());
-    this.registerStatement(Keyword.Let, new DeclarationStatement());
-    this.registerStatement(Keyword.Function, new FunctionDeclarationStatement());
-    this.registerStatement(Keyword.Return, new ReturnStatement());
+    this.registerStatement(Punctuator.LeftCurly, new LeftCurlyStatementParser());
+    this.registerStatement(Keyword.If, new IfStatementParser());
+    this.registerStatement(Keyword.Var, new DeclarationStatementParser());
+    this.registerStatement(Keyword.Let, new DeclarationStatementParser());
+    this.registerStatement(Keyword.Function, new FunctionDeclarationStatementParser());
+    this.registerStatement(Keyword.Return, new ReturnStatementParser());
   }
 
   registerPostfixGeneric (token, precedence) {
-    this.registerInfix(token, new PostfixOperatorExpression(precedence));
+    this.registerInfix(token, new PostfixOperatorExpressionParser(precedence));
   }
 
   registerPrefixGeneric (token, precedence) {
-    this.registerPrefix(token, new PrefixOperatorExpression(precedence));
+    this.registerPrefix(token, new PrefixOperatorExpressionParser(precedence));
   }
 
   registerInfixLeftGeneric (token, precedence) {
-    this.registerInfix(token, new BinaryOperatorExpression(precedence, false));
+    this.registerInfix(token, new BinaryOperatorExpressionParser(precedence, false));
   }
 
   registerInfixRightGeneric (token, precedence) {
-    this.registerInfix(token, new BinaryOperatorExpression(precedence, true));
+    this.registerInfix(token, new BinaryOperatorExpressionParser(precedence, true));
   }
 }

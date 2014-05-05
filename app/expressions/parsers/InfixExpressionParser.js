@@ -1,4 +1,4 @@
-export default class InfixExpression {
+export default class InfixExpressionParser {
   parse (parser, left, token) {
     throw new Error('Not implemented.');
   }

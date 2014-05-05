@@ -1,15 +1,15 @@
-import Statement from './Statement';
-import IdentifierExpression from '../expressions/IdentifierExpression';
-import { TokenType, Punctuator } from '../Lexer';
+import StatementParser from './StatementParser';
+import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
+import { TokenType, Punctuator } from '../../Lexer';
 
-class FunctionDeclarationStatement extends Statement {
+class FunctionDeclarationStatementParser extends StatementParser {
   parse (parser, token) {
     //
     var tokenId = parser.consumeType(TokenType.Identifier);
     var params = [];
     var body;
 
-    var id = IdentifierExpression.parse(parser, tokenId);
+    var id = IdentifierExpressionParser.parse(parser, tokenId);
 
     parser.consume(Punctuator.LeftParen);
 
@@ -21,7 +21,7 @@ class FunctionDeclarationStatement extends Statement {
           throw new SyntaxError('Unexpected token ILLEGAL.');
         }
 
-        params.push(IdentifierExpression.parse(parser, paramToken));
+        params.push(IdentifierExpressionParser.parse(parser, paramToken));
 
         if (!parser.match(Punctuator.Comma)) {
           break;
@@ -49,4 +49,4 @@ class FunctionDeclarationStatement extends Statement {
   }
 }
 
-export default FunctionDeclarationStatement;
+export default FunctionDeclarationStatementParser;

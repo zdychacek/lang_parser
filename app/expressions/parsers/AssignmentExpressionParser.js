@@ -1,7 +1,7 @@
-import InfixExpression from './InfixExpression';
-import { TokenType, Precedence } from '../Lexer';
+import InfixExpressionParser from './InfixExpressionParser';
+import { TokenType, Precedence } from '../../Lexer';
 
-export default class AssignmentExpression extends InfixExpression {
+export default class AssignmentExpressionParser extends InfixExpressionParser {
   parse (parser, left, token) {
     var right = parser.parseExpression(Precedence.Assignment - 1);
 

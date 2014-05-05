@@ -1,4 +1,4 @@
-export default class PrefixExpression {
+export default class PrefixExpressionParser {
   parse (parser, token) {
     throw new Error('Not implemented.');
   }

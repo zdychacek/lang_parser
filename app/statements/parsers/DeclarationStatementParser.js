@@ -1,8 +1,8 @@
-import Statement from './Statement';
-import IdentifierExpression from '../expressions/IdentifierExpression';
-import { TokenType, Punctuator } from '../Lexer';
+import StatementParser from './StatementParser';
+import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
+import { TokenType, Punctuator } from '../../Lexer';
 
-class DeclarationStatement extends Statement {
+class DeclarationStatementParser extends StatementParser {
   parse (parser, statementToken) {
     var declarations = [];
     var kind = statementToken.value;
@@ -34,7 +34,7 @@ class DeclarationStatement extends Statement {
   }
 
   _makeDeclarator (parser, id, init) {
-    id = IdentifierExpression.parse(parser, id);
+    id = IdentifierExpressionParser.parse(parser, id);
 
     return {
       type: 'VariableDeclarator',
@@ -44,4 +44,4 @@ class DeclarationStatement extends Statement {
   }
 }
 
-export default DeclarationStatement;
+export default DeclarationStatementParser;

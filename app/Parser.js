@@ -20,7 +20,7 @@ export default class Parser {
     this._statements.set(token, statementExpression);
   }
 
-  getPrefixExpressionParser (token) {
+  getPrefixExpressionParserParser (token) {
     var key = token.type;
 
     if (key == TokenType.Keyword || key == TokenType.Punctuator) {
@@ -30,7 +30,7 @@ export default class Parser {
     return this._prefixExpressions.get(key);
   }
 
-  getInfixExpressionParser (token) {
+  getInfixExpressionParserParser (token) {
     var key = token.type;
 
     if (key == TokenType.Keyword || key == TokenType.Punctuator) {
@@ -42,7 +42,7 @@ export default class Parser {
 
   parseExpression (precedence = 0) {
     var token = this.consume();
-    var prefixParser = this.getPrefixExpressionParser(token);
+    var prefixParser = this.getPrefixExpressionParserParser(token);
 
     if (this.matchType(TokenType.EOF, token)) {
       token.error('Unexpected end of file.', false);
@@ -57,7 +57,7 @@ export default class Parser {
     while (precedence < this.getPrecedence()) {
       token = this.consume();
 
-      let infixParser = this.getInfixExpressionParser(token);
+      let infixParser = this.getInfixExpressionParserParser(token);
 
       left = infixParser.parse(this, left, token);
     }
@@ -94,7 +94,7 @@ export default class Parser {
     }
     else {
       let expr = this.parseExpression();
-      this.consume(TokenType.Semicolon);
+      this.consume(Punctuator.Semicolon);
 
       return {
         type: 'ExpressionStatement',
@@ -179,7 +179,7 @@ export default class Parser {
   }
 
   getPrecedence () {
-    var exprParser = this.getInfixExpressionParser(this.peek());
+    var exprParser = this.getInfixExpressionParserParser(this.peek());
 
     if (exprParser) {
       return exprParser.precedence;

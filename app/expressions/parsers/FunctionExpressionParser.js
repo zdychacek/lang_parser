@@ -1,8 +1,8 @@
-import PrefixExpression from './PrefixExpression';
-import IdentifierExpression from './IdentifierExpression';
-import { TokenType, Keyword, Punctuator } from '../Lexer';
+import PrefixExpressionParser from './PrefixExpressionParser';
+import IdentifierExpressionParser from './IdentifierExpressionParser';
+import { TokenType, Keyword, Punctuator } from '../../Lexer';
 
-class FunctionExpression extends PrefixExpression {
+class FunctionExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
     var id = null;
     var params = [];
@@ -11,7 +11,7 @@ class FunctionExpression extends PrefixExpression {
     // parse optional name
     if (parser.matchType(TokenType.Identifier)) {
       let idToken = parser.consumeType(TokenType.Identifier);
-      id = IdentifierExpression.parse(parser, idToken);
+      id = IdentifierExpressionParser.parse(parser, idToken);
     }
 
     parser.consume(Punctuator.LeftParen);
@@ -25,7 +25,7 @@ class FunctionExpression extends PrefixExpression {
           throw new SyntaxError('Unexpected token ILLEGAL.');
         }
 
-        params.push(IdentifierExpression.parse(parser, paramToken));
+        params.push(IdentifierExpressionParser.parse(parser, paramToken));
 
         if (!parser.match(Punctuator.Comma)) {
           break;
@@ -49,4 +49,4 @@ class FunctionExpression extends PrefixExpression {
   }
 }
 
-export default FunctionExpression;
+export default FunctionExpressionParser;

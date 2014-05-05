@@ -1,5 +1,6 @@
 import { Lexer } from './Lexer';
 import MyParser from './MyParser';
+import Interpreter from './Interpreter';
 
 var sourceInput = document.getElementById('source');
 var btnDo = document.getElementById('do');
@@ -8,9 +9,9 @@ var preAST = document.getElementById('ast');
 
 var lexer = new Lexer();
 var parser = new MyParser(lexer);
+var interpreter = new Interpreter();
 
 sourceInput.value =
-
 `var a = 1 + 2;
 
 var fn = function (a,b,c) {
@@ -38,6 +39,9 @@ function _do () {
   try {
     ast = parser.parseProgram();
     $(preAST).JSONView(ast);
+
+    // TODO:
+    let retVal = interpreter.interpretProgram(ast);
   }
   catch (ex) {
     preAST.innerHTML = ex.message;

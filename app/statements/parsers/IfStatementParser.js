@@ -1,7 +1,7 @@
-import Statement from './Statement';
-import { TokenType, Punctuator, Keyword } from '../Lexer';
+import StatementParser from './StatementParser';
+import { TokenType, Punctuator, Keyword } from '../../Lexer';
 
-class IfStatement extends Statement {
+class IfStatementParser extends StatementParser {
   parse (parser) {
     var test, consequent, alternate = null;
 
@@ -40,4 +40,4 @@ class IfStatement extends Statement {
   }
 }
 
-export default IfStatement;
+export default IfStatementParser;

@@ -1,7 +1,7 @@
-import InfixExpression from './InfixExpression';
-import { TokenType, Precedence, Punctuator } from '../Lexer';
+import InfixExpressionParser from './InfixExpressionParser';
+import { TokenType, Precedence, Punctuator } from '../../Lexer';
 
-export default class ConditionalExpression extends InfixExpression {
+export default class ConditionalExpressionParserParser extends InfixExpressionParser {
   parse (parser, left, token) {
     var consequent = parser.parseExpression();
     parser.consume(Punctuator.Colon);

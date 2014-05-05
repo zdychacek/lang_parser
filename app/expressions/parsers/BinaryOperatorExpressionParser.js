@@ -1,6 +1,6 @@
-import InfixExpression from './InfixExpression';
+import InfixExpressionParser from './InfixExpressionParser';
 
-export default class BinaryOperatorExpression extends InfixExpression {
+export default class BinaryOperatorExpressionParser extends InfixExpressionParser {
   constructor (precedence, isRight) {
     this._precedence = precedence;
     this._isRight = isRight;
@@ -11,7 +11,7 @@ export default class BinaryOperatorExpression extends InfixExpression {
 
     return {
       type: 'BinaryExpression',
-      operator: token.type,
+      operator: token.value,
       left,
       right
     };

@@ -1,4 +1,4 @@
-export default class Statement {
+export default class Expression {
     interpret (context) {
       throw new Error('Not implemented.');
     }
