@@ -1,7 +1,6 @@
-import { TokenType } from './Lexer';
+import { TokenType, Punctuator } from './Lexer';
 
 export default class Parser {
-
   constructor (lexer) {
     this._lexer = lexer;
     this._prefixExpressions = new Map();
@@ -21,32 +20,46 @@ export default class Parser {
     this._statements.set(token, statementExpression);
   }
 
-  parseExpression (precedence = 0) {
-    var token = this.consume();
+  getPrefixExpressionParser (token) {
     var key = token.type;
 
-    if (key == TokenType.KEYWORD) {
+    if (key == TokenType.Keyword || key == TokenType.Punctuator) {
       key = token.value;
     }
 
-    var prefix = this._prefixExpressions.get(key);
+    return this._prefixExpressions.get(key);
+  }
 
-    if (token.type == TokenType.EOF) {
+  getInfixExpressionParser (token) {
+    var key = token.type;
+
+    if (key == TokenType.Keyword || key == TokenType.Punctuator) {
+      key = token.value;
+    }
+
+    return this._infixExpressions.get(key);
+  }
+
+  parseExpression (precedence = 0) {
+    var token = this.consume();
+    var prefixParser = this.getPrefixExpressionParser(token);
+
+    if (this.matchType(TokenType.EOF, token)) {
       token.error('Unexpected end of file.', false);
     }
 
-    if (prefix == null) {
+    if (!prefixParser) {
       token.error('Could not parse.');
     }
 
-    var left = prefix.parse(this, token);
+    var left = prefixParser.parse(this, token);
 
     while (precedence < this.getPrecedence()) {
       token = this.consume();
 
-      var infix = this._infixExpressions.get(token.type);
+      let infixParser = this.getInfixExpressionParser(token);
 
-      left = infix.parse(this, left, token);
+      left = infixParser.parse(this, left, token);
     }
 
     return left;
@@ -56,7 +69,7 @@ export default class Parser {
     var statements = [];
 
     while (true) {
-      if (this.match(TokenType.RIGHT_CURLY) || this.match(TokenType.EOF)) {
+      if (this.match(Punctuator.RightCurly) || this.matchType(TokenType.EOF)) {
         break;
       }
 
@@ -81,7 +94,7 @@ export default class Parser {
     }
     else {
       let expr = this.parseExpression();
-      this.consume(TokenType.SEMICOLON);
+      this.consume(TokenType.Semicolon);
 
       return {
         type: 'ExpressionStatement',
@@ -94,7 +107,7 @@ export default class Parser {
     var token = this.peek();
     var statementExpression = this._statements.get(token.value);
 
-    this.consume(TokenType.LEFT_CURLY);
+    this.consume(Punctuator.LeftCurly);
 
     return {
       type: 'BlockStatement',
@@ -109,10 +122,32 @@ export default class Parser {
     };
   }
 
-  matchAndConsume (expected) {
-    var token = this.peek();
+  consume (expected) {
+    if (expected) {
+      let token = this.peek();
 
-    if (token.type == TokenType.KEYWORD && token.value == expected || token.type == expected) {
+      if (!token || token.value != expected) {
+        token.error(`Unexpected token ${token.value}, got ${expected}.`, false);
+      }
+    }
+
+    return this._lexer.next();
+  }
+
+  consumeType (expected) {
+    if (expected) {
+      let token = this.peek();
+
+      if (!token || token.type != expected) {
+        token.error(`Unexpected token type ${token.type}, got ${expected}.`, false);
+      }
+    }
+
+    return this._lexer.next();
+  }
+
+  matchAndConsume (expected, token = this.peek()) {
+    if (token && token.value == expected) {
       this.consume();
 
       return true;
@@ -121,22 +156,22 @@ export default class Parser {
     return false;
   }
 
-  match (expected) {
-    var token = this.peek();
+  matchAndConsumeType (expected, token = this.peek()) {
+    if (token && token.type == expected) {
+      this.consume();
 
-    return token.type == TokenType.KEYWORD && token.value == expected || token.type == expected;
-  }
-
-  consume (expected) {
-    if (expected) {
-      var token = this.peek();
-
-      if (token.type != expected && token.value != expected) {
-        token.error(`Unexpected token ${token.value}, got ${expected}.`, false);
-      }
+      return true;
     }
 
-    return this._lexer.next();
+    return false;
+  }
+
+  match (expected, token = this.peek()) {
+    return token && token.value == expected;
+  }
+
+  matchType (expected, token = this.peek()) {
+    return token && token.type == expected;
   }
 
   peek () {
@@ -144,8 +179,7 @@ export default class Parser {
   }
 
   getPrecedence () {
-    var next = this.peek();
-    var exprParser = this._infixExpressions.get(next.type);
+    var exprParser = this.getInfixExpressionParser(this.peek());
 
     if (exprParser) {
       return exprParser.precedence;

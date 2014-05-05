@@ -1,11 +1,11 @@
 import Statement from './Statement';
-import { TokenType } from '../Lexer';
+import { Punctuator } from '../Lexer';
 
 class LeftCurlyStatement extends Statement {
   parse (parser) {
     var statements = parser.parseStatements();
 
-    parser.consume(TokenType.RIGHT_CURLY);
+    parser.consume(Punctuator.RightCurly);
 
     return statements;
   }

@@ -1,10 +1,10 @@
 import PrefixExpression from './PrefixExpression';
-import { TokenType } from '../Lexer';
+import { TokenType, Punctuator } from '../Lexer';
 
 export default class GroupExpression extends PrefixExpression {
   parse (parser, token) {
     var expression = parser.parseExpression();
-    parser.consume(TokenType.RIGHT_PAREN);
+    parser.consume(Punctuator.RightParen);
 
     return expression;
   }

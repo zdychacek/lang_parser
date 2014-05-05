@@ -1,12 +1,11 @@
 import InfixExpression from './InfixExpression';
-import { TokenType } from '../Lexer';
-import Precedence from '../Precedence';
+import { TokenType, Precedence, Punctuator } from '../Lexer';
 
 export default class ConditionalExpression extends InfixExpression {
   parse (parser, left, token) {
     var consequent = parser.parseExpression();
-    parser.consume(TokenType.COLON);
-    var alternate = parser.parseExpression(Precedence.CONDITIONAL - 1);
+    parser.consume(Punctuator.Colon);
+    var alternate = parser.parseExpression(Precedence.Conditional - 1);
 
     return {
       type: 'ConditionalExpression',
@@ -17,6 +16,6 @@ export default class ConditionalExpression extends InfixExpression {
   }
 
   get precedence () {
-    return Precedence.CONDITIONAL;
+    return Precedence.Conditional;
   }
 }

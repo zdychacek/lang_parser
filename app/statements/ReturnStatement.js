@@ -1,16 +1,16 @@
 import Statement from './Statement';
-import { TokenType } from '../Lexer';
+import { Punctuator } from '../Lexer';
 
 class ReturnStatement extends Statement {
   parse (parser) {
     var argument = null;
 
-    if (!parser.matchAndConsume(TokenType.SEMICOLON)) {
+    if (!parser.matchAndConsume(Punctuator.Semicolon)) {
       argument = parser.parseExpression();
-      parser.consume(TokenType.SEMICOLON);
+      parser.consume(Punctuator.Semicolon);
     }
 
-    if (!parser.match(TokenType.RIGHT_CURLY)) {
+    if (!parser.match(Punctuator.RightCurly)) {
       throw new SyntaxError('Unreachable statement.');
     }
 

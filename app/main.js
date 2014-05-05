@@ -11,7 +11,7 @@ var parser = new MyParser(lexer);
 
 sourceInput.value =
 
-`var b = 5;
+`var a = 1 + 2;
 
 var fn = function (a,b,c) {
   let a = 'ahoj';
@@ -30,7 +30,7 @@ var fn = function (a,b,c) {
   else f(a >= 5 && b < 12);
 
   return b || a && 28;
-};`;
+};`
 
 function _do () {
   lexer.source = sourceInput.value;

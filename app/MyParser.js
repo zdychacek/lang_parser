@@ -1,6 +1,6 @@
 import Parser from './Parser';
 import Precedence from './Precedence';
-import { TokenType, Keyword } from './Lexer';
+import { TokenType, Keyword, Punctuator, Precedence } from './Lexer';
 
 ///// Expressions
 import IdentifierExpression from './expressions/IdentifierExpression';
@@ -26,60 +26,60 @@ export default class MyParser extends Parser {
   constructor (lexer) {
     super(lexer);
 
-    this.registerPrefix(TokenType.IDENTIFIER, new IdentifierExpression());
-    this.registerPrefix(TokenType.LITERAL, new LiteralExpression());
-    this.registerPrefix(TokenType.LEFT_PAREN, new GroupExpression());
-    this.registerPrefix(Keyword.FUNCTION, new FunctionExpression());
+    this.registerPrefix(TokenType.Identifier, new IdentifierExpression());
+    this.registerPrefix(TokenType.Literal, new LiteralExpression());
+    this.registerPrefix(Punctuator.LeftParen, new GroupExpression());
+    this.registerPrefix(Keyword.Function, new FunctionExpression());
 
-    this.registerInfix(TokenType.QUESTION, new ConditionalExpression());
-    this.registerInfix(TokenType.LEFT_PAREN, new CallExpression());
+    this.registerInfix(Punctuator.Question, new ConditionalExpression());
+    this.registerInfix(Punctuator.LeftParen, new CallExpression());
 
     // assignments
     [
-      TokenType.ASSIGN,
-      TokenType.PLUS_ASSIGN,
-      TokenType.MINUS_ASSIGN,
-      TokenType.ASTERISK_ASSIGN,
-      TokenType.SLASH_ASSIGN,
-      TokenType.CARET_ASSIGN
+      Punctuator.Assign,
+      Punctuator.PlusAssign,
+      Punctuator.MinusAssign,
+      Punctuator.AsteriskAssign,
+      Punctuator.SlashAssign,
+      Punctuator.CaretAssign
     ].forEach(function (tokenType) {
       this.registerInfix(tokenType, new AssignmentExpression())
     }, this);
 
-    this.registerPrefixGeneric(TokenType.PLUS, Precedence.PREFIX);
-    this.registerPrefixGeneric(TokenType.MINUS, Precedence.PREFIX);
-    this.registerPrefixGeneric(TokenType.TILDE, Precedence.PREFIX);
-    this.registerPrefixGeneric(TokenType.BANG, Precedence.PREFIX);
+    this.registerPrefixGeneric(Punctuator.Plus, Precedence.Prefix);
+    this.registerPrefixGeneric(Punctuator.Minus, Precedence.Prefix);
+    this.registerPrefixGeneric(Punctuator.Tilde, Precedence.Prefix);
+    this.registerPrefixGeneric(Punctuator.Bang, Precedence.Prefix);
 
-    this.registerPostfixGeneric(TokenType.BANG, Precedence.POSTFIX);
+    this.registerPostfixGeneric(Punctuator.Bang, Precedence.Postfix);
 
-    this.registerInfixLeftGeneric(TokenType.PLUS, Precedence.SUM);
-    this.registerInfixLeftGeneric(TokenType.MINUS, Precedence.SUM);
-    this.registerInfixLeftGeneric(TokenType.ASTERISK, Precedence.PRODUCT);
-    this.registerInfixLeftGeneric(TokenType.SLASH, Precedence.PRODUCT);
+    this.registerInfixLeftGeneric(Punctuator.Plus, Precedence.Sum);
+    this.registerInfixLeftGeneric(Punctuator.Minus, Precedence.Sum);
+    this.registerInfixLeftGeneric(Punctuator.Asterisk, Precedence.Product);
+    this.registerInfixLeftGeneric(Punctuator.Slash, Precedence.Product);
 
     // relational
-    this.registerInfixLeftGeneric(TokenType.EQUAL, Precedence.RELATION);
-    this.registerInfixLeftGeneric(TokenType.NOT_EQUAL, Precedence.RELATION);
-    this.registerInfixLeftGeneric(TokenType.GREATER, Precedence.RELATION);
-    this.registerInfixLeftGeneric(TokenType.LESS, Precedence.RELATION);
-    this.registerInfixLeftGeneric(TokenType.GREATER_OR_EQUAL, Precedence.RELATION);
-    this.registerInfixLeftGeneric(TokenType.LESS_OR_EQUAL, Precedence.RELATION);
+    this.registerInfixLeftGeneric(Punctuator.Equal, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.NotEqual, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.Greater, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.Less, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.GreaterEqual, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.LessEqual, Precedence.Relational);
 
     // logical
-    this.registerInfixLeftGeneric(TokenType.LOGICAL_AND, Precedence.LOGICAL_AND);
-    this.registerInfixLeftGeneric(TokenType.LOGICAL_OR, Precedence.LOGICAL_OR);
+    this.registerInfixLeftGeneric(Punctuator.LogicalAnd, Precedence.LogicalAnd);
+    this.registerInfixLeftGeneric(Punctuator.LogicalOr, Precedence.LogicalOr);
 
     // right associativity
-    this.registerInfixRightGeneric(TokenType.CARET, Precedence.EXPONENT);
+    this.registerInfixRightGeneric(Punctuator.Caret, Precedence.Exponent);
 
     // statements
-    this.registerStatement(TokenType.LEFT_CURLY, new LeftCurlyStatement());
-    this.registerStatement(Keyword.IF, new IfStatement());
-    this.registerStatement(Keyword.VAR, new DeclarationStatement());
-    this.registerStatement(Keyword.LET, new DeclarationStatement());
-    this.registerStatement(Keyword.FUNCTION, new FunctionDeclarationStatement());
-    this.registerStatement(Keyword.RETURN, new ReturnStatement());
+    this.registerStatement(Punctuator.LeftCurly, new LeftCurlyStatement());
+    this.registerStatement(Keyword.If, new IfStatement());
+    this.registerStatement(Keyword.Var, new DeclarationStatement());
+    this.registerStatement(Keyword.Let, new DeclarationStatement());
+    this.registerStatement(Keyword.Function, new FunctionDeclarationStatement());
+    this.registerStatement(Keyword.Return, new ReturnStatement());
   }
 
   registerPostfixGeneric (token, precedence) {

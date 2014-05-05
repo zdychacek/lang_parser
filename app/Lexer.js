@@ -1,48 +1,68 @@
 export var TokenType = {
-  LEFT_PAREN: '(',
-  RIGHT_PAREN: ')',
-  LEFT_CURLY: '{',
-  RIGHT_CURLY: '}',
-  COMMA: ',',
-  ASSIGN: '=',
-  PLUS_ASSIGN: '+=',
-  MINUS_ASSIGN: '-=',
-  ASTERISK_ASSIGN: '*=',
-  SLASH_ASSIGN: '/=',
-  CARET_ASSIGN: '^=',
-  EQUAL: '==',
-  NOT_EQUAL: '!=',
-  GREATER: '>',
-  GREATER_OR_EQUAL: '>=',
-  LESS: '<',
-  LESS_OR_EQUAL: '<=',
-  LOGICAL_AND: '&&',
-  AMPERSAND: '&',
-  PIPE: '|',
-  LOGICAL_OR: '||',
-  PLUS: '+',
-  MINUS: '-',
-  ASTERISK: '*',
-  SLASH: '/',
-  CARET: '^',
-  TILDE: '~',
-  BANG: '!',
-  QUESTION: '?',
-  COLON: ':',
-  SEMICOLON: ';',
-  IDENTIFIER: '(identifier)',
-  LITERAL: '(literal)',
-  KEYWORD: '(keyword)',
+  Identifier: '(identifier)',
+  Literal: '(literal)',
+  Keyword: '(keyword)',
+  Punctuator: '(punctuator)',
   EOF: '(EOF)'
 };
 
+export var Punctuator = {
+  LeftParen: '(',
+  RightParen: ')',
+  LeftCurly: '{',
+  RightCurly: '}',
+  Comma: ',',
+  Assign: '=',
+  PlusAssign: '+=',
+  MinusAssign: '-=',
+  AsteriskAssign: '*=',
+  SlashAssign: '/=',
+  CaretAssign: '^=',
+  Equal: '==',
+  NotEqual: '!=',
+  Greater: '>',
+  GreaterEqual: '>=',
+  Less: '<',
+  LessEqual: '<=',
+  BitwiseAnd: '&',
+  LogicalAnd: '&&',
+  BitwiseOr: '|',
+  LogicalOr: '||',
+  Plus: '+',
+  Minus: '-',
+  Asterisk: '*',
+  Slash: '/',
+  Caret: '^',
+  Tilde: '~',
+  Bang: '!',
+  Question: '?',
+  Colon: ':',
+  Semicolon: ';'
+};
+
 export var Keyword = {
-  IF: 'if',
-  ELSE: 'else',
-  VAR: 'var',
-  LET: 'let',
-  FUNCTION: 'function',
-  RETURN: 'return'
+  If: 'if',
+  Else: 'else',
+  Var: 'var',
+  Let: 'let',
+  'Function': 'function',
+  Return: 'return'
+};
+
+export var Precedence = {
+  Assignment: 10,
+  Conditional: 20,
+  LogicalOr: 30,
+  LogicalAnd: 31,
+  BitwiseOr: 32,
+  BitwiseAnd: 33,
+  Relational: 40,
+  Sum: 50,
+  Product: 60,
+  Exponent: 70,
+  Prefix: 80,
+  Postfix: 90,
+  Call: 100
 };
 
 export class Token {
@@ -73,7 +93,7 @@ export class Lexer {
       return this._createToken(TokenType.EOF, TokenType.EOF);
     }
 
-    var token = this._scanOperator();
+    var token = this._scanPunctuator();
     if (token) return token;
 
     token = this._scanString();
@@ -173,7 +193,7 @@ export class Lexer {
     }
 
     if (str !== null) {
-      return this._createToken(TokenType.LITERAL, str);
+      return this._createToken(TokenType.Literal, str);
     }
   }
 
@@ -232,72 +252,72 @@ export class Lexer {
     }
 
     if (number) {
-      return this._createToken(TokenType.LITERAL, parseFloat(number));
+      return this._createToken(TokenType.Literal, parseFloat(number));
     }
   }
 
-  _scanOperator () {
+  _scanPunctuator () {
     var nextToken = this._peekNextChar(), prevToken;
-    var operator = '';
+    var punctuator = '';
 
     switch (nextToken) {
-      case TokenType.AMPERSAND:
-      case TokenType.PIPE:
+      case Punctuator.BitwiseAnd:
+      case Punctuator.BitwiseOr:
 
         // & and | can only be duplicated
         prevToken = nextToken;
-        operator = this._getNextChar();
+        punctuator = this._getNextChar();
         nextToken = this._peekNextChar();
 
         if (nextToken == prevToken) {
-          operator += this._getNextChar();
+          punctuator += this._getNextChar();
         }
 
         break;
-      case TokenType.PLUS:
-      case TokenType.MINUS:
-      case TokenType.ASSIGN:
-      case TokenType.LESS:
-      case TokenType.GREATER:
+      case Punctuator.Plus:
+      case Punctuator.Minus:
+      case Punctuator.Assign:
+      case Punctuator.Less:
+      case Punctuator.Greater:
         // these can be combined with itself or with equal sign
         prevToken = nextToken;
-        operator = this._getNextChar();
+        punctuator = this._getNextChar();
         nextToken = this._peekNextChar();
 
         if (nextToken == prevToken || nextToken == '=') {
-          operator += this._getNextChar();
+          punctuator += this._getNextChar();
         }
 
         break;
-      case TokenType.ASTERISK:
-      case TokenType.SLASH:
-      case TokenType.CARET:
-      case TokenType.BANG:
+      case Punctuator.Asterisk:
+      case Punctuator.Slash:
+      case Punctuator.Caret:
+      case Punctuator.Bang:
         // these be combined only with equal sign
-        operator = this._getNextChar();
+        punctuator = this._getNextChar();
         nextToken = this._peekNextChar();
 
         if (nextToken == '=') {
-          operator += this._getNextChar();
+          punctuator += this._getNextChar();
         }
 
         break;
-      case TokenType.QUESTION:
-      case TokenType.TILDE:
-      case TokenType.COLON:
-      case TokenType.SEMICOLON:
-      case TokenType.LEFT_PAREN:
-      case TokenType.RIGHT_PAREN:
-      case TokenType.LEFT_CURLY:
-      case TokenType.RIGHT_CURLY:
-      case TokenType.COMMA:
+      case Punctuator.Question:
+      case Punctuator.Tilde:
+      case Punctuator.Colon:
+      case Punctuator.Semicolon:
+      case Punctuator.LeftParen:
+      case Punctuator.RightParen:
+      case Punctuator.LeftCurly:
+      case Punctuator.RightCurly:
+      case Punctuator.Comma:
         // one char operators
-        operator += this._getNextChar();
+        punctuator += this._getNextChar();
         break;
     }
 
-    if (operator) {
-      return this._createToken(operator);
+    if (punctuator) {
+      return this._createToken(TokenType.Punctuator, punctuator);
     }
   }
 
@@ -317,7 +337,7 @@ export class Lexer {
     }
 
     if (identifier) {
-      return this._createToken(this._isKeyword(identifier)? TokenType.KEYWORD : TokenType.IDENTIFIER, identifier);
+      return this._createToken(this._isKeyword(identifier)? TokenType.Keyword : TokenType.Identifier, identifier);
     }
   }
 

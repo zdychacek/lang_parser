@@ -1,6 +1,6 @@
 import Statement from './Statement';
 import IdentifierExpression from '../expressions/IdentifierExpression';
-import { TokenType, Keyword } from '../Lexer';
+import { TokenType, Punctuator } from '../Lexer';
 
 class DeclarationStatement extends Statement {
   parse (parser, statementToken) {
@@ -8,25 +8,23 @@ class DeclarationStatement extends Statement {
     var kind = statementToken.value;
 
     while (true) {
-      let id = parser.consume(TokenType.IDENTIFIER);
+      let id = parser.consumeType(TokenType.Identifier);
       let init = null;
 
-      if (parser.match(TokenType.ASSIGN)) {
-        parser.consume(TokenType.ASSIGN);
-
+      if (parser.matchAndConsume(Punctuator.Assign)) {
         init = parser.parseExpression();
       }
 
       declarations.push(this._makeDeclarator(parser, id, init));
 
-      if (!parser.match(TokenType.COMMA)) {
+      if (!parser.match(Punctuator.Comma)) {
         break;
       }
 
-      parser.consume(TokenType.COMMA);
+      parser.consume(Punctuator.Comma);
     }
 
-    parser.consume(TokenType.SEMICOLON);
+    parser.consume(Punctuator.Semicolon);
 
     return {
       type: 'VariableDeclaration',

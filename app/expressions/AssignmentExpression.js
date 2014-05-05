@@ -1,10 +1,9 @@
 import InfixExpression from './InfixExpression';
-import Precedence from '../Precedence';
-import { TokenType } from '../Lexer';
+import { TokenType, Precedence } from '../Lexer';
 
 export default class AssignmentExpression extends InfixExpression {
   parse (parser, left, token) {
-    var right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
+    var right = parser.parseExpression(Precedence.Assignment - 1);
 
     if (left.type != 'Identifier') {
       throw new Error('The left-hand side of an assignment must be an identifier.');
@@ -19,6 +18,6 @@ export default class AssignmentExpression extends InfixExpression {
   }
 
   get precedence () {
-    return Precedence.ASSIGNMENT;
+    return Precedence.Assignment;
   }
 }

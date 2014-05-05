@@ -1,20 +1,20 @@
 import Statement from './Statement';
-import { TokenType, Keyword } from '../Lexer';
+import { TokenType, Punctuator, Keyword } from '../Lexer';
 
 class IfStatement extends Statement {
   parse (parser) {
     var test, consequent, alternate = null;
 
-    parser.consume(TokenType.LEFT_PAREN);
+    parser.consume(Punctuator.LeftParen);
     test = parser.parseExpression();
-    parser.consume(TokenType.RIGHT_PAREN);
+    parser.consume(Punctuator.RightParen);
 
     consequent = this._parseArm(parser);
 
-    if (parser.match(Keyword.ELSE)) {
-      parser.consume(Keyword.ELSE);
+    if (parser.match(Keyword.Else)) {
+      parser.consume(Keyword.Else);
 
-      if (parser.match(Keyword.IF)) {
+      if (parser.match(Keyword.If)) {
         alternate = parser.parseStatement();
       }
       else {
@@ -31,7 +31,7 @@ class IfStatement extends Statement {
   }
 
   _parseArm (parser) {
-    if (parser.match(TokenType.LEFT_CURLY)) {
+    if (parser.match(Punctuator.LeftCurly)) {
       return parser.parseBlock();
     }
     else {

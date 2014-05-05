@@ -1,43 +1,43 @@
 import Statement from './Statement';
 import IdentifierExpression from '../expressions/IdentifierExpression';
-import { TokenType, Keyword } from '../Lexer';
+import { TokenType, Punctuator } from '../Lexer';
 
 class FunctionDeclarationStatement extends Statement {
   parse (parser, token) {
     //
-    var tokenId = parser.consume(TokenType.IDENTIFIER);
+    var tokenId = parser.consumeType(TokenType.Identifier);
     var params = [];
     var body;
 
     var id = IdentifierExpression.parse(parser, tokenId);
 
-    parser.consume(TokenType.LEFT_PAREN);
+    parser.consume(Punctuator.LeftParen);
 
-    if (!parser.match(TokenType.RIGHT_PAREN)) {
+    if (!parser.match(Punctuator.RightParen)) {
       while (true) {
         let paramToken = parser.consume();
 
-        if (paramToken.type != TokenType.IDENTIFIER) {
+        if (!parser.matchType(TokenType.Identifier, paramToken)) {
           throw new SyntaxError('Unexpected token ILLEGAL.');
         }
 
         params.push(IdentifierExpression.parse(parser, paramToken));
 
-        if (!parser.match(TokenType.COMMA)) {
+        if (!parser.match(Punctuator.Comma)) {
           break;
         }
 
-        parser.consume(TokenType.COMMA);
+        parser.consume(Punctuator.Comma);
       }
     }
 
-    parser.consume(TokenType.RIGHT_PAREN);
+    parser.consume(Punctuator.RightParen);
 
     body = parser.parseBlock();
 
     // optional semicolon after function declaration
-    if (parser.match(TokenType.SEMICOLON)) {
-      parser.consume(TokenType.SEMICOLON);
+    if (parser.match(Punctuator.Semicolon)) {
+      parser.consume(Punctuator.Semicolon);
     }
 
     return {
