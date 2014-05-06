@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Expression Parser</title>
+  <title>Lang Parser</title>
   <link rel="stylesheet" href="css/jquery.jsonview.css" />
   <script src="lib/jquery-1.11.1.min.js"></script>
   <script src="lib/jquery.jsonview.js"></script>
@@ -32,8 +32,7 @@
         System.paths['app/*'] = 'dist/*.js';
       }
 
-      System.import('app/main')
-        .catch(console.error.bind(console));
+      System.import('app/main').catch(console.error.bind(console));
     })(false);
   </script>
 </body>

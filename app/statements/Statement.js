@@ -1,5 +1,9 @@
 export default class Statement {
-    interpret (context) {
+    constructor (type) {
+      this.type = type;
+    }
+    
+    eval (context) {
       throw new Error('Not implemented.');
     }
 }

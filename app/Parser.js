@@ -1,4 +1,7 @@
 import { TokenType, Punctuator } from './Lexer';
+import Program from './statements/Program';
+import BlockStatement from './statements/BlockStatement';
+import ExpressionStatement from './statements/ExpressionStatement';
 
 export default class Parser {
   constructor (lexer) {
@@ -20,7 +23,7 @@ export default class Parser {
     this._statements.set(token, statementExpression);
   }
 
-  getPrefixExpressionParserParser (token) {
+  getPrefixExpressionParser (token) {
     var key = token.type;
 
     if (key == TokenType.Keyword || key == TokenType.Punctuator) {
@@ -30,7 +33,7 @@ export default class Parser {
     return this._prefixExpressions.get(key);
   }
 
-  getInfixExpressionParserParser (token) {
+  getInfixExpressionParser (token) {
     var key = token.type;
 
     if (key == TokenType.Keyword || key == TokenType.Punctuator) {
@@ -42,7 +45,7 @@ export default class Parser {
 
   parseExpression (precedence = 0) {
     var token = this.consume();
-    var prefixParser = this.getPrefixExpressionParserParser(token);
+    var prefixParser = this.getPrefixExpressionParser(token);
 
     if (this.matchType(TokenType.EOF, token)) {
       token.error('Unexpected end of file.', false);
@@ -57,7 +60,7 @@ export default class Parser {
     while (precedence < this.getPrecedence()) {
       token = this.consume();
 
-      let infixParser = this.getInfixExpressionParserParser(token);
+      let infixParser = this.getInfixExpressionParser(token);
 
       left = infixParser.parse(this, left, token);
     }
@@ -88,38 +91,33 @@ export default class Parser {
     var statementExpression = this._statements.get(token.value);
 
     if (statementExpression) {
-        let statementToken = this.consume();
+      let statementToken = this.consume();
 
-        return statementExpression.parse(this, statementToken);
+      return statementExpression.parse(this, statementToken);
     }
     else {
       let expr = this.parseExpression();
       this.consume(Punctuator.Semicolon);
 
-      return {
-        type: 'ExpressionStatement',
-        expression: expr
-      };
+      return new ExpressionStatement(expr);
     }
   }
 
   parseBlock () {
     var token = this.peek();
-    var statementExpression = this._statements.get(token.value);
+    var statement = this._statements.get(token.value);
 
     this.consume(Punctuator.LeftCurly);
+    
+    let body = statement.parse(this);
 
-    return {
-      type: 'BlockStatement',
-      body: statementExpression.parse(this)
-    };
+    return new BlockStatement(body);
   }
 
   parseProgram () {
-    return {
-      type: 'Program',
-      body: this.parseStatements()
-    };
+    var body = this.parseStatements();
+    
+    return new Program(body);
   }
 
   consume (expected) {
@@ -179,7 +177,7 @@ export default class Parser {
   }
 
   getPrecedence () {
-    var exprParser = this.getInfixExpressionParserParser(this.peek());
+    var exprParser = this.getInfixExpressionParser(this.peek());
 
     if (exprParser) {
       return exprParser.precedence;

@@ -11,7 +11,7 @@ export default class AssignmentExpressionParser extends InfixExpressionParser {
 
     return {
       type: 'AssignmentExpression',
-      operator: token.type,
+      operator: token.value,
       left,
       right
     };

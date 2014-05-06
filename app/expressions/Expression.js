@@ -1,5 +1,5 @@
 export default class Expression {
-    interpret (context) {
+    eval (context) {
       throw new Error('Not implemented.');
     }
 }

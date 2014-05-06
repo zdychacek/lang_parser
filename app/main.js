@@ -38,7 +38,7 @@ function _do () {
 
   try {
     ast = parser.parseProgram();
-    $(preAST).JSONView(ast);
+    $(preAST).JSONView(JSON.stringify(ast));
 
     // TODO:
     let retVal = interpreter.interpretProgram(ast);
