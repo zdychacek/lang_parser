@@ -2,7 +2,7 @@ import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 import { TokenType, Punctuator } from '../../Lexer';
 
-class DeclarationStatementParser extends StatementParser {
+export default class DeclarationStatementParser extends StatementParser {
   parse (parser, statementToken) {
     var declarations = [];
     var kind = statementToken.value;
@@ -43,5 +43,3 @@ class DeclarationStatementParser extends StatementParser {
     };
   }
 }
-
-export default DeclarationStatementParser;

@@ -1,7 +1,7 @@
 import StatementParser from './StatementParser';
 import { TokenType, Punctuator, Keyword } from '../../Lexer';
 
-class IfStatementParser extends StatementParser {
+export default class IfStatementParser extends StatementParser {
   parse (parser) {
     var test, consequent, alternate = null;
 
@@ -39,5 +39,3 @@ class IfStatementParser extends StatementParser {
     }
   }
 }
-
-export default IfStatementParser;

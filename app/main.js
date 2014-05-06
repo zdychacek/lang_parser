@@ -12,7 +12,14 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`var a = 1 + 2;
+`var person = {
+  name: 'Ondrej',
+  age: 26,
+  data: {
+    a: 1,
+    b: 2
+  }
+};
 
 var fn = function (a,b,c) {
   let a = 'ahoj';

@@ -2,7 +2,7 @@ import PrefixExpressionParser from './PrefixExpressionParser';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
 import { TokenType, Keyword, Punctuator } from '../../Lexer';
 
-class FunctionExpressionParser extends PrefixExpressionParser {
+export default class FunctionExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
     var id = null;
     var params = [];
@@ -48,5 +48,3 @@ class FunctionExpressionParser extends PrefixExpressionParser {
     };
   }
 }
-
-export default FunctionExpressionParser;

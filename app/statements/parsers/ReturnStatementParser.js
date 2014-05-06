@@ -1,7 +1,7 @@
 import StatementParser from './StatementParser';
 import { Punctuator } from '../../Lexer';
 
-class ReturnStatementParser extends StatementParser {
+export default class ReturnStatementParser extends StatementParser {
   parse (parser) {
     var argument = null;
 
@@ -20,5 +20,3 @@ class ReturnStatementParser extends StatementParser {
     }
   }
 }
-
-export default ReturnStatementParser;

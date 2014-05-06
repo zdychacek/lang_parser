@@ -8,7 +8,7 @@ export default class PostfixOperatorExpressionParser extends InfixExpressionPars
   parse (parser, left, token) {
     return {
       type: 'PostfixExpression',
-      operator: token.type,
+      operator: token.value,
       left
     };
   }

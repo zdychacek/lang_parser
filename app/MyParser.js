@@ -3,7 +3,7 @@ import { TokenType, Keyword, Punctuator, Precedence } from './Lexer';
 
 ///// Expressions
 import IdentifierExpressionParser from './expressions/parsers/IdentifierExpressionParser';
-import LiteralExpression from './expressions/parsers/LiteralExpression';
+import LiteralExpressionParser from './expressions/parsers/LiteralExpressionParser';
 import AssignmentExpressionParser from './expressions/parsers/AssignmentExpressionParser';
 import ConditionalExpressionParser from './expressions/parsers/ConditionalExpressionParser';
 import GroupExpressionParser from './expressions/parsers/GroupExpressionParser';
@@ -12,6 +12,7 @@ import PrefixOperatorExpressionParser from './expressions/parsers/PrefixOperator
 import PostfixOperatorExpressionParser from './expressions/parsers/PostfixOperatorExpressionParser';
 import BinaryOperatorExpressionParser from './expressions/parsers/BinaryOperatorExpressionParser';
 import FunctionExpressionParser from './expressions/parsers/FunctionExpressionParser';
+import ObjectExpressionParser from './expressions/parsers/ObjectExpressionParser';
 
 ///// Statements
 import IfStatementParser from './statements/parsers/IfStatementParser';
@@ -26,8 +27,9 @@ export default class MyParser extends Parser {
     super(lexer);
 
     this.registerPrefix(TokenType.Identifier, new IdentifierExpressionParser());
-    this.registerPrefix(TokenType.Literal, new LiteralExpression());
+    this.registerPrefix(TokenType.Literal, new LiteralExpressionParser());
     this.registerPrefix(Punctuator.LeftParen, new GroupExpressionParser());
+    this.registerPrefix(Punctuator.LeftCurly, new ObjectExpressionParser());
     this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
