@@ -105,17 +105,23 @@ export default class Parser {
 
   parseBlock () {
     var token = this.peek();
-    var statement = this._statements.get(token.value);
 
     this.consume(Punctuator.LeftCurly);
     
-    let body = statement.parse(this);
+    let body = this.parseStatements();
+
+    this.consume(Punctuator.RightCurly);
 
     return new BlockStatement(body);
   }
 
   parseProgram () {
     var body = this.parseStatements();
+    var token = this.peek();
+
+    if (token.type != TokenType.EOF) {
+      token.error(`Unexpected token ${token.value}.`, false);
+    }
     
     return new Program(body);
   }
@@ -125,7 +131,7 @@ export default class Parser {
       let token = this.peek();
 
       if (!token || token.value != expected) {
-        token.error(`Unexpected token ${token.value}, got ${expected}.`, false);
+        token.error(`Unexpected token ${token.value}.`, false);
       }
     }
 
@@ -137,7 +143,7 @@ export default class Parser {
       let token = this.peek();
 
       if (!token || token.type != expected) {
-        token.error(`Unexpected token type ${token.type}, got ${expected}.`, false);
+        token.error(`Unexpected token type ${token.type}.`, false);
       }
     }
 

@@ -1,14 +1,13 @@
 import StatementParser from './StatementParser';
+import BlockStatement from '../BlockStatement';
 import { Punctuator } from '../../Lexer';
 
-class LeftCurlyStatementParser extends StatementParser {
+export default class LeftCurlyStatementParser extends StatementParser {
   parse (parser) {
     var statements = parser.parseStatements();
 
     parser.consume(Punctuator.RightCurly);
 
-    return statements;
+    return new BlockStatement(statements);
   }
 }
-
-export default LeftCurlyStatementParser;

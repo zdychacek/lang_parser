@@ -19,6 +19,7 @@ import LeftCurlyStatementParser from './statements/parsers/LeftCurlyStatementPar
 import DeclarationStatementParser from './statements/parsers/DeclarationStatementParser';
 import FunctionDeclarationStatementParser from './statements/parsers/FunctionDeclarationStatementParser';
 import ReturnStatementParser from './statements/parsers/ReturnStatementParser';
+import EmptyStatementParser from './statements/parsers/EmptyStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -73,6 +74,7 @@ export default class MyParser extends Parser {
 
     // statements
     this.registerStatement(Punctuator.LeftCurly, new LeftCurlyStatementParser());
+    this.registerStatement(Punctuator.Semicolon, new EmptyStatementParser());
     this.registerStatement(Keyword.If, new IfStatementParser());
     this.registerStatement(Keyword.Var, new DeclarationStatementParser());
     this.registerStatement(Keyword.Let, new DeclarationStatementParser());
