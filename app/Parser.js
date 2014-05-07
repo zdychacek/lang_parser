@@ -9,6 +9,12 @@ export default class Parser {
     this._prefixExpressions = new Map();
     this._infixExpressions = new Map();
     this._statements = new Map();
+
+    // parser state
+    this._state = {
+      inFunction: false,
+      inLoop: false
+    };
   }
 
   registerPrefix (token, expression) {
@@ -55,14 +61,14 @@ export default class Parser {
       token.error('Could not parse.');
     }
 
-    var left = prefixParser.parse(this, token);
+    var left = prefixParser.parse(this, token, this._state);
 
     while (precedence < this.getPrecedence()) {
       token = this.consume();
 
       let infixParser = this.getInfixExpressionParser(token);
 
-      left = infixParser.parse(this, left, token);
+      left = infixParser.parse(this, left, token, this._state);
     }
 
     return left;
@@ -93,10 +99,12 @@ export default class Parser {
     if (statementExpression) {
       let statementToken = this.consume();
 
-      return statementExpression.parse(this, statementToken);
+      return statementExpression.parse(this, statementToken, this._state);
     }
     else {
       let expr = this.parseExpression();
+
+      // required semicolon
       this.consume(Punctuator.Semicolon);
 
       return new ExpressionStatement(expr);
@@ -107,7 +115,7 @@ export default class Parser {
     var token = this.peek();
 
     this.consume(Punctuator.LeftCurly);
-    
+
     let body = this.parseStatements();
 
     this.consume(Punctuator.RightCurly);
@@ -122,7 +130,7 @@ export default class Parser {
     if (token.type != TokenType.EOF) {
       token.error(`Unexpected token ${token.value}.`, false);
     }
-    
+
     return new Program(body);
   }
 

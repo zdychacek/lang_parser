@@ -1,6 +1,7 @@
 import InfixExpressionParser from './InfixExpressionParser';
 import { Precedence, Punctuator } from '../../Lexer';
 import MemberExpression from '../MemberExpression';
+import IdentifierExpression from '../IdentifierExpression';
 
 export default class MemberExpressionParser extends InfixExpressionParser {
   constructor (computed = false) {
@@ -18,7 +19,7 @@ export default class MemberExpressionParser extends InfixExpressionParser {
     else {
       property = parser.parseExpression(this.precedence);
 
-      if (property.type != 'Identifier') {
+      if (!(property instanceof IdentifierExpression)) {
         throw new Error('Unexpected expression.');
       }
     }

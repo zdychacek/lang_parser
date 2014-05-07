@@ -1,10 +1,8 @@
 import PrefixExpressionParser from './PrefixExpressionParser';
+import IdentifierExpression from '../IdentifierExpression';
 
 export default class IdentifierExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
-    return {
-      type: 'Identifier',
-      name: token.value
-    };
+    return new IdentifierExpression(token.value);
   }
 }

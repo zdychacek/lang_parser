@@ -3,18 +3,16 @@ import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpr
 import { TokenType, Punctuator } from '../../Lexer';
 
 export default class FunctionDeclarationStatementParser extends StatementParser {
-  parse (parser, token) {
-    //
+  parse (parser, token, state) {
     var tokenId = parser.consumeType(TokenType.Identifier);
     var params = [];
-    var body;
-
+    var body = null;
     var id = IdentifierExpressionParser.parse(parser, tokenId);
 
     parser.consume(Punctuator.LeftParen);
 
     if (!parser.match(Punctuator.RightParen)) {
-      while (true) {
+      do {
         let paramToken = parser.consume();
 
         if (!parser.matchType(TokenType.Identifier, paramToken)) {
@@ -26,14 +24,16 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
         if (!parser.match(Punctuator.Comma)) {
           break;
         }
-
-        parser.consume(Punctuator.Comma);
       }
+      while (parser.matchAndConsume(Punctuator.Comma));
     }
 
     parser.consume(Punctuator.RightParen);
 
+    // parse function body
+    state.inFunction = true;
     body = parser.parseBlock();
+    state.inFunction = false;
 
     // optional semicolon after function declaration
     if (parser.match(Punctuator.Semicolon)) {

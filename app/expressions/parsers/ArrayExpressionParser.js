@@ -1,5 +1,6 @@
 import PrefixExpressionParser from './PrefixExpressionParser';
 import { Punctuator } from '../../Lexer';
+import ArrayExpression from '../ArrayExpression';
 
 export default class ArrayExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
@@ -9,14 +10,12 @@ export default class ArrayExpressionParser extends PrefixExpressionParser {
       do {
         elements.push(parser.parseExpression());
       }
+      // no support for trailing comma
       while (parser.matchAndConsume(Punctuator.Comma));
     }
 
     parser.consume(Punctuator.RightSquare);
 
-    return {
-      type: 'ArrayExpression',
-      elements
-    };
+    return new ArrayExpression(elements);
   }
 }

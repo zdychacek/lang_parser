@@ -1,4 +1,5 @@
 import InfixExpressionParser from './InfixExpressionParser';
+import BinaryExpression from '../BinaryExpression';
 
 export default class BinaryOperatorExpressionParser extends InfixExpressionParser {
   constructor (precedence, isRight) {
@@ -9,12 +10,7 @@ export default class BinaryOperatorExpressionParser extends InfixExpressionParse
   parse (parser, left, token) {
     var right = parser.parseExpression(this.precedence - (this._isRight ? 1 : 0));
 
-    return {
-      type: 'BinaryExpression',
-      operator: token.value,
-      left,
-      right
-    };
+    return new BinaryExpression(token.value, left, right);
   }
 
   get precedence () {

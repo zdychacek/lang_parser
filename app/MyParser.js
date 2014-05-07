@@ -7,7 +7,7 @@ import LiteralExpressionParser from './expressions/parsers/LiteralExpressionPars
 import AssignmentExpressionParser from './expressions/parsers/AssignmentExpressionParser';
 import ConditionalExpressionParser from './expressions/parsers/ConditionalExpressionParser';
 import GroupExpressionParser from './expressions/parsers/GroupExpressionParser';
-import CallExpression from './expressions/parsers/CallExpression';
+import CallExpressionParser from './expressions/parsers/CallExpressionParser';
 import PrefixOperatorExpressionParser from './expressions/parsers/PrefixOperatorExpressionParser';
 import PostfixOperatorExpressionParser from './expressions/parsers/PostfixOperatorExpressionParser';
 import BinaryOperatorExpressionParser from './expressions/parsers/BinaryOperatorExpressionParser';
@@ -37,7 +37,7 @@ export default class MyParser extends Parser {
     this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
-    this.registerInfix(Punctuator.LeftParen, new CallExpression());
+    this.registerInfix(Punctuator.LeftParen, new CallExpressionParser());
     this.registerInfix(Punctuator.Dot, new MemberExpressionParser(false));
     this.registerInfix(Punctuator.LeftSquare, new MemberExpressionParser(true));
 

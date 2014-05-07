@@ -1,9 +1,12 @@
 import StatementParser from './StatementParser';
-import { TokenType, Punctuator, Keyword } from '../../Lexer';
+import { Punctuator, Keyword } from '../../Lexer';
+import IfStatement from '../IfStatement';
 
 export default class IfStatementParser extends StatementParser {
   parse (parser) {
-    var test, consequent, alternate = null;
+    var test = null;
+    var consequent = null;
+    var alternate = null;
 
     parser.consume(Punctuator.LeftParen);
     test = parser.parseExpression();
@@ -22,12 +25,7 @@ export default class IfStatementParser extends StatementParser {
       }
     }
 
-    return {
-      type: 'IfStatement',
-      test,
-      consequent,
-      alternate
-    };
+    return new IfStatement(test, consequent, alternate);
   }
 
   _parseArm (parser) {

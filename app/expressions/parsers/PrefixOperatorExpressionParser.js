@@ -6,7 +6,7 @@ export default class PrefixOperatorExpressionParser extends PrefixExpressionPars
   }
 
   parse (parser, token) {
-    var right = parser.parseExpression(this._precedence);
+    var right = parser.parseExpression(this.precedence);
 
     return {
       type: 'PrefixExpressionParser',

@@ -1,8 +1,9 @@
 import InfixExpressionParser from './InfixExpressionParser';
 import { TokenType, Precedence, Punctuator } from '../../Lexer';
+import CallExpression from '../CallExpression';
 
-export default class CallExpression extends InfixExpressionParser {
-  parse (parser, left, token) {
+export default class CallExpressionParser extends InfixExpressionParser {
+  parse (parser, callee, token) {
     var args = [];
 
     if (!parser.matchAndConsume(Punctuator.RightParen)) {
@@ -13,11 +14,7 @@ export default class CallExpression extends InfixExpressionParser {
       parser.consume(Punctuator.RightParen);
     }
 
-    return {
-      type: 'CallExpression',
-      callee: left,
-      args
-    };
+    return new CallExpression(callee, args);
   }
 
   get precedence () {
