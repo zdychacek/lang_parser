@@ -11,8 +11,8 @@ var lexer = new Lexer();
 var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
-sourceInput.value =
-`var person = {
+sourceInput.value = `a.b.c;`;
+/*`var person = {
   name: 'Ondrej',
   age: 26,
   data: {
@@ -38,7 +38,7 @@ var fn = function (a,b,c) {
   else f(a >= 5 && b < 12);
 
   return b || a && 28;
-};`
+};`*/
 
 function _do () {
   lexer.source = sourceInput.value;

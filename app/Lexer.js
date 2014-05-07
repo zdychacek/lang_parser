@@ -11,6 +11,8 @@ export var Punctuator = {
   RightParen: ')',
   LeftCurly: '{',
   RightCurly: '}',
+  LeftSquare: '[',
+  RightSquare: ']',
   Comma: ',',
   Assign: '=',
   PlusAssign: '+=',
@@ -37,7 +39,8 @@ export var Punctuator = {
   Bang: '!',
   Question: '?',
   Colon: ':',
-  Semicolon: ';'
+  Semicolon: ';',
+  Dot: '.'
 };
 
 export var Keyword = {
@@ -45,7 +48,7 @@ export var Keyword = {
   Else: 'else',
   Var: 'var',
   Let: 'let',
-  'Function': 'function',
+  Function: 'function',
   Return: 'return'
 };
 
@@ -62,7 +65,8 @@ export var Precedence = {
   Exponent: 70,
   Prefix: 80,
   Postfix: 90,
-  Call: 100
+  Call: 100,
+  Member: 110
 };
 
 export class Token {
@@ -310,7 +314,10 @@ export class Lexer {
       case Punctuator.RightParen:
       case Punctuator.LeftCurly:
       case Punctuator.RightCurly:
+      case Punctuator.LeftSquare:
+      case Punctuator.RightSquare:
       case Punctuator.Comma:
+      case Punctuator.Dot:
         // one char operators
         punctuator += this._getNextChar();
         break;

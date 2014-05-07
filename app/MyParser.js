@@ -13,10 +13,12 @@ import PostfixOperatorExpressionParser from './expressions/parsers/PostfixOperat
 import BinaryOperatorExpressionParser from './expressions/parsers/BinaryOperatorExpressionParser';
 import FunctionExpressionParser from './expressions/parsers/FunctionExpressionParser';
 import ObjectExpressionParser from './expressions/parsers/ObjectExpressionParser';
+import ArrayExpressionParser from './expressions/parsers/ArrayExpressionParser';
+import MemberExpressionParser from './expressions/parsers/MemberExpressionParser';
 
 ///// Statements
 import IfStatementParser from './statements/parsers/IfStatementParser';
-import LeftCurlyStatementParser from './statements/parsers/LeftCurlyStatementParser';
+import BlockStatementParser from './statements/parsers/BlockStatementParser';
 import DeclarationStatementParser from './statements/parsers/DeclarationStatementParser';
 import FunctionDeclarationStatementParser from './statements/parsers/FunctionDeclarationStatementParser';
 import ReturnStatementParser from './statements/parsers/ReturnStatementParser';
@@ -30,10 +32,14 @@ export default class MyParser extends Parser {
     this.registerPrefix(TokenType.Literal, new LiteralExpressionParser());
     this.registerPrefix(Punctuator.LeftParen, new GroupExpressionParser());
     this.registerPrefix(Punctuator.LeftCurly, new ObjectExpressionParser());
+    this.registerPrefix(Punctuator.LeftSquare, new ArrayExpressionParser());
+
     this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
     this.registerInfix(Punctuator.LeftParen, new CallExpression());
+    this.registerInfix(Punctuator.Dot, new MemberExpressionParser(false));
+    this.registerInfix(Punctuator.LeftSquare, new MemberExpressionParser(true));
 
     // assignments
     [
@@ -75,7 +81,7 @@ export default class MyParser extends Parser {
     this.registerInfixRightGeneric(Punctuator.Caret, Precedence.Exponent);
 
     // statements
-    this.registerStatement(Punctuator.LeftCurly, new LeftCurlyStatementParser());
+    this.registerStatement(Punctuator.LeftCurly, new BlockStatementParser());
     this.registerStatement(Punctuator.Semicolon, new EmptyStatementParser());
     this.registerStatement(Keyword.If, new IfStatementParser());
     this.registerStatement(Keyword.Var, new DeclarationStatementParser());

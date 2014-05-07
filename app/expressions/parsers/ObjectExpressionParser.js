@@ -22,7 +22,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
           keyToken = IdentifierExpressionParser.parse(parser, keyToken);
         }
         else if (parser.matchType(TokenType.Literal, keyToken)) {
-          keyToken = LiteralExpressionParser.parse(parser, keyToken); 
+          keyToken = LiteralExpressionParser.parse(parser, keyToken);
         }
         else {
           keyToken.error('Bad object property name.');
@@ -33,7 +33,8 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
         // note property name
         keys[key] = true;
-      } while (parser.matchAndConsume(Punctuator.Comma));
+      }
+      while (parser.matchAndConsume(Punctuator.Comma));
     }
 
     parser.consume(Punctuator.RightCurly);

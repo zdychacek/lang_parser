@@ -1,5 +1,9 @@
 export default class Expression {
-    eval (context) {
-      throw new Error('Not implemented.');
-    }
+  constructor (type) {
+    this.type = type;
+  }
+
+  eval (context) {
+    throw new Error('Not implemented.');
+  }
 }

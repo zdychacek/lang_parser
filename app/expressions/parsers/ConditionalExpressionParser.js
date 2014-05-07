@@ -5,7 +5,7 @@ export default class ConditionalExpressionParserParser extends InfixExpressionPa
   parse (parser, left, token) {
     var consequent = parser.parseExpression();
     parser.consume(Punctuator.Colon);
-    var alternate = parser.parseExpression(Precedence.Conditional - 1);
+    var alternate = parser.parseExpression(this.precedence - 1);
 
     return {
       type: 'ConditionalExpression',
