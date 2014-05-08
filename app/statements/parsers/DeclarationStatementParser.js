@@ -12,7 +12,7 @@ export default class DeclarationStatementParser extends StatementParser {
       let init = null;
 
       if (parser.matchAndConsume(Punctuator.Assign)) {
-        init = parser.parseExpression();
+        init = parser.parseExpression(Precedence.Sequence);
       }
 
       // defined variable in current scope
