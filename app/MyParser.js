@@ -16,6 +16,7 @@ import FunctionExpressionParser from './expressions/parsers/FunctionExpressionPa
 import ObjectExpressionParser from './expressions/parsers/ObjectExpressionParser';
 import ArrayExpressionParser from './expressions/parsers/ArrayExpressionParser';
 import MemberExpressionParser from './expressions/parsers/MemberExpressionParser';
+import UpdateExpressionParser from './expressions/parsers/UpdateExpressionParser';
 
 ///// Statements
 import IfStatementParser from './statements/parsers/IfStatementParser';
@@ -40,12 +41,16 @@ export default class MyParser extends Parser {
     this.registerPrefix(Punctuator.LeftCurly, new ObjectExpressionParser());
     this.registerPrefix(Punctuator.LeftSquare, new ArrayExpressionParser());
     this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
+    this.registerPrefix(Punctuator.Increment, new UpdateExpressionParser(true));
+    this.registerPrefix(Punctuator.Decrement, new UpdateExpressionParser(true));
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
     this.registerInfix(Punctuator.LeftParen, new CallExpressionParser());
     this.registerInfix(Punctuator.Dot, new MemberExpressionParser(false));
     this.registerInfix(Punctuator.LeftSquare, new MemberExpressionParser(true));
     this.registerInfix(Punctuator.Comma, new SequenceExpressionParser());
+    this.registerInfix(Punctuator.Increment, new UpdateExpressionParser(false));
+    this.registerInfix(Punctuator.Decrement, new UpdateExpressionParser(false));
 
     // assignments
     [

@@ -1,13 +1,7 @@
-export default class InfixExpressionParser {
-  parse (parser, left, token) {
-    throw new Error('Not implemented.');
-  }
+import ExpressionParser from './ExpressionParser';
 
+export default class InfixExpressionParser extends ExpressionParser {
   get precedence () {
     throw new Error('Not implemented.');
-  }
-
-  static parse (parser, token) {
-    return new this().parse(parser, token);
   }
 }

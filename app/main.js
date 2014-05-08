@@ -12,7 +12,7 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`for (var i = 0, l = 5; i < l; i+1) {
+`for (var i = 0, l = 5; i < l; i++, --j) {
   ;
 }`;
 /*`var person = {

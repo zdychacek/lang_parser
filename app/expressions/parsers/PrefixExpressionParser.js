@@ -1,9 +1,4 @@
-export default class PrefixExpressionParser {
-  parse (parser, token) {
-    throw new Error('Not implemented.');
-  }
+import ExpressionParser from './ExpressionParser';
 
-  static parse (parser, token) {
-    return new this().parse(parser, token);
-  }
+export default class PrefixExpressionParser extends ExpressionParser {
 }

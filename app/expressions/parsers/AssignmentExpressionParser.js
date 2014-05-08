@@ -8,7 +8,7 @@ export default class AssignmentExpressionParser extends InfixExpressionParser {
     var right = parser.parseExpression(this.precedence - 1);
 
     if (!(left instanceof IdentifierExpression)) {
-      throw new Error('The left-hand side of an assignment must be an identifier.');
+      throw new SyntaxError('The left-hand side of an assignment must be an identifier.');
     }
 
     return new AssignmentExpression(token.value, left, right);

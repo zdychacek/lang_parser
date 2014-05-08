@@ -40,7 +40,9 @@ export var Punctuator = {
   Question: '?',
   Colon: ':',
   Semicolon: ';',
-  Dot: '.'
+  Dot: '.',
+  Increment: '++',
+  Decrement: '--'
 };
 
 export var Keyword = {
