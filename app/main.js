@@ -11,11 +11,14 @@ var lexer = new Lexer();
 var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
-sourceInput.value = 'this;';
-`for (var i = 0, l = 5; i < l; i++, --j) {
-  ;
-}`;
-/*`var person = {
+sourceInput.value =
+`var arr = [1, 2, 3, 4, 5];
+
+for (var i = 0, l = arr.length; i < l; i++, --j) {
+  this[i] = a + 6;
+};
+
+var person = {
   name: 'Ondrej',
   age: 26,
   data: {
@@ -41,7 +44,7 @@ var fn = function (a,b,c) {
   else f(a >= 5 && b < 12);
 
   return b || a && 28;
-};`*/
+};`
 
 function _do () {
   lexer.source = sourceInput.value;

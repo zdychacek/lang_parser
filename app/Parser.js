@@ -77,6 +77,9 @@ export default class Parser {
     this.reset();
   }
 
+  /**
+   * Reset parser's state.
+   */
   reset () {
     // parser state
     this._state = {
@@ -116,6 +119,13 @@ export default class Parser {
     var len = this._scopeChain.length;
 
     return this._scopeChain[len - 1];
+  }
+
+  /**
+   * Return global scope.
+   */
+  get globalScope () {
+    return this._scopeChain[0];
   }
 
   /**
@@ -339,6 +349,9 @@ export default class Parser {
     return this._transformToken(token);
   }
 
+  /**
+   * Get precedence of current infix expression;
+   */
   getPrecedence () {
     var exprParser = this.getInfixExpressionParser(this.peek());
 

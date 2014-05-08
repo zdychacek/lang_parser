@@ -63,7 +63,8 @@ export var Keyword = {
   For: 'for',
   InstanceOf: 'instanceof',
   TypeOf: 'typeof',
-  This: 'this'
+  This: 'this',
+  In: 'in'
 };
 
 export var Precedence = {

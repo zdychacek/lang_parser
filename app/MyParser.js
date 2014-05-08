@@ -72,8 +72,6 @@ export default class MyParser extends Parser {
     this.registerPrefixGeneric(Punctuator.Bang, Precedence.Prefix);
     this.registerPrefixGeneric(Keyword.TypeOf, Precedence.Prefix);
 
-    //this.registerPostfixGeneric(Punctuator.Bang, Precedence.Postfix);
-
     this.registerInfixLeftGeneric(Punctuator.Plus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Minus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Asterisk, Precedence.Product);
@@ -87,6 +85,7 @@ export default class MyParser extends Parser {
     this.registerInfixLeftGeneric(Punctuator.GreaterEqual, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.LessEqual, Precedence.Relational);
     this.registerInfixLeftGeneric(Keyword.InstanceOf, Precedence.Relational);
+    this.registerInfixLeftGeneric(Keyword.In, Precedence.Relational);
 
     // logical
     this.registerInfixLeftGeneric(Punctuator.LogicalAnd, Precedence.LogicalAnd);
