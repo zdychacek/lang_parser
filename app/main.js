@@ -12,7 +12,9 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`test:
+`var a = 5 +9;
+
+test:
   a + 1;
 
 while (a + 1 > 2) {

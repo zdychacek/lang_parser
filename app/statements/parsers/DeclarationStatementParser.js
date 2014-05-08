@@ -7,7 +7,7 @@ export default class DeclarationStatementParser extends StatementParser {
     var declarations = [];
     var kind = statementToken.value;
 
-    while (true) {
+    do {
       let id = parser.consumeType(TokenType.Identifier);
       let init = null;
 
@@ -15,14 +15,12 @@ export default class DeclarationStatementParser extends StatementParser {
         init = parser.parseExpression();
       }
 
+      // defined variable in current scope
+      parser.scope.define(id.value);
+
       declarations.push(this._makeDeclarator(parser, id, init));
-
-      if (!parser.match(Punctuator.Comma)) {
-        break;
-      }
-
-      parser.consume(Punctuator.Comma);
     }
+    while (parser.matchAndConsume(Punctuator.Comma));
 
     parser.consume(Punctuator.Semicolon);
 

@@ -32,10 +32,13 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
     // parse function body
     var currInFunctionState = parser.state.inFunction;
-
     parser.state.inFunction = true;
+    // create new scope
+    parser.pushScope();
+
     body = parser.parseBlock();
 
+    parser.popScope();
     parser.state.inFunction = currInFunctionState;
 
     // optional semicolon after function declaration

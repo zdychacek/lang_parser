@@ -8,19 +8,33 @@ class Scope {
   constructor (parent = null) {
     this._parent = parent;
 
-    // map of variables defined in this scope
-    this._vars = {};
+    // array of variables defined in this scope
+    this._vars = [];
 
     // array of labels (continue, break) defined in this scope
     this._labels = [];
   }
 
-  declare (varName) {
-
+  define (varName) {
+    if (this._vars.indexOf(varName) == -1) {
+      this._vars.push(varName);
+    }
+    else {
+      throw new SyntaxError(`Variable '${varName}' already defined in current scope.`);
+    }
   }
 
-  define (varName, value) {
+  isVariableDefined (varName) {
+    var currScope = this;
 
+    do {
+      if (currScope._vars.indexOf(varName) > -1) {
+        return true;
+      }
+    }
+    while (currScope = currScope._parent);
+
+    return false;
   }
 
   addLabel (name) {
@@ -87,8 +101,8 @@ export default class Parser {
     this._infixExpressions.set(token, expression);
   }
 
-  registerStatement (token, statementExpression) {
-    this._statements.set(token, statementExpression);
+  registerStatement (token, statement) {
+    this._statements.set(token, statement);
   }
 
   getPrefixExpressionParser (token) {
