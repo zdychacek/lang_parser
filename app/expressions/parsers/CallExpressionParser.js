@@ -8,7 +8,7 @@ export default class CallExpressionParser extends InfixExpressionParser {
 
     if (!parser.matchAndConsume(Punctuator.RightParen)) {
       do {
-        args.push(parser.parseExpression());
+        args.push(parser.parseExpression(Precedence.Sequence));
       } while (parser.matchAndConsume(Punctuator.Comma));
 
       parser.consume(Punctuator.RightParen);

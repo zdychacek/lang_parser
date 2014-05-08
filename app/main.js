@@ -11,7 +11,7 @@ var lexer = new Lexer();
 var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
-sourceInput.value =
+sourceInput.value = 'this;';
 `for (var i = 0, l = 5; i < l; i++, --j) {
   ;
 }`;
@@ -45,6 +45,7 @@ var fn = function (a,b,c) {
 
 function _do () {
   lexer.source = sourceInput.value;
+  //console.log(lexer.dump());return;
 
   try {
     ast = parser.parseProgram();

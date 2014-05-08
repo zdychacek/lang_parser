@@ -3,6 +3,10 @@ export var TokenType = {
   Literal: '(literal)',
   Keyword: '(keyword)',
   Punctuator: '(punctuator)',
+  Boolean: '(boolean)',
+  String: '(string)',
+  Number: '(number)',
+  Null: '(null)',
   EOF: '(EOF)'
 };
 
@@ -58,7 +62,8 @@ export var Keyword = {
   Break: 'break',
   For: 'for',
   InstanceOf: 'instanceof',
-  TypeOf: 'typeof'
+  TypeOf: 'typeof',
+  This: 'this'
 };
 
 export var Precedence = {
@@ -79,11 +84,27 @@ export var Precedence = {
   Member: 110
 };
 
+var literalsValues = [
+  'null',
+  'true',
+  'false'
+];
+
+var literalsTypes = [
+  TokenType.String,
+  TokenType.Number,
+  TokenType.Boolean,
+  TokenType.Null
+];
+
 export class Token {
 
-  constructor ({ type, value, start, end }) {
+  constructor ({ type, value, raw = null, start, end }) {
     this.type = type;
     this.value = value;
+
+    // raw value to distinguish between literals types
+    this.raw = raw;
     this.start = start;
     this.end = end;
   }
@@ -110,10 +131,10 @@ export class Lexer {
     var token = this._scanPunctuator();
     if (token) return token;
 
-    token = this._scanString();
+    token = this._scanNumber();
     if (token) return token;
 
-    token = this._scanNumber();
+    token = this._scanString();
     if (token) return token;
 
     token = this._scanIdentifier();
@@ -180,12 +201,21 @@ export class Lexer {
     return false;
   }
 
+  _isLiteralValue (identifier) {
+    return literalsValues.indexOf(identifier) > -1;
+  }
+
+  _isLiteralType (tokenType) {
+    return literalsTypes.indexOf(tokenType) > -1;
+  }
+
   _scanString () {
     var str = null;
     var char = this._peekNextChar();
+    var beginChar = '';
 
     if (char == '\'' || char == '"') {
-      let beginChar = this._getNextChar();
+      beginChar = this._getNextChar();
 
       char = this._peekNextChar();
 
@@ -211,7 +241,7 @@ export class Lexer {
     }
 
     if (str !== null) {
-      return this._createToken(TokenType.Literal, str);
+      return this._createToken(TokenType.String, str, `${beginChar}${str}${beginChar}`);
     }
   }
 
@@ -220,8 +250,9 @@ export class Lexer {
     var char = this._peekNextChar();
 
     // whole part
-    if (this._isDigit(char)) {
+    while (this._isDigit(char)) {
       number += this._getNextChar();
+      char = this._peekNextChar();
     }
 
     char = this._peekNextChar();
@@ -270,7 +301,7 @@ export class Lexer {
     }
 
     if (number) {
-      return this._createToken(TokenType.Literal, parseFloat(number));
+      return this._createToken(TokenType.Number, parseFloat(number), number);
     }
   }
 
@@ -357,8 +388,25 @@ export class Lexer {
       char = this._peekNextChar();
     }
 
-    if (identifier) {
-      return this._createToken(this._isKeyword(identifier)? TokenType.Keyword : TokenType.Identifier, identifier);
+    var tokenType = TokenType.Identifier;
+    var raw;
+
+    if (this._isKeyword(identifier)) {
+      tokenType = TokenType.Keyword;
+    }
+    else if (identifier == 'true' || identifier == 'false') {
+      tokenType = TokenType.Boolean;
+      raw = identifier;
+      identifier = (identifier === 'true');
+    }
+    else if (identifier == 'null') {
+      tokenType = TokenType.Null;
+      raw = identifier;
+      identifier = null;
+    }
+
+    if (identifier !== '') {
+      return this._createToken(tokenType, identifier, raw);
     }
   }
 
@@ -396,12 +444,15 @@ export class Lexer {
     return this._isIdentifierStart(char) || this._isDigit(char);
   }
 
-  _createToken (type, value = type) {
-    return new Token({
+  _createToken (type, value, raw = value) {
+    var token = new Token({
       type,
       value,
+      raw,
       start: this._marker,
       end: this._index
     });
+
+    return token;
   }
 }

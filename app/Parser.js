@@ -265,6 +265,18 @@ export default class Parser {
     return new Program(body);
   }
 
+  _transformToken (token) {
+    switch (token.type) {
+      case TokenType.Boolean:
+      case TokenType.String:
+      case TokenType.Number:
+      case TokenType.Null:
+        token.type = TokenType.Literal;
+    }
+
+    return token;
+  }
+
   consume (expected) {
     if (expected) {
       let token = this.peek();
@@ -274,7 +286,9 @@ export default class Parser {
       }
     }
 
-    return this._lexer.next();
+    var next = this._lexer.next();
+
+    return this._transformToken(next);
   }
 
   consumeType (expected) {
@@ -286,7 +300,9 @@ export default class Parser {
       }
     }
 
-    return this._lexer.next();
+    var next = this._lexer.next();
+
+    return this._transformToken(next);
   }
 
   matchAndConsume (expected, token = this.peek()) {
@@ -318,7 +334,9 @@ export default class Parser {
   }
 
   peek (distance = 0) {
-    return this._lexer.peek(distance);
+    var token = this._lexer.peek(distance);
+
+    return this._transformToken(token);
   }
 
   getPrecedence () {
