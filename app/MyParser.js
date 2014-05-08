@@ -9,7 +9,7 @@ import AssignmentExpressionParser from './expressions/parsers/AssignmentExpressi
 import ConditionalExpressionParser from './expressions/parsers/ConditionalExpressionParser';
 import GroupExpressionParser from './expressions/parsers/GroupExpressionParser';
 import CallExpressionParser from './expressions/parsers/CallExpressionParser';
-import PrefixOperatorExpressionParser from './expressions/parsers/PrefixOperatorExpressionParser';
+import UnaryExpressionParser from './expressions/parsers/UnaryExpressionParser';
 import PostfixOperatorExpressionParser from './expressions/parsers/PostfixOperatorExpressionParser';
 import BinaryOperatorExpressionParser from './expressions/parsers/BinaryOperatorExpressionParser';
 import FunctionExpressionParser from './expressions/parsers/FunctionExpressionParser';
@@ -63,8 +63,9 @@ export default class MyParser extends Parser {
     this.registerPrefixGeneric(Punctuator.Minus, Precedence.Prefix);
     this.registerPrefixGeneric(Punctuator.Tilde, Precedence.Prefix);
     this.registerPrefixGeneric(Punctuator.Bang, Precedence.Prefix);
+    this.registerPrefixGeneric(Keyword.TypeOf, Precedence.Prefix);
 
-    this.registerPostfixGeneric(Punctuator.Bang, Precedence.Postfix);
+    //this.registerPostfixGeneric(Punctuator.Bang, Precedence.Postfix);
 
     this.registerInfixLeftGeneric(Punctuator.Plus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Minus, Precedence.Sum);
@@ -78,6 +79,7 @@ export default class MyParser extends Parser {
     this.registerInfixLeftGeneric(Punctuator.Less, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.GreaterEqual, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.LessEqual, Precedence.Relational);
+    this.registerInfixLeftGeneric(Keyword.InstanceOf, Precedence.Relational);
 
     // logical
     this.registerInfixLeftGeneric(Punctuator.LogicalAnd, Precedence.LogicalAnd);
@@ -106,7 +108,7 @@ export default class MyParser extends Parser {
   }
 
   registerPrefixGeneric (token, precedence) {
-    this.registerPrefix(token, new PrefixOperatorExpressionParser(precedence));
+    this.registerPrefix(token, new UnaryExpressionParser(precedence));
   }
 
   registerInfixLeftGeneric (token, precedence) {

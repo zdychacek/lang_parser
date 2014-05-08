@@ -1,7 +1,8 @@
 import PrefixExpressionParser from './PrefixExpressionParser';
-import PrefixExpression from '../PrefixExpression';
+import { Precedence } from '../../Lexer';
+import UnaryExpression from '../UnaryExpression';
 
-export default class PrefixOperatorExpressionParser extends PrefixExpressionParser {
+export default class UnaryExpressionParser extends PrefixExpressionParser {
   constructor (precedence) {
     this._precedence = precedence;
   }
@@ -9,7 +10,7 @@ export default class PrefixOperatorExpressionParser extends PrefixExpressionPars
   parse (parser, token) {
     var right = parser.parseExpression(this.precedence);
 
-    return new PrefixExpression(token.value, right);
+    return new UnaryExpression(token.value, right);
   }
 
   get precedence () {

@@ -54,7 +54,9 @@ export var Keyword = {
   Do: 'do',
   Continue: 'continue',
   Break: 'break',
-  For: 'for'
+  For: 'for',
+  InstanceOf: 'instanceof',
+  TypeOf: 'typeof'
 };
 
 export var Precedence = {
