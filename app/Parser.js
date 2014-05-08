@@ -6,6 +6,7 @@ import LabeledStatementParser from './statements/parsers/LabeledStatementParser'
 
 class Scope {
   constructor (parent = null) {
+    // reference to parent scope
     this._parent = parent;
 
     // array of variables defined in this scope
@@ -15,6 +16,9 @@ class Scope {
     this._labels = [];
   }
 
+  /**
+   * Define variable in current scope (disabling variable redefinition).
+   */
   define (varName) {
     if (this._vars.indexOf(varName) == -1) {
       this._vars.push(varName);
@@ -24,6 +28,9 @@ class Scope {
     }
   }
 
+  /**
+   * Check if variable is defined (traverses scope chain)
+   */
   isVariableDefined (varName) {
     var currScope = this;
 
@@ -37,10 +44,16 @@ class Scope {
     return false;
   }
 
+  /**
+   * Add label name definition
+   */
   addLabel (name) {
     this._labels.push(name);
   }
 
+  /**
+   * Check if scope has label defined
+   */
   hasLabel (name) {
     return this._labels.indexOf(name) > -1;
   }
@@ -49,10 +62,18 @@ class Scope {
 export default class Parser {
   constructor (lexer) {
     this._lexer = lexer;
+
+    // prefix expressions parsers
     this._prefixExpressions = new Map();
+
+    // infix expressions parsers
     this._infixExpressions = new Map();
+
+    // statements parsers
     this._statements = new Map();
 
+
+    // reset parser state
     this.reset();
   }
 
@@ -72,23 +93,34 @@ export default class Parser {
     this.pushScope();
   }
 
+  /**
+   * Push new scope on stack.
+   */
   pushScope () {
     var newScope = new Scope(this._scopeChain.length? this.scope : null);
 
     this._scopeChain.push(newScope);
   }
 
+  /**
+   * Pop and return current scope from stack.
+   */
   popScope () {
     return this._scopeChain.pop();
   }
 
-  // returns current scope
+  /**
+   * Return current scope.
+   */
   get scope () {
     var len = this._scopeChain.length;
 
     return this._scopeChain[len - 1];
   }
 
+  /**
+   * Return parsers current state.
+   */
   get state () {
     return this._state;
   }
@@ -209,6 +241,15 @@ export default class Parser {
     this.consume(Punctuator.RightCurly);
 
     return new BlockStatement(body);
+  }
+
+  parseExpressionStatementOrBlock () {
+    if (this.match(Punctuator.LeftCurly)) {
+      return this.parseBlock();
+    }
+    else {
+      return this.parseStatement();
+    }
   }
 
   parseProgram () {

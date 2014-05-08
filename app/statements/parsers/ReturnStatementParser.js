@@ -10,7 +10,7 @@ export default class ReturnStatementParser extends StatementParser {
       throw new SyntaxError('Illegal return statement.');
     }
 
-    if (!parser.matchAndConsume(Punctuator.Semicolon)) {
+    if (!parser.match(Punctuator.Semicolon)) {
       argument = parser.parseExpression();
       parser.consume(Punctuator.Semicolon);
     }

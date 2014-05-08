@@ -1,10 +1,8 @@
 import PrefixExpressionParser from './PrefixExpressionParser';
+import LiteralExpression from '../LiteralExpression';
 
 export default class LiteralExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
-    return {
-      type: 'Literal',
-      value: token.value
-    };
+    return new LiteralExpression(token.value);
   }
 }

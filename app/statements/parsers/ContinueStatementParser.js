@@ -21,8 +21,6 @@ export default class ContinueStatementParser extends StatementParser {
       if (!parser.scope.hasLabel(label.name)) {
         throw new SyntaxError(`Undefined label ${label.name}.`);
       }
-
-      parser.consume(Punctuator.Semicolon);
     }
 
     return new ContinueStatement(label);

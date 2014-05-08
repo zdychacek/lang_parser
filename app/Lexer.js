@@ -53,10 +53,12 @@ export var Keyword = {
   While: 'while',
   Do: 'do',
   Continue: 'continue',
-  Break: 'break'
+  Break: 'break',
+  For: 'for'
 };
 
 export var Precedence = {
+  Sequence: 5,
   Assignment: 10,
   Conditional: 20,
   LogicalOr: 30,

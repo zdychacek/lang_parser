@@ -1,4 +1,5 @@
 import PrefixExpressionParser from './PrefixExpressionParser';
+import PrefixExpression from '../PrefixExpression';
 
 export default class PrefixOperatorExpressionParser extends PrefixExpressionParser {
   constructor (precedence) {
@@ -8,11 +9,7 @@ export default class PrefixOperatorExpressionParser extends PrefixExpressionPars
   parse (parser, token) {
     var right = parser.parseExpression(this.precedence);
 
-    return {
-      type: 'PrefixExpressionParser',
-      operator: token.value,
-      right
-    };
+    return new PrefixExpression(token.value, right);
   }
 
   get precedence () {

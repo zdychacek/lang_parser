@@ -21,8 +21,6 @@ export default class BreakStatementParser extends StatementParser {
       if (!parser.scope.hasLabel(label.name)) {
         throw new SyntaxError(`Undefined label ${label.name}.`);
       }
-
-      parser.consume(Punctuator.Semicolon);
     }
 
     return new BreakStatement(label);

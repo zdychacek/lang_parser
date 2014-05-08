@@ -1,14 +1,14 @@
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
-import { TokenType, Punctuator } from '../../Lexer';
+import { Precedence, TokenType, Punctuator } from '../../Lexer';
+import DeclarationStatement from '../DeclarationStatement';
 
 export default class DeclarationStatementParser extends StatementParser {
-  parse (parser, statementToken) {
-    var declarations = [];
-    var kind = statementToken.value;
+  parse (parser, token) {
+    var declarationStmt = new DeclarationStatement([], token.value);
 
     do {
-      let id = parser.consumeType(TokenType.Identifier);
+      let idToken = parser.consumeType(TokenType.Identifier);
       let init = null;
 
       if (parser.matchAndConsume(Punctuator.Assign)) {
@@ -16,28 +16,14 @@ export default class DeclarationStatementParser extends StatementParser {
       }
 
       // defined variable in current scope
-      parser.scope.define(id.value);
+      parser.scope.define(idToken.value);
 
-      declarations.push(this._makeDeclarator(parser, id, init));
+      declarationStmt.addDeclarator(IdentifierExpressionParser.parse(parser, idToken), init);
     }
     while (parser.matchAndConsume(Punctuator.Comma));
 
     parser.consume(Punctuator.Semicolon);
 
-    return {
-      type: 'VariableDeclaration',
-      declarations,
-      kind
-    };
-  }
-
-  _makeDeclarator (parser, id, init) {
-    id = IdentifierExpressionParser.parse(parser, id);
-
-    return {
-      type: 'VariableDeclarator',
-      id,
-      init
-    };
+    return declarationStmt;
   }
 }

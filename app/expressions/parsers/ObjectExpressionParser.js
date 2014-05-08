@@ -2,11 +2,12 @@ import PrefixExpressionParser from './PrefixExpressionParser';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
 import LiteralExpressionParser from './LiteralExpressionParser';
 import { TokenType, Precedence, Punctuator } from '../../Lexer';
+import ObjectExpression from '../ObjectExpression';
 
 export default class ObjectExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
-    var properties = [];
     var keys = {};
+    var objectExpr = new ObjectExpression();
 
     if (!parser.match(Punctuator.RightCurly)) {
       do {
@@ -29,9 +30,11 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
         }
 
         parser.consume(Punctuator.Colon);
-        properties.push(this._makeProperty(keyToken, parser.parseExpression()));
 
-        // note property name
+        // add new property
+        objectExpr.addProperty(keyToken, parser.parseExpression(Precedence.Sequence));
+
+        // note property name to avoid key duplicity
         keys[key] = true;
       }
       while (parser.matchAndConsume(Punctuator.Comma));
@@ -39,17 +42,6 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
     parser.consume(Punctuator.RightCurly);
 
-    return {
-      type: 'ObjectExpression',
-      properties
-    };
-  }
-
-  _makeProperty (key, value) {
-    return {
-      type: 'Property',
-      key,
-      value
-    };
+    return objectExpr;
   }
 }

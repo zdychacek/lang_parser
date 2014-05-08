@@ -8,6 +8,6 @@ export default class BlockStatement extends Statement {
   }
 
   eval (context) {
-    
+
   }
 }

@@ -4,6 +4,7 @@ import { TokenType, Keyword, Punctuator, Precedence } from './Lexer';
 ///// Expressions
 import IdentifierExpressionParser from './expressions/parsers/IdentifierExpressionParser';
 import LiteralExpressionParser from './expressions/parsers/LiteralExpressionParser';
+import SequenceExpressionParser from './expressions/parsers/SequenceExpressionParser';
 import AssignmentExpressionParser from './expressions/parsers/AssignmentExpressionParser';
 import ConditionalExpressionParser from './expressions/parsers/ConditionalExpressionParser';
 import GroupExpressionParser from './expressions/parsers/GroupExpressionParser';
@@ -27,6 +28,7 @@ import WhileStatementParser from './statements/parsers/WhileStatementParser';
 import DoWhileStatementParser from './statements/parsers/DoWhileStatementParser';
 import ContinueStatementParser from './statements/parsers/ContinueStatementParser';
 import BreakStatementParser from './statements/parsers/BreakStatementParser';
+import ForStatementParser from './statements/parsers/ForStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -43,6 +45,7 @@ export default class MyParser extends Parser {
     this.registerInfix(Punctuator.LeftParen, new CallExpressionParser());
     this.registerInfix(Punctuator.Dot, new MemberExpressionParser(false));
     this.registerInfix(Punctuator.LeftSquare, new MemberExpressionParser(true));
+    this.registerInfix(Punctuator.Comma, new SequenceExpressionParser());
 
     // assignments
     [
@@ -95,6 +98,7 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Do, new DoWhileStatementParser());
     this.registerStatement(Keyword.Continue, new ContinueStatementParser());
     this.registerStatement(Keyword.Break, new BreakStatementParser());
+    this.registerStatement(Keyword.For, new ForStatementParser());
   }
 
   registerPostfixGeneric (token, precedence) {

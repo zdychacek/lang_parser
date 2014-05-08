@@ -1,4 +1,5 @@
 import InfixExpressionParser from './InfixExpressionParser';
+import PostfixExpression from '../PostfixExpression';
 
 export default class PostfixOperatorExpressionParser extends InfixExpressionParser {
   constructor (precedence) {
@@ -6,11 +7,7 @@ export default class PostfixOperatorExpressionParser extends InfixExpressionPars
   }
 
   parse (parser, left, token) {
-    return {
-      type: 'PostfixExpression',
-      operator: token.value,
-      left
-    };
+    return new PostfixExpression(token.value, left);
   }
 
   get precedence () {

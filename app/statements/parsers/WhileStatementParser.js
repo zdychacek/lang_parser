@@ -5,7 +5,6 @@ import { Punctuator } from '../../Lexer';
 export default class WhileStatementParser extends StatementParser {
   parse (parser, token) {
     var test = null;
-    var body = null;
 
     parser.consume(Punctuator.LeftParen);
     test = parser.parseExpression();
@@ -14,12 +13,7 @@ export default class WhileStatementParser extends StatementParser {
     var currInLoopState = parser.state.inLoop;
     parser.state.inLoop = true;
 
-    if (parser.match(Punctuator.LeftCurly)) {
-      body = parser.parseBlock();
-    }
-    else {
-      body = parser.parseStatement();
-    }
+    var body = parser.parseExpressionStatementOrBlock();
 
     parser.state.inLoop = currInLoopState;
 

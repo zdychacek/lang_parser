@@ -1,6 +1,7 @@
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 import { TokenType, Punctuator } from '../../Lexer';
+import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
 
 export default class FunctionDeclarationStatementParser extends StatementParser {
   parse (parser, token) {
@@ -12,6 +13,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.consume(Punctuator.LeftParen);
 
     if (!parser.match(Punctuator.RightParen)) {
+      // parse parameters
       do {
         let paramToken = parser.consume();
 
@@ -20,10 +22,6 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
         }
 
         params.push(IdentifierExpressionParser.parse(parser, paramToken));
-
-        if (!parser.match(Punctuator.Comma)) {
-          break;
-        }
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }
@@ -41,16 +39,6 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.popScope();
     parser.state.inFunction = currInFunctionState;
 
-    // optional semicolon after function declaration
-    if (parser.match(Punctuator.Semicolon)) {
-      parser.consume(Punctuator.Semicolon);
-    }
-
-    return {
-      type: 'FunctionDeclaration',
-      id,
-      params,
-      body
-    };
+    return new FunctionDeclarationStatement(id, params, body);
   }
 }
