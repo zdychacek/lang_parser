@@ -11,7 +11,14 @@ var lexer = new Lexer();
 var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
-sourceInput.value = `a.b.c;`;
+sourceInput.value =
+`test:
+  a + 1;
+
+while (a + 1 > 2) {
+  continue test;
+}
+`;
 /*`var person = {
   name: 'Ondrej',
   age: 26,

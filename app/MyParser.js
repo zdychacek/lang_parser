@@ -23,6 +23,10 @@ import DeclarationStatementParser from './statements/parsers/DeclarationStatemen
 import FunctionDeclarationStatementParser from './statements/parsers/FunctionDeclarationStatementParser';
 import ReturnStatementParser from './statements/parsers/ReturnStatementParser';
 import EmptyStatementParser from './statements/parsers/EmptyStatementParser';
+import WhileStatementParser from './statements/parsers/WhileStatementParser';
+import DoWhileStatementParser from './statements/parsers/DoWhileStatementParser';
+import ContinueStatementParser from './statements/parsers/ContinueStatementParser';
+import BreakStatementParser from './statements/parsers/BreakStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -33,7 +37,6 @@ export default class MyParser extends Parser {
     this.registerPrefix(Punctuator.LeftParen, new GroupExpressionParser());
     this.registerPrefix(Punctuator.LeftCurly, new ObjectExpressionParser());
     this.registerPrefix(Punctuator.LeftSquare, new ArrayExpressionParser());
-
     this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
@@ -88,6 +91,10 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Let, new DeclarationStatementParser());
     this.registerStatement(Keyword.Function, new FunctionDeclarationStatementParser());
     this.registerStatement(Keyword.Return, new ReturnStatementParser());
+    this.registerStatement(Keyword.While, new WhileStatementParser());
+    this.registerStatement(Keyword.Do, new DoWhileStatementParser());
+    this.registerStatement(Keyword.Continue, new ContinueStatementParser());
+    this.registerStatement(Keyword.Break, new BreakStatementParser());
   }
 
   registerPostfixGeneric (token, precedence) {

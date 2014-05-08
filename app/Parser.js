@@ -2,6 +2,35 @@ import { TokenType, Punctuator } from './Lexer';
 import Program from './statements/Program';
 import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
+import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
+
+class Scope {
+  constructor (parent = null) {
+    this._parent = parent;
+
+    // map of variables defined in this scope
+    this._vars = {};
+
+    // array of labels (continue, break) defined in this scope
+    this._labels = [];
+  }
+
+  declare (varName) {
+
+  }
+
+  define (varName, value) {
+
+  }
+
+  addLabel (name) {
+    this._labels.push(name);
+  }
+
+  hasLabel (name) {
+    return this._labels.indexOf(name) > -1;
+  }
+}
 
 export default class Parser {
   constructor (lexer) {
@@ -10,11 +39,44 @@ export default class Parser {
     this._infixExpressions = new Map();
     this._statements = new Map();
 
+    this.reset();
+  }
+
+  reset () {
     // parser state
     this._state = {
+      // if we are currently parsing function body
       inFunction: false,
+      // if we are currently parsing loop body
       inLoop: false
     };
+
+    // scope chain for identifier lookup
+    this._scopeChain = [];  // of scopes
+
+    // create global scope
+    this.pushScope();
+  }
+
+  pushScope () {
+    var newScope = new Scope(this._scopeChain.length? this.scope : null);
+
+    this._scopeChain.push(newScope);
+  }
+
+  popScope () {
+    return this._scopeChain.pop();
+  }
+
+  // returns current scope
+  get scope () {
+    var len = this._scopeChain.length;
+
+    return this._scopeChain[len - 1];
+  }
+
+  get state () {
+    return this._state;
   }
 
   registerPrefix (token, expression) {
@@ -61,14 +123,14 @@ export default class Parser {
       token.error('Could not parse.');
     }
 
-    var left = prefixParser.parse(this, token, this._state);
+    var left = prefixParser.parse(this, token);
 
     while (precedence < this.getPrecedence()) {
       token = this.consume();
 
       let infixParser = this.getInfixExpressionParser(token);
 
-      left = infixParser.parse(this, left, token, this._state);
+      left = infixParser.parse(this, left, token);
     }
 
     return left;
@@ -94,12 +156,24 @@ export default class Parser {
 
   parseStatement () {
     var token = this.peek();
-    var statementExpression = this._statements.get(token.value);
+    var statementExpression = null;
+
+    // try to parse labeled statement
+    if (this.matchType(TokenType.Identifier)) {
+      let token1 = this.peek(1);
+
+      if (token1.value == Punctuator.Colon) {
+        statementExpression = new LabeledStatementParser();
+      }
+    }
+    else {
+      statementExpression = this._statements.get(token.value);
+    }
 
     if (statementExpression) {
       let statementToken = this.consume();
 
-      return statementExpression.parse(this, statementToken, this._state);
+      return statementExpression.parse(this, statementToken);
     }
     else {
       let expr = this.parseExpression();
@@ -124,6 +198,8 @@ export default class Parser {
   }
 
   parseProgram () {
+    this.reset();
+
     var body = this.parseStatements();
     var token = this.peek();
 
@@ -186,8 +262,8 @@ export default class Parser {
     return token && token.type == expected;
   }
 
-  peek () {
-    return this._lexer.peek();
+  peek (distance = 0) {
+    return this._lexer.peek(distance);
   }
 
   getPrecedence () {

@@ -4,7 +4,7 @@ import { TokenType, Keyword, Punctuator } from '../../Lexer';
 import FunctionExpression from '../FunctionExpression';
 
 export default class FunctionExpressionParser extends PrefixExpressionParser {
-  parse (parser, token, state) {
+  parse (parser, token) {
     var id = null;
     var params = [];
     var body = null;
@@ -37,9 +37,12 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     parser.consume(Punctuator.RightParen);
 
     // parse function body
-    state.inFunction = true;
+    var currInFunctionState = parser.state.inFunction;
+
+    parser.state.inFunction = true;
     body = parser.parseBlock();
-    state.inFunction = false;
+
+    parser.state.inFunction = currInFunctionState;
 
     return new FunctionExpression(id, params, body);
   }

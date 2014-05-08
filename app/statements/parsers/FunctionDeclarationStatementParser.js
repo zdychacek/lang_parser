@@ -3,7 +3,7 @@ import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpr
 import { TokenType, Punctuator } from '../../Lexer';
 
 export default class FunctionDeclarationStatementParser extends StatementParser {
-  parse (parser, token, state) {
+  parse (parser, token) {
     var tokenId = parser.consumeType(TokenType.Identifier);
     var params = [];
     var body = null;
@@ -31,9 +31,12 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.consume(Punctuator.RightParen);
 
     // parse function body
-    state.inFunction = true;
+    var currInFunctionState = parser.state.inFunction;
+
+    parser.state.inFunction = true;
     body = parser.parseBlock();
-    state.inFunction = false;
+
+    parser.state.inFunction = currInFunctionState;
 
     // optional semicolon after function declaration
     if (parser.match(Punctuator.Semicolon)) {

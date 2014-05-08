@@ -1,11 +1,12 @@
 import StatementParser from './StatementParser';
 import { Punctuator } from '../../Lexer';
+import ReturnStatement from '../ReturnStatement';
 
 export default class ReturnStatementParser extends StatementParser {
-  parse (parser, token, state) {
+  parse (parser, token) {
     var argument = null;
 
-    if (!state.inFunction) {
+    if (!parser.state.inFunction) {
       throw new SyntaxError('Illegal return statement.');
     }
 
@@ -18,9 +19,6 @@ export default class ReturnStatementParser extends StatementParser {
       throw new SyntaxError('Unreachable statement.');
     }
 
-    return {
-      type: 'ReturnStatement',
-      argument
-    }
+    return new ReturnStatement(argument);
   }
 }

@@ -49,7 +49,11 @@ export var Keyword = {
   Var: 'var',
   Let: 'let',
   Function: 'function',
-  Return: 'return'
+  Return: 'return',
+  While: 'while',
+  Do: 'do',
+  Continue: 'continue',
+  Break: 'break'
 };
 
 export var Precedence = {
@@ -112,13 +116,17 @@ export class Lexer {
     throw new SyntaxError('Unexpected token \'' + this._peekNextChar() + '\'.');
   }
 
-  peek () {
+  peek (distance = 0) {
+    var peeks = [];
     var idx = this._index;
-    var token = this.next();
+
+    while (distance + 1 > peeks.length) {
+      peeks.push(this.next());
+    }
 
     this._index = idx;
 
-    return token;
+    return peeks[distance];
   }
 
   reset () {
