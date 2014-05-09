@@ -1,7 +1,8 @@
 import InfixExpressionParser from './InfixExpressionParser';
-import { Precedence, Punctuator } from '../../Lexer';
+import { Precedence, Punctuator, TokenType } from '../../Lexer';
 import MemberExpression from '../MemberExpression';
 import IdentifierExpression from '../IdentifierExpression';
+import IdentifierExpressionParser from './IdentifierExpressionParser';
 
 export default class MemberExpressionParser extends InfixExpressionParser {
   constructor (computed = false) {
@@ -17,11 +18,9 @@ export default class MemberExpressionParser extends InfixExpressionParser {
       parser.consume(Punctuator.RightSquare);
     }
     else {
-      property = parser.parseExpression(this.precedence);
-
-      if (!(property instanceof IdentifierExpression)) {
-        throw new Error('Unexpected expression.');
-      }
+      let propertyToken = parser.consumeType(TokenType.Identifier);
+      
+      property = IdentifierExpressionParser.parse(parser, propertyToken, true);
     }
 
     return new MemberExpression(object, property, this.computed);

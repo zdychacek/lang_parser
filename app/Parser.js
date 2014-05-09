@@ -59,8 +59,29 @@ class Scope {
   }
 }
 
+class ParserState {
+  constructor () {
+    // if we are currently parsing function body
+    this.inFunction = false;
+    // if we are currently parsing loop body
+    this.inLoop = false;
+    // if we are currently parsing switch case statements
+    this.inSwitchCaseBody = false;
+
+    this._stacks = {};
+  }
+
+  pushAttribute (attribute, value) {
+
+  }
+
+  popAttribute (attribute) {
+
+  }
+}
+
 export default class Parser {
-  constructor (lexer) {
+  constructor (lexer, globals = null) {
     this._lexer = lexer;
 
     // prefix expressions parsers
@@ -72,6 +93,7 @@ export default class Parser {
     // statements parsers
     this._statements = new Map();
 
+    this._globals = globals;
 
     // reset parser state
     this.reset();
@@ -85,27 +107,27 @@ export default class Parser {
     // implement stack push/pop mechanism for remembering state's properties
     
     // parser state
-    this._state = {
-      // if we are currently parsing function body
-      inFunction: false,
-      // if we are currently parsing loop body
-      inLoop: false,
-      // if we are currently parsing switch case statements
-      inSwitchCaseBody: false
-    };
+    this._state = new ParserState();
 
     // scope chain for identifier lookup
     this._scopeChain = [];  // of scopes
 
     // create global scope
-    this.pushScope();
+    this.pushScope(this._globals);
   }
 
   /**
-   * Push new scope on stack.
+   * Push new scope on stack, optionaly with some injected variables.
    */
-  pushScope () {
+  pushScope (injectVariables = null) {
     var newScope = new Scope(this._scopeChain.length? this.scope : null);
+
+    // inject some variables
+    if (Array.isArray(injectVariables)) {
+      injectVariables.forEach(function (varName) {
+        newScope.define(varName);
+      });
+    }
 
     this._scopeChain.push(newScope);
   }

@@ -31,7 +31,7 @@ export default class SwitchStatementParser extends StatementParser {
         // default clause
         else {
           if (containsDefaultClause) {
-            throw new SyntaxError('Switch statement has already default clasuse defined.');
+            throw new SyntaxError('Switch statement has already default clause defined.');
           }
           containsDefaultClause = true;
         }       

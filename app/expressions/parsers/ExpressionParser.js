@@ -3,7 +3,7 @@ export default class ExpressionParser {
     throw new Error('Not implemented.');
   }
 
-  static parse (parser, token) {
-    return new this().parse(parser, token);
+  static parse () {
+    return new this().parse(...arguments);
   }
 }

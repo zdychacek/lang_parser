@@ -35,7 +35,14 @@ import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
-    super(lexer);
+    // define some globals
+    var globals = [
+      'window',
+      'alert',
+      'confirm'
+    ];
+
+    super(lexer, globals);
 
     this.registerPrefix(TokenType.Identifier, new IdentifierExpressionParser());
     this.registerPrefix(TokenType.Literal, new LiteralExpressionParser());

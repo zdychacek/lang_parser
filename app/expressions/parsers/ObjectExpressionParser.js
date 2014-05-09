@@ -20,7 +20,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
         }
 
         if (parser.matchType(TokenType.Identifier, keyToken)) {
-          keyToken = IdentifierExpressionParser.parse(parser, keyToken);
+          keyToken = IdentifierExpressionParser.parse(parser, keyToken, true);
         }
         else if (parser.matchType(TokenType.Literal, keyToken)) {
           keyToken = LiteralExpressionParser.parse(parser, keyToken);

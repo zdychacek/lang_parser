@@ -12,7 +12,9 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`switch (a+b) {
+`var a,b,j,c,f;
+
+switch (a+b) {
   case 1:
     a++;
     break;

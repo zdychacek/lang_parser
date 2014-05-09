@@ -9,14 +9,15 @@ export default class DeclarationStatementParser extends StatementParser {
 
     do {
       let idToken = parser.consumeType(TokenType.Identifier);
+
+      // defined variable in current scope
+      parser.scope.define(idToken.value);
+      
       let init = null;
 
       if (parser.matchAndConsume(Punctuator.Assign)) {
         init = parser.parseExpression(Precedence.Sequence);
       }
-
-      // defined variable in current scope
-      parser.scope.define(idToken.value);
 
       declarationStmt.addDeclarator(IdentifierExpressionParser.parse(parser, idToken), init);
     }

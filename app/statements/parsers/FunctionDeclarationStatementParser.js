@@ -6,6 +6,10 @@ import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
 export default class FunctionDeclarationStatementParser extends StatementParser {
   parse (parser, token) {
     var tokenId = parser.consumeType(TokenType.Identifier);
+
+    // defined variable in current scope
+    parser.scope.define(tokenId.value);
+
     var params = [];
     var body = null;
     var id = IdentifierExpressionParser.parse(parser, tokenId);

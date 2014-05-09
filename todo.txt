@@ -1,3 +1,7 @@
+Variables hoisting.
+
+Statements:
+-----------------------
 Try/catch statement
 Debugger statement
 For-in statement
