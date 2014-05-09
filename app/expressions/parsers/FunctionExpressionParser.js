@@ -11,7 +11,7 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
 
     // parse optional name
     if (parser.matchType(TokenType.Identifier)) {
-      id = IdentifierExpressionParser.parse(parser, parser.consume());
+      id = IdentifierExpressionParser.parse(parser, parser.consume(), true);
     }
 
     parser.consume(Punctuator.LeftParen);
@@ -40,7 +40,8 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     var currInFunctionState = parser.state.inFunction;
     parser.state.inFunction = true;
     // create new scope
-    parser.pushScope();
+    // if function id was specified, then inject that id in the function scope
+    parser.pushScope(id? [id.name] : null);
 
     body = parser.parseBlock();
 
