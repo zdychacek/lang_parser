@@ -1,5 +1,4 @@
 Try/catch statement
-Switch statement
 Debugger statement
 For-in statement
 New operator
@@ -8,4 +7,3 @@ Void
 With
 New
 Delete
-In

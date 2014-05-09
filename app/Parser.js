@@ -1,4 +1,4 @@
-import { TokenType, Punctuator } from './Lexer';
+import { TokenType, Punctuator, Keyword } from './Lexer';
 import Program from './statements/Program';
 import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
@@ -81,12 +81,17 @@ export default class Parser {
    * Reset parser's state.
    */
   reset () {
+    // TODO:
+    // implement stack push/pop mechanism for remembering state's properties
+    
     // parser state
     this._state = {
       // if we are currently parsing function body
       inFunction: false,
       // if we are currently parsing loop body
-      inLoop: false
+      inLoop: false,
+      // if we are currently parsing switch case statements
+      inSwitchCaseBody: false
     };
 
     // scope chain for identifier lookup
@@ -196,7 +201,11 @@ export default class Parser {
     var statements = [];
 
     while (true) {
-      if (this.match(Punctuator.RightCurly) || this.matchType(TokenType.EOF)) {
+      if (this.match(Punctuator.RightCurly)
+        || this.match(Keyword.Case)
+        || this.match(Keyword.Default)
+        || this.matchType(TokenType.EOF)
+      ) {
         break;
       }
 

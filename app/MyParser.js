@@ -31,6 +31,7 @@ import DoWhileStatementParser from './statements/parsers/DoWhileStatementParser'
 import ContinueStatementParser from './statements/parsers/ContinueStatementParser';
 import BreakStatementParser from './statements/parsers/BreakStatementParser';
 import ForStatementParser from './statements/parsers/ForStatementParser';
+import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -107,6 +108,7 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Continue, new ContinueStatementParser());
     this.registerStatement(Keyword.Break, new BreakStatementParser());
     this.registerStatement(Keyword.For, new ForStatementParser());
+    this.registerStatement(Keyword.Switch, new SwitchStatementParser());
   }
 
   registerPostfixGeneric (token, precedence) {

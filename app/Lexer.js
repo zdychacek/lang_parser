@@ -64,7 +64,11 @@ export var Keyword = {
   InstanceOf: 'instanceof',
   TypeOf: 'typeof',
   This: 'this',
-  In: 'in'
+  In: 'in',
+  Switch: 'switch',
+  Case: 'case',
+  Default: 'default'
+  // TODO: new, delete, throw, try/catch, throw, debugger, with
 };
 
 export var Precedence = {

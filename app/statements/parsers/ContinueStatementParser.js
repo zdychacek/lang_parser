@@ -11,7 +11,7 @@ export default class ContinueStatementParser extends StatementParser {
       throw new SyntaxError('Illegal continue statement.');
     }
 
-    if (!parser.matchAndConsume(Punctuator.Semicolon)) {
+    if (!parser.match(Punctuator.Semicolon)) {
       label = parser.parseExpression();
 
       if (!(label instanceof IdentifierExpression)) {
@@ -22,6 +22,8 @@ export default class ContinueStatementParser extends StatementParser {
         throw new SyntaxError(`Undefined label ${label.name}.`);
       }
     }
+
+    parser.consume(Punctuator.Semicolon);
 
     return new ContinueStatement(label);
   }

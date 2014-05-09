@@ -12,7 +12,21 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`var arr = [1, 2, 3, 4, 5];
+`switch (a+b) {
+  case 1:
+    a++;
+    break;
+  case 2:
+    a--;
+    {
+      a = a*b;
+    }
+    break;
+  default:
+    ;
+}
+
+var arr = [1, 2, 3, 4, 5];
 
 for (var i = 0, l = arr.length; i < l; i++, --j) {
   this[i] = a + 6;
