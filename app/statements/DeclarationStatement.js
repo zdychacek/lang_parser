@@ -18,7 +18,7 @@ class VariableDeclarator extends Statement {
 }
 
 export default class DeclarationStatement extends Statement {
-  constructor (declarations = [], kind = 'var') {
+  constructor (declarations = [], kind) {
     super('VariableDeclaration');
 
     this.declarations = declarations;

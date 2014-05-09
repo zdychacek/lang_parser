@@ -1,19 +1,21 @@
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
-import { Precedence, TokenType, Punctuator } from '../../Lexer';
+import { Precedence, TokenType, Punctuator, Keyword } from '../../Lexer';
 import DeclarationStatement from '../DeclarationStatement';
 
 export default class DeclarationStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser, token, params) {
     var kind = token.value;
     var declarationStmt = new DeclarationStatement([], kind);
+
+    params || (params = {});
 
     do {
       let idToken = parser.consumeType(TokenType.Identifier);
 
       // define variable in current scope
-      parser.scope.define(idToken.value, kind == 'var');
-      
+      parser.scope.define(idToken.value, kind == Keyword.Var);
+
       let init = null;
 
       if (parser.matchAndConsume(Punctuator.Assign)) {
@@ -24,7 +26,9 @@ export default class DeclarationStatementParser extends StatementParser {
     }
     while (parser.matchAndConsume(Punctuator.Comma));
 
-    parser.consume(Punctuator.Semicolon);
+    if (params.consumeSemicolon !== false) {
+      parser.consume(Punctuator.Semicolon);
+    }
 
     return declarationStmt;
   }

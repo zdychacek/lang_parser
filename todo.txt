@@ -1,10 +1,14 @@
 - variables hoisting
+- fix for expression scope:
+
+var obj;
+for (var prop in obj) let x = 4;
+x;
 
 Statements:
 -----------------------
 Try/catch statement
 Debugger statement
-For-in statement
 New operator
 Throw statement
 Void

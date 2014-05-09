@@ -19,10 +19,8 @@ export default class Parser {
     // statements parsers
     this._statements = new Map();
 
+    // parser will ignore these globals
     this._globals = globals;
-
-    // if we are parsing block
-    this._blockOpened = false;
   }
 
   /**
@@ -135,6 +133,12 @@ export default class Parser {
     var left = prefixParser.parse(this, token);
 
     while (precedence < this.getPrecedence()) {
+      token = this.peek();
+
+      if (token.value == Keyword.In && !this.state.getAttribute('allowIn')) {
+        break;
+      }
+
       token = this.consume();
 
       let infixParser = this.getInfixExpressionParser(token);
@@ -167,7 +171,7 @@ export default class Parser {
     return statements;
   }
 
-  parseStatement () {
+  parseStatement (params = null) {
     var token = this.peek();
     var statementExpression = null;
 
@@ -186,7 +190,7 @@ export default class Parser {
     if (statementExpression) {
       let statementToken = this.consume();
 
-      return statementExpression.parse(this, statementToken);
+      return statementExpression.parse(this, statementToken, params);
     }
     else {
       let expr = this.parseExpression();

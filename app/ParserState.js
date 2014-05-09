@@ -3,6 +3,13 @@ export default class ParserState {
     // inFunction - if we are currently parsing function body
     // inLoop - if we are currently parsing switch case statements
     // inSwitchCaseBody - if we are currently parsing switch case statements
+    // allowIn -
+    this._defaults = {
+      inFunction: false,
+      inLoop: false,
+      allowIn: true
+    };
+
     this._stacks = {};
   }
 
@@ -28,7 +35,11 @@ export default class ParserState {
     var attrStack = this._stacks[attribute];
 
     if (attrStack) {
-      return attrStack[attrStack.length - 1];
+      let lastValue = attrStack[attrStack.length - 1];
+
+      return lastValue !== undefined? lastValue : this._defaults[attribute];
     }
+
+    return this._defaults[attribute];
   }
 }
