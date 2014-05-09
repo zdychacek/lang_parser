@@ -6,9 +6,9 @@ export default class IdentifierExpressionParser extends PrefixExpressionParser {
     var id = token.value;
 
     if (!withoutDefinitionCheck && !parser.scope.isVariableDefined(id)) {
-      token.error('Identifier not defined.');
+      token.error(`${id} is not defined.`);
     }
-    
+
     return new IdentifierExpression(id);
   }
 }

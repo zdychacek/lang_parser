@@ -43,7 +43,7 @@ export default class ForStatementParser extends StatementParser {
 
     parser.state.pushAttribute('inLoop', true);
 
-    var body = parser.parseExpressionStatementOrBlock(false);
+    var body = parser.parseBlockOrExpression(false);
 
     parser.state.popAttribute('inLoop');
 

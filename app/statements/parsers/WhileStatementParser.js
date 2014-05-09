@@ -4,19 +4,12 @@ import { Punctuator } from '../../Lexer';
 
 export default class WhileStatementParser extends StatementParser {
   parse (parser, token) {
-    var test = null;
-
     parser.consume(Punctuator.LeftParen);
-    test = parser.parseExpression();
+    var test = parser.parseExpression();
     parser.consume(Punctuator.RightParen);
 
     parser.state.pushAttribute('inLoop', true);
-
-    // create new block scope
-    parser.pushScope(true);
-    var body = parser.parseExpressionStatementOrBlock();
-    parser.popScope();
-
+    var body = parser.parseBlockOrExpression();
     parser.state.popAttribute('inLoop');
 
     return new WhileStatement(test, body);

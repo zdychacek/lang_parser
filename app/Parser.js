@@ -1,121 +1,10 @@
 import { TokenType, Punctuator, Keyword } from './Lexer';
+import Scope from './Scope';
+import ParserState from './ParserState';
 import Program from './statements/Program';
 import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
-
-class Scope {
-  constructor ({ parent = null, block = false }) {
-    // reference to parent scope
-    this._parent = parent;
-
-    // array of variables defined in this scope
-    this._vars = [];
-
-    // array of labels (continue, break) defined in this scope
-    this._labels = [];
-
-    // block scope or not
-    this._isBlock = block;
-  }
-
-  /**
-   * Define variable in current scope (disabling variable redefinition).
-   */
-  define (varName, varDeclaration = true) {
-    var scope = this;
-    
-    if (varDeclaration) {
-      scope = this._findFunctionScope();
-    }
-
-    if (scope._vars.indexOf(varName) == -1) {
-      scope._vars.push(varName);
-    }
-    else {
-      throw new SyntaxError(`Variable '${varName}' already defined in current scope.`);
-    }
-  }
-
-  /**
-   * Return "nearest" function/global scope.
-   */
-  _findFunctionScope () {
-    var currScope = this;
-
-    do {
-      if (!currScope._isBlock) {
-        return currScope;
-      }
-    }
-    while (currScope = currScope._parent);
-  }
-
-  /**
-   * Check if variable is defined (traverses scope chain)
-   */
-  isVariableDefined (varName) {
-    var currScope = this;
-
-    do {
-      if (currScope._vars.indexOf(varName) > -1) {
-        return true;
-      }
-    }
-    while (currScope = currScope._parent);
-
-    return false;
-  }
-
-  /**
-   * Add label name definition
-   */
-  addLabel (name) {
-    this._labels.push(name);
-  }
-
-  /**
-   * Check if scope has label defined
-   */
-  hasLabel (name) {
-    return this._labels.indexOf(name) > -1;
-  }
-}
-
-class ParserState {
-  constructor () {
-    // inFunction - if we are currently parsing function body
-    // inLoop - if we are currently parsing switch case statements
-    // inSwitchCaseBody - if we are currently parsing switch case statements
-    this._stacks = {};
-  }
-
-  pushAttribute (attribute, value) {
-    if (!this._stacks[attribute]) {
-      this._stacks[attribute] = [];
-    }
-
-    this._stacks[attribute].push(value);
-  }
-
-  popAttribute (attribute) {
-    var attrStack = this._stacks[attribute];
-
-    if (!attrStack || !attrStack.length) {
-      throw new Error('Cannot pop state attribute.');;
-    }
-
-    return this._stacks[attribute].pop();
-  }
-
-  getAttribute (attribute) {
-    var attrStack = this._stacks[attribute];
-
-    if (attrStack) {
-      return attrStack[attrStack.length - 1];
-    }
-  }
-}
 
 export default class Parser {
   constructor (lexer, globals = null) {
@@ -131,6 +20,9 @@ export default class Parser {
     this._statements = new Map();
 
     this._globals = globals;
+
+    // if we are parsing block
+    this._blockOpened = false;
   }
 
   /**
@@ -306,25 +198,44 @@ export default class Parser {
     }
   }
 
-  parseBlock (createBlockScope = true) {
+  parseBlock () {
     var token = this.peek();
 
     this.consume(Punctuator.LeftCurly);
-      
+
     let body = this.parseStatements();
-    
+
     this.consume(Punctuator.RightCurly);
 
     return new BlockStatement(body);
   }
 
-  parseExpressionStatementOrBlock (createBlockScope = true) {
+  /**
+   * Parse and return expression statement or block statement.
+   * @handleScope - if set and parsing block, than create new block scope
+   */
+  parseBlockOrExpression (handleScope = true) {
+    var popScope = false;
+    var ret = null;
+
+    // if we are parsing block, than we must create new block scope
+    if (handleScope && this.match(Punctuator.LeftCurly)) {
+      this.pushScope(true);
+      popScope = true;
+    }
+
     if (this.match(Punctuator.LeftCurly)) {
-      return this.parseBlock(createBlockScope);
+      ret = this.parseBlock();
     }
     else {
-      return this.parseStatement();
+      ret = this.parseStatement();
     }
+
+    if (popScope) {
+      this.popScope();
+    }
+
+    return ret;
   }
 
   parseProgram () {

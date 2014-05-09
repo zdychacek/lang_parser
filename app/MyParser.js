@@ -38,8 +38,7 @@ export default class MyParser extends Parser {
     // define some globals
     var globals = [
       'window',
-      'alert',
-      'confirm'
+      'console'
     ];
 
     super(lexer, globals);

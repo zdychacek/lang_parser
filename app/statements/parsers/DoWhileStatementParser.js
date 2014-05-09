@@ -5,12 +5,7 @@ import { Keyword, Punctuator } from '../../Lexer';
 export default class DoWhileStatementParser extends StatementParser {
   parse (parser, token) {
     parser.state.pushAttribute('inLoop', true);
-
-    // create new block scope
-    parser.pushScope(true);
-    var body = parser.parseExpressionStatementOrBlock();
-    parser.popScope();
-
+    var body = parser.parseBlockOrExpression();
     parser.state.popAttribute('inLoop', true);
 
     parser.consume(Keyword.While);
