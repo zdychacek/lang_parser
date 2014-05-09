@@ -5,7 +5,7 @@ import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
 
 class Scope {
-  constructor ({ parent = null, blockScope = false }) {
+  constructor ({ parent = null, block = false }) {
     // reference to parent scope
     this._parent = parent;
 
@@ -15,7 +15,8 @@ class Scope {
     // array of labels (continue, break) defined in this scope
     this._labels = [];
 
-    this._isBlockScope = blockScope;
+    // block scope or not
+    this._isBlock = block;
   }
 
   /**
@@ -43,7 +44,7 @@ class Scope {
     var currScope = this;
 
     do {
-      if (!currScope._isBlockScope) {
+      if (!currScope._isBlock) {
         return currScope;
       }
     }
@@ -130,9 +131,6 @@ export default class Parser {
     this._statements = new Map();
 
     this._globals = globals;
-
-    // reset parser state
-    this.reset();
   }
 
   /**
@@ -152,10 +150,10 @@ export default class Parser {
   /**
    * Push new scope on stack, optionaly with some injected variables.
    */
-  pushScope (blockScope = false, injectVariables = null) {
+  pushScope (block = false, injectVariables = null) {
     var newScope = new Scope({
       parent: this._scopeChain.length? this.scope : null,
-      blockScope
+      block
     });
 
     // inject some variables
@@ -308,21 +306,21 @@ export default class Parser {
     }
   }
 
-  parseBlock () {
+  parseBlock (createBlockScope = true) {
     var token = this.peek();
 
     this.consume(Punctuator.LeftCurly);
-
+      
     let body = this.parseStatements();
-
+    
     this.consume(Punctuator.RightCurly);
 
     return new BlockStatement(body);
   }
 
-  parseExpressionStatementOrBlock () {
+  parseExpressionStatementOrBlock (createBlockScope = true) {
     if (this.match(Punctuator.LeftCurly)) {
-      return this.parseBlock();
+      return this.parseBlock(createBlockScope);
     }
     else {
       return this.parseStatement();

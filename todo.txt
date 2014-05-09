@@ -1,4 +1,5 @@
-Variables hoisting.
+- variables hoisting
+- fix expression scope
 
 Statements:
 -----------------------

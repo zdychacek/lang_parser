@@ -10,6 +10,8 @@ export default class ForStatementParser extends StatementParser {
     var test = null;
     var update = null;
 
+    // create new block scope
+    parser.pushScope(true);
 
     parser.consume(Punctuator.LeftParen);
 
@@ -41,9 +43,11 @@ export default class ForStatementParser extends StatementParser {
 
     parser.state.pushAttribute('inLoop', true);
 
-    var body = parser.parseExpressionStatementOrBlock();
+    var body = parser.parseExpressionStatementOrBlock(false);
 
     parser.state.popAttribute('inLoop');
+
+    parser.popScope();
 
     return new ForStatement(init, test, update, body);
   }

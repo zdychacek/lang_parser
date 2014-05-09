@@ -12,7 +12,10 @@ export default class WhileStatementParser extends StatementParser {
 
     parser.state.pushAttribute('inLoop', true);
 
+    // create new block scope
+    parser.pushScope(true);
     var body = parser.parseExpressionStatementOrBlock();
+    parser.popScope();
 
     parser.state.popAttribute('inLoop');
 

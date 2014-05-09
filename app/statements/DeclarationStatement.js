@@ -8,6 +8,10 @@ class VariableDeclarator extends Statement {
     this.init = init;
   }
 
+  get name () {
+    return this.id.name;
+  }
+
   eval (context) {
 
   }

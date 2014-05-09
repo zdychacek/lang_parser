@@ -12,7 +12,10 @@ export default class IfStatementParser extends StatementParser {
     var test = parser.parseExpression();
     parser.consume(Punctuator.RightParen);
 
+    // create new block scope
+    parser.pushScope(true);
     consequent = parser.parseExpressionStatementOrBlock();
+    parser.popScope();
 
     // try to parse else clause
     if (parser.match(Keyword.Else)) {
@@ -23,7 +26,10 @@ export default class IfStatementParser extends StatementParser {
         alternate = parser.parseStatement(false);
       }
       else {
+        // create new block scope
+        parser.pushScope(true);
         alternate = parser.parseExpressionStatementOrBlock();
+        parser.popScope();
       }
     }
 

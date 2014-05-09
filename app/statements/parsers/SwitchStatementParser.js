@@ -15,6 +15,9 @@ export default class SwitchStatementParser extends StatementParser {
     var containsDefaultClause = false;
 
     if (!parser.match(Punctuator.RightCurly)) {
+      // create block scope
+      parser.pushScope(true);
+
       do {
         let token = parser.consume();
 
@@ -48,6 +51,8 @@ export default class SwitchStatementParser extends StatementParser {
         switchStmt.addCase(testExpr, consequentStmts);
       }
       while (!parser.match(Punctuator.RightCurly));
+
+      parser.popScope();
     }
 
     parser.consume(Punctuator.RightCurly);

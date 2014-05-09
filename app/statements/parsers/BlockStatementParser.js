@@ -4,6 +4,7 @@ import BlockStatement from '../BlockStatement';
 
 export default class BlockStatementParser extends StatementParser {
   parse (parser) {
+    // create block scope
     parser.pushScope(true);
     var statements = parser.parseStatements();
     parser.popScope();

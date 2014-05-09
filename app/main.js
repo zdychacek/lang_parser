@@ -12,16 +12,19 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`
-{
-  var a = 1;
-  let b = 2;
-} 
-a, b;
-`;
-/*`var a,b,j,c,f;
+`var a,b,j,c;
 
-switch (a+b) {
+{
+  a = 1;
+  let q = 2;
+} 
+a;
+
+var fun = function f () {
+  f();
+};
+
+switch (a + b) {
   case 1:
     a++;
     break;
@@ -37,7 +40,7 @@ switch (a+b) {
 
 var arr = [1, 2, 3, 4, 5];
 
-for (var i = 0, l = arr.length; i < l; i++, --j) {
+for (let i = 0, l = arr.length; i < l; i++, --j) {
   this[i] = a + 6;
 };
 
@@ -68,10 +71,10 @@ var fn = function (a,b,c) {
 
     b += a;
   }
-  else f(a >= 5 && b < 12);
+  else fn(a >= 5 && b < 12);
 
   return b || a && 28;
-};`*/
+};`
 
 function _do () {
   lexer.source = sourceInput.value;
