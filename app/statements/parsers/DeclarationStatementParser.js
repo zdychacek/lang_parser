@@ -5,13 +5,14 @@ import DeclarationStatement from '../DeclarationStatement';
 
 export default class DeclarationStatementParser extends StatementParser {
   parse (parser, token) {
-    var declarationStmt = new DeclarationStatement([], token.value);
+    var kind = token.value;
+    var declarationStmt = new DeclarationStatement([], kind);
 
     do {
       let idToken = parser.consumeType(TokenType.Identifier);
 
-      // defined variable in current scope
-      parser.scope.define(idToken.value);
+      // define variable in current scope
+      parser.scope.define(idToken.value, kind == 'var');
       
       let init = null;
 

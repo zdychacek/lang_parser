@@ -12,7 +12,14 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`var a,b,j,c,f;
+`
+{
+  var a = 1;
+  let b = 2;
+} 
+a, b;
+`;
+/*`var a,b,j,c,f;
 
 switch (a+b) {
   case 1:
@@ -49,6 +56,10 @@ var fn = function (a,b,c) {
   b += 14 + 28 * 3;
 
   var ab = 1 + 2, b = 3;
+  
+  while(true) {
+    break;
+  }
 
   let c = 'ahoj';
 
@@ -60,7 +71,7 @@ var fn = function (a,b,c) {
   else f(a >= 5 && b < 12);
 
   return b || a && 28;
-};`
+};`*/
 
 function _do () {
   lexer.source = sourceInput.value;

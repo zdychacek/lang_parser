@@ -4,12 +4,11 @@ import { Keyword, Punctuator } from '../../Lexer';
 
 export default class DoWhileStatementParser extends StatementParser {
   parse (parser, token) {
-    var currInLoopState = parser.state.inLoop;
-    parser.state.inLoop = true;
+    parser.state.pushAttribute('inLoop', true);
 
     var body = parser.parseExpressionStatementOrBlock();
 
-    parser.state.inLoop = currInLoopState;
+    parser.state.popAttribute('inLoop', true);
 
     parser.consume(Keyword.While);
     parser.consume(Punctuator.LeftParen);

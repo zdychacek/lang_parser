@@ -10,12 +10,11 @@ export default class WhileStatementParser extends StatementParser {
     test = parser.parseExpression();
     parser.consume(Punctuator.RightParen);
 
-    var currInLoopState = parser.state.inLoop;
-    parser.state.inLoop = true;
+    parser.state.pushAttribute('inLoop', true);
 
     var body = parser.parseExpressionStatementOrBlock();
 
-    parser.state.inLoop = currInLoopState;
+    parser.state.popAttribute('inLoop');
 
     return new WhileStatement(test, body);
   }

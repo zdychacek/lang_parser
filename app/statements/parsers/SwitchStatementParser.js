@@ -38,13 +38,12 @@ export default class SwitchStatementParser extends StatementParser {
 
         parser.consume(Punctuator.Colon);
 
-        let oldInSwitchcaseBody = parser.state.inSwitchCaseBody;
-        parser.state.inSwitchCaseBody = true;
+        parser.state.pushAttribute('inSwitchCaseBody', true);
 
         // parse case/default statements 
         let consequentStmts = parser.parseStatements();
 
-        parser.state.inSwitchCaseBody = oldInSwitchcaseBody;
+        parser.state.popAttribute('inSwitchCaseBody');
 
         switchStmt.addCase(testExpr, consequentStmts);
       }

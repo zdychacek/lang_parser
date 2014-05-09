@@ -33,15 +33,14 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.consume(Punctuator.RightParen);
 
     // parse function body
-    var currInFunctionState = parser.state.inFunction;
-    parser.state.inFunction = true;
+    parser.state.pushAttribute('inFunction', true);
     // create new scope
     parser.pushScope();
 
     body = parser.parseBlock();
 
     parser.popScope();
-    parser.state.inFunction = currInFunctionState;
+    parser.state.popAttribute('inFunction');
 
     return new FunctionDeclarationStatement(id, params, body);
   }

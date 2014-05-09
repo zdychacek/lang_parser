@@ -4,7 +4,9 @@ import BlockStatement from '../BlockStatement';
 
 export default class BlockStatementParser extends StatementParser {
   parse (parser) {
+    parser.pushScope(true);
     var statements = parser.parseStatements();
+    parser.popScope();
 
     parser.consume(Punctuator.RightCurly);
 

@@ -9,7 +9,7 @@ export default class ForStatementParser extends StatementParser {
     var init = null;
     var test = null;
     var update = null;
-    var currInLoopState = parser.state.inLoop;
+
 
     parser.consume(Punctuator.LeftParen);
 
@@ -39,11 +39,11 @@ export default class ForStatementParser extends StatementParser {
 
     parser.consume(Punctuator.RightParen);
 
-    parser.state.inLoop = true;
+    parser.state.pushAttribute('inLoop', true);
 
     var body = parser.parseExpressionStatementOrBlock();
 
-    parser.state.inLoop = currInLoopState;
+    parser.state.popAttribute('inLoop');
 
     return new ForStatement(init, test, update, body);
   }

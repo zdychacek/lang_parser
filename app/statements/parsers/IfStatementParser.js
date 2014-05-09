@@ -7,12 +7,12 @@ export default class IfStatementParser extends StatementParser {
     var consequent = null;
     var alternate = null;
 
-    parser.consume(Punctuator.LeftParen);
     // parse condition
+    parser.consume(Punctuator.LeftParen);
     var test = parser.parseExpression();
     parser.consume(Punctuator.RightParen);
 
-    consequent = this._parseArm(parser);
+    consequent = parser.parseExpressionStatementOrBlock();
 
     // try to parse else clause
     if (parser.match(Keyword.Else)) {
@@ -23,19 +23,10 @@ export default class IfStatementParser extends StatementParser {
         alternate = parser.parseStatement(false);
       }
       else {
-        alternate = this._parseArm(parser);
+        alternate = parser.parseExpressionStatementOrBlock();
       }
     }
 
     return new IfStatement(test, consequent, alternate);
-  }
-
-  _parseArm (parser) {
-    if (parser.match(Punctuator.LeftCurly)) {
-      return parser.parseBlock();
-    }
-    else {
-      return parser.parseStatement();
-    }
   }
 }

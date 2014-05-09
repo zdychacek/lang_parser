@@ -6,13 +6,15 @@ import IdentifierExpression from '../../expressions/IdentifierExpression';
 export default class BreakStatementParser extends StatementParser {
   parse (parser, token) {
     var label = null;
+    var inLoop = parser.state.getAttribute('inLoop');
+    var inSwitchCaseBody = parser.state.getAttribute('inSwitchCaseBody');
 
-    if (!parser.state.inLoop && !parser.state.inSwitchCaseBody) {
+    if (!inLoop && !inSwitchCaseBody) {
       throw new SyntaxError('Illegal break statement.');
     }
 
     // labels are allowed only in loop bodies, NOT in switch case statement
-    if (parser.state.inLoop) {
+    if (inLoop) {
       if (!parser.match(Punctuator.Semicolon)) {
         label = parser.parseExpression();
 

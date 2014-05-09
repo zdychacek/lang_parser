@@ -6,7 +6,7 @@ export default class ReturnStatementParser extends StatementParser {
   parse (parser, token) {
     var argument = null;
 
-    if (!parser.state.inFunction) {
+    if (!parser.state.getAttribute('inFunction')) {
       throw new SyntaxError('Illegal return statement.');
     }
 

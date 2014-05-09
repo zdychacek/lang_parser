@@ -5,7 +5,7 @@ import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
 
 class Scope {
-  constructor (parent = null) {
+  constructor ({ parent = null, blockScope = false }) {
     // reference to parent scope
     this._parent = parent;
 
@@ -14,18 +14,40 @@ class Scope {
 
     // array of labels (continue, break) defined in this scope
     this._labels = [];
+
+    this._isBlockScope = blockScope;
   }
 
   /**
    * Define variable in current scope (disabling variable redefinition).
    */
-  define (varName) {
-    if (this._vars.indexOf(varName) == -1) {
-      this._vars.push(varName);
+  define (varName, varDeclaration = true) {
+    var scope = this;
+    
+    if (varDeclaration) {
+      scope = this._findFunctionScope();
+    }
+
+    if (scope._vars.indexOf(varName) == -1) {
+      scope._vars.push(varName);
     }
     else {
       throw new SyntaxError(`Variable '${varName}' already defined in current scope.`);
     }
+  }
+
+  /**
+   * Return "nearest" function/global scope.
+   */
+  _findFunctionScope () {
+    var currScope = this;
+
+    do {
+      if (!currScope._isBlockScope) {
+        return currScope;
+      }
+    }
+    while (currScope = currScope._parent);
   }
 
   /**
@@ -61,22 +83,36 @@ class Scope {
 
 class ParserState {
   constructor () {
-    // if we are currently parsing function body
-    this.inFunction = false;
-    // if we are currently parsing loop body
-    this.inLoop = false;
-    // if we are currently parsing switch case statements
-    this.inSwitchCaseBody = false;
-
+    // inFunction - if we are currently parsing function body
+    // inLoop - if we are currently parsing switch case statements
+    // inSwitchCaseBody - if we are currently parsing switch case statements
     this._stacks = {};
   }
 
   pushAttribute (attribute, value) {
+    if (!this._stacks[attribute]) {
+      this._stacks[attribute] = [];
+    }
 
+    this._stacks[attribute].push(value);
   }
 
   popAttribute (attribute) {
+    var attrStack = this._stacks[attribute];
 
+    if (!attrStack || !attrStack.length) {
+      throw new Error('Cannot pop state attribute.');;
+    }
+
+    return this._stacks[attribute].pop();
+  }
+
+  getAttribute (attribute) {
+    var attrStack = this._stacks[attribute];
+
+    if (attrStack) {
+      return attrStack[attrStack.length - 1];
+    }
   }
 }
 
@@ -103,9 +139,6 @@ export default class Parser {
    * Reset parser's state.
    */
   reset () {
-    // TODO:
-    // implement stack push/pop mechanism for remembering state's properties
-    
     // parser state
     this._state = new ParserState();
 
@@ -113,14 +146,17 @@ export default class Parser {
     this._scopeChain = [];  // of scopes
 
     // create global scope
-    this.pushScope(this._globals);
+    this.pushScope(false, this._globals);
   }
 
   /**
    * Push new scope on stack, optionaly with some injected variables.
    */
-  pushScope (injectVariables = null) {
-    var newScope = new Scope(this._scopeChain.length? this.scope : null);
+  pushScope (blockScope = false, injectVariables = null) {
+    var newScope = new Scope({
+      parent: this._scopeChain.length? this.scope : null,
+      blockScope
+    });
 
     // inject some variables
     if (Array.isArray(injectVariables)) {

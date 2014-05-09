@@ -37,16 +37,15 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     parser.consume(Punctuator.RightParen);
 
     // parse function body
-    var currInFunctionState = parser.state.inFunction;
-    parser.state.inFunction = true;
-    // create new scope
-    // if function id was specified, then inject that id in the function scope
+    parser.state.pushAttribute('inFunction', true);
+
+    // create new scope, if function id was specified, then inject that id in the function scope
     parser.pushScope(id? [id.name] : null);
 
     body = parser.parseBlock();
 
     parser.popScope();
-    parser.state.inFunction = currInFunctionState;
+    parser.state.popAttribute('inFunction');
 
     return new FunctionExpression(id, params, body);
   }
