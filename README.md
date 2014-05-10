@@ -10,9 +10,7 @@ Missing statements and operators
 -----------------------
 - Try/catch statement
 - Debugger statement
-- New operator
 - Throw statement
 - Void
 - With
-- New
 - Delete

@@ -239,6 +239,10 @@ export class Lexer {
           if (!char) {
             throw new SyntaxError('Unterminated string.');
           }
+
+          if (char == '\n') {
+            throw new SyntaxError('Multiline strings are not allowed.');
+          }
         } while (char != beginChar);
 
         this._getNextChar();
