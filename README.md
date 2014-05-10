@@ -1,5 +1,7 @@
 JavaScript like language parser
 =====================
+- every statement or expression statement must end with semicolon
+- array expressions must not contain trailing comma, detto object expressions
 
 TODO
 -----------------------
