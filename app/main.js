@@ -19,11 +19,13 @@ sourceInput.value =
   for (let i = 0, l = arr.length; i < l; i++) {
     window[i] = i;
   }
+  //i;
 
   var Error = function (message) {
     this.message = message;
   };
 
+  // throw statement example
   throw new Error('Error kamo.');
 
   var a,b,j,c;
@@ -36,27 +38,35 @@ sourceInput.value =
   */
   if (true) let x = 2;
 
+  // block scope
   {
     a = 1;
     let q = 2;
   }
   a;
+  //q;
 
-  var obj;
+// label example
+myLabel:
+  for (var prop in window) {
+    console.log(window[prop]);
 
-  for (var prop in obj) {
-    console.log(obj[prop]);
+    continue myLabel;
   }
 
   prop;
 
+  // function expression declaration
   var fun = function f () {
+    // f is visible only in this scope
     f();
   };
 
+  // switch example
   switch (a + b) {
     case 1:
       a++;
+
       break;
     case 2:
       a--;
@@ -65,18 +75,24 @@ sourceInput.value =
       }
       break;
     default:
-      ;
+      window.alert('Default case...');
   }
 
+  // for example
   for (let i = 0, l = arr.length; i < l; i++, --j) {
     this[i] = a + 6;
   };
 
+  // object expression example
   var person = {
     name: 'Ondrej',
     age: 26,
+    // duplicate property name are not allowed
+    //age: 25,
     data: {
-      a: 1,
+      a: function (name) {
+        console.log('huhu' + name);
+      },
       b: 2
     }
   };
@@ -88,12 +104,20 @@ sourceInput.value =
 
     var ab = 1 + 2, b = 3;
 
-    while(true) {
+    // while statement example
+    while (true) {
       break;
     }
 
+    // do while statement example
+    do {
+      --a;
+    }
+    while (a +5  > bb);
+
     let c = 'ahoj';
 
+    // if statement example
     if (a == 28) {
       a = 14;
 
@@ -101,9 +125,14 @@ sourceInput.value =
     }
     else fn(a >= 5 && b < 12);
 
+    // return statement example
     return b || a && 28;
   };
-})();`
+})();
+
+// illegal statement
+//return;
+`;
 
 var oldSource = '';
 

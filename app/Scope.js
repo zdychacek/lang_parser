@@ -74,6 +74,9 @@ export default class Scope {
    * Check if scope has label defined
    */
   hasLabel (name) {
-    return this._labels.indexOf(name) > -1;
+    // labels are always defined on function scope level
+    var scope = this._findFunctionScope();
+
+    return scope._labels.indexOf(name) > -1;
   }
 }
