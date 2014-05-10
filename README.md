@@ -1,6 +1,6 @@
 JavaScript like language parser
 =====================
-- every statement or expression statement must end with semicolon
+- every statement (except block statements) or expression statement must end with semicolon
 - array expressions cannot contain trailing comma, detto object expressions
 - object expressions cannot contain duplicate property names
 - support for block (```let```) declarations
@@ -18,7 +18,6 @@ Missing statements
 - Debugger statement
 - Void
 - With
-- Delete
 
 NOTES
 -----------------------

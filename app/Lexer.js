@@ -69,8 +69,9 @@ export var Keyword = {
   Case: 'case',
   Default: 'default',
   New: 'new',
-  Throw: 'throw'
-  // TODO: delete, try/catch, debugger, with
+  Throw: 'throw',
+  Delete: 'delete'
+  // TODO: try/catch, debugger, with
 };
 
 export var Precedence = {

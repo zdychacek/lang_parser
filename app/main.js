@@ -97,6 +97,9 @@ myLabel:
     }
   };
 
+  // delete operator example
+  delete window['temp'];
+
   var fn = function (aa,bb,cc) {
     let a = 'ahoj';
 
@@ -127,6 +130,9 @@ myLabel:
 
     // return statement example
     return b || a && 28;
+
+    // throws unreachable statements
+    //b;
   };
 })();
 

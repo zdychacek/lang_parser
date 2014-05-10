@@ -84,6 +84,7 @@ export default class MyParser extends Parser {
     this.registerPrefixGeneric(Punctuator.Tilde, Precedence.Prefix);
     this.registerPrefixGeneric(Punctuator.Bang, Precedence.Prefix);
     this.registerPrefixGeneric(Keyword.TypeOf, Precedence.Prefix);
+    this.registerPrefixGeneric(Keyword.Delete, Precedence.Prefix);
 
     this.registerInfixLeftGeneric(Punctuator.Plus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Minus, Precedence.Sum);
