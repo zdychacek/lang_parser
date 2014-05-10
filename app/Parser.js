@@ -250,6 +250,8 @@ export default class Parser {
   }
 
   parseProgram () {
+    var start = new Date();
+
     this.reset();
 
     var body = this.parseStatements();
@@ -258,6 +260,8 @@ export default class Parser {
     if (token.type != TokenType.EOF) {
       token.error(`Unexpected token ${token.value}.`, false);
     }
+
+    console.log('Time - parseProgram():', (new Date() - start) / 1000);
 
     return new Program(body);
   }

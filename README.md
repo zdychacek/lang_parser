@@ -1,4 +1,4 @@
-JavaScript like language parser:
+JavaScript like language parser
 =====================
 
 TODO

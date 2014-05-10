@@ -18,6 +18,7 @@ import ArrayExpressionParser from './expressions/parsers/ArrayExpressionParser';
 import MemberExpressionParser from './expressions/parsers/MemberExpressionParser';
 import UpdateExpressionParser from './expressions/parsers/UpdateExpressionParser';
 import ThisExpressionParser from './expressions/parsers/ThisExpressionParser';
+import NewExpressionParser from './expressions/parsers/NewExpressionParser';
 
 ///// Statements
 import IfStatementParser from './statements/parsers/IfStatementParser';
@@ -36,6 +37,7 @@ import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 export default class MyParser extends Parser {
   constructor (lexer) {
     // define some globals
+    // TODO: make it array of variables
     var globals = {
       'window': 'var',
       'console': 'var'
@@ -52,6 +54,7 @@ export default class MyParser extends Parser {
     this.registerPrefix(Punctuator.Increment, new UpdateExpressionParser(true));
     this.registerPrefix(Punctuator.Decrement, new UpdateExpressionParser(true));
     this.registerPrefix(Keyword.This, new ThisExpressionParser());
+    this.registerPrefix(Keyword.New, new NewExpressionParser());
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
     this.registerInfix(Punctuator.LeftParen, new CallExpressionParser());

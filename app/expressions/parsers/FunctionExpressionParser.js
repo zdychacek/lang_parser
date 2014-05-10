@@ -26,10 +26,6 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
         }
 
         params.push(IdentifierExpressionParser.parse(parser, paramToken));
-
-        if (!parser.match(Punctuator.Comma)) {
-          break;
-        }
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }

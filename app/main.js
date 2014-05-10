@@ -12,86 +12,91 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`// inline comment
-var arr = [1, 2, 3, 4, 5];
+`(function () {
+  // inline comment
+  var arr = [1, 2, 3, 4, 5];
 
-for (let i = 0, l = arr.length; i < l; i++) {
-  window[i] = i;
-}
-var a,b,j,c;
+  for (let i = 0, l = arr.length; i < l; i++) {
+    window[i] = i;
+  }
+  var a,b,j,c;
 
-/*
-Block comment
-*/
-if (true) let x = 2;
+  // new operator test
+  var bb = new b(a)+1()();
 
-{
-  a = 1;
-  let q = 2;
-}
-a;
+  /*
+  Block comment
+  */
+  if (true) let x = 2;
 
-var obj;
+  {
+    a = 1;
+    let q = 2;
+  }
+  a;
 
-for (var prop in obj) {
-console.log(obj[prop]);
-}
+  var obj;
 
-prop;
+  for (var prop in obj) {
+    console.log(obj[prop]);
+  }
 
-var fun = function f () {
-  f();
-};
+  prop;
 
-switch (a + b) {
-  case 1:
-    a++;
-    break;
-  case 2:
-    a--;
-    {
-      a = a*b;
+  var fun = function f () {
+    f();
+  };
+
+  switch (a + b) {
+    case 1:
+      a++;
+      break;
+    case 2:
+      a--;
+      {
+        a = a*b;
+      }
+      break;
+    default:
+      ;
+  }
+
+  for (let i = 0, l = arr.length; i < l; i++, --j) {
+    this[i] = a + 6;
+  };
+
+  var person = {
+    name: 'Ondrej',
+    age: 26,
+    data: {
+      a: 1,
+      b: 2
     }
-    break;
-  default:
-    ;
-}
+  };
 
-for (let i = 0, l = arr.length; i < l; i++, --j) {
-  this[i] = a + 6;
-};
+  var fn = function (a,b,c) {
+    let a = 'ahoj';
 
-var person = {
-  name: 'Ondrej',
-  age: 26,
-  data: {
-    a: 1,
-    b: 2
-  }
-};
+    b += 14 + 28 * 3;
 
-var fn = function (a,b,c) {
-  let a = 'ahoj';
+    var ab = 1 + 2, b = 3;
 
-  b += 14 + 28 * 3;
+    while(true) {
+      break;
+    }
 
-  var ab = 1 + 2, b = 3;
+    let c = 'ahoj';
 
-  while(true) {
-    break;
-  }
+    if (a == 28) {
+      a = 14;
 
-  let c = 'ahoj';
+      b += a;
+    }
+    else fn(a >= 5 && b < 12);
 
-  if (a == 28) {
-    a = 14;
-
-    b += a;
-  }
-  else fn(a >= 5 && b < 12);
-
-  return b || a && 28;
-};`
+    return b || a && 28;
+  };
+})();`
 
 var oldSource = '';
 
@@ -103,8 +108,7 @@ function _do () {
     ast = parser.parseProgram();
     $(preAST).JSONView(JSON.stringify(ast));
 
-    // TODO:
-    let retVal = interpreter.interpretProgram(ast);
+    //let retVal = interpreter.interpretProgram(ast);
   }
   catch (ex) {
     preAST.innerHTML = ex.message;
