@@ -125,7 +125,11 @@ export class Lexer {
   }
 
   next () {
-    this._skipWhitespaces();
+    // skip whitespaces and comments
+    do {
+      this._skipWhitespaces();
+    }
+    while (this._skipComments());
 
     this._marker = this._index;
 
@@ -425,6 +429,52 @@ export class Lexer {
 
   _peekNextChar (distance = 0) {
     return this._text[this._index + distance];
+  }
+
+  _skipComments () {
+    var peek = this._peekNextChar();
+    var peek1 = this._peekNextChar(1);
+    var char;
+
+    if (peek == '/' && (peek1 == '/' || peek1 == '*')) {
+      this._getNextChar();
+      this._getNextChar();
+
+      // inline comments //
+      if (peek1 == '/') {
+        while (true) {
+          char = this._getNextChar();
+
+          if (char == '\n' || this._index >= this._text.length) {
+            break;
+          }
+        }
+      }
+      // block comments /**/
+      else {
+        var char;
+        var peek;
+
+        while (true) {
+          char = this._getNextChar();
+          peek = this._peekNextChar();
+
+          if (this._index >= this._text.length) {
+            throw new SyntaxError('Unexpected end of file.');
+          }
+
+          if (char == '*' && peek == '/') {
+            this._getNextChar();
+            this._getNextChar();
+            break;
+          }
+        }
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   _skipWhitespaces () {

@@ -12,13 +12,17 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`var arr = [1, 2, 3, 4, 5];
+`// inline comment
+var arr = [1, 2, 3, 4, 5];
 
 for (let i = 0, l = arr.length; i < l; i++) {
   window[i] = i;
 }
 var a,b,j,c;
 
+/*
+Block comment
+*/
 if (true) let x = 2;
 
 {
@@ -89,9 +93,11 @@ var fn = function (a,b,c) {
   return b || a && 28;
 };`
 
+var oldSource = '';
+
 function _do () {
   lexer.source = sourceInput.value;
-  //console.log(lexer.dump());return;
+  oldSource = sourceInput.value;
 
   try {
     ast = parser.parseProgram();
@@ -106,6 +112,11 @@ function _do () {
   }
 }
 
-sourceInput.addEventListener('keyup', _do, false);
+function _t () {
+  if (oldSource != sourceInput.value) {
+    _do();
+  }
+  setTimeout(_t, 150);
+}
 
-_do();
+_t();
