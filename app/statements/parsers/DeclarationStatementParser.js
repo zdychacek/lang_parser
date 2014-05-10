@@ -10,11 +10,15 @@ export default class DeclarationStatementParser extends StatementParser {
 
     params || (params = {});
 
+    var withoutDefinition = params.withoutDefinition;
+
     do {
       let idToken = parser.consumeType(TokenType.Identifier);
 
       // define variable in current scope
-      parser.scope.define(idToken.value, kind == Keyword.Var);
+      if (!withoutDefinition) {
+        parser.scope.define(idToken.value, kind);
+      }
 
       let init = null;
 
@@ -22,7 +26,7 @@ export default class DeclarationStatementParser extends StatementParser {
         init = parser.parseExpression(Precedence.Sequence);
       }
 
-      declarationStmt.addDeclarator(IdentifierExpressionParser.parse(parser, idToken), init);
+      declarationStmt.addDeclarator(IdentifierExpressionParser.parse(parser, idToken, true), init);
     }
     while (parser.matchAndConsume(Punctuator.Comma));
 

@@ -29,6 +29,10 @@ export default class DeclarationStatement extends Statement {
     this.declarations.push(new VariableDeclarator(id, init));
   }
 
+  get names () {
+    return this.declarations.map((decl) => decl.name);
+  }
+
   eval (context) {
 
   }

@@ -36,10 +36,10 @@ import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 export default class MyParser extends Parser {
   constructor (lexer) {
     // define some globals
-    var globals = [
-      'window',
-      'console'
-    ];
+    var globals = {
+      'window': 'var',
+      'console': 'var'
+    };
 
     super(lexer, globals);
 

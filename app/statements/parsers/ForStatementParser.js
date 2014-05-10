@@ -8,22 +8,18 @@ import ExpressionStatement from '../ExpressionStatement';
 
 export default class ForStatementParser extends StatementParser {
   parse (parser) {
-    var forStmt = null;
+    var stmt = null;
     var leftOrInit = null;
-
-    // create new block scope
-    parser.pushScope(true);
 
     parser.consume(Punctuator.LeftParen);
 
     // init expression or declaration list
-    if (parser.match(Punctuator.Semicolon)) {
-      parser.consume();
-      forStmt = this._parseForLoop(parser, leftOrInit);
+    if (parser.matchAndConsume(Punctuator.Semicolon)) {
+      stmt = this._parseForLoop(parser, leftOrInit);
     }
     else {
       if (parser.match(Keyword.Var) || parser.match(Keyword.Let)) {
-        leftOrInit = parser.parseStatement({ consumeSemicolon: false });
+        leftOrInit = parser.parseStatement({ consumeSemicolon: false, withoutDefinition: true });
       }
       else {
         parser.state.pushAttribute('allowIn', false);
@@ -31,13 +27,12 @@ export default class ForStatementParser extends StatementParser {
         parser.state.popAttribute('allowIn');
       }
 
-      if (parser.match(Keyword.In)) {
-        parser.consume();
-        forStmt = this._parseForInLoop(parser, leftOrInit);
+      if (parser.matchAndConsume(Keyword.In)) {
+        stmt = this._parseForInLoop(parser, leftOrInit);
       }
       else {
         parser.consume(Punctuator.Semicolon);
-        forStmt = this._parseForLoop(parser, leftOrInit);
+        stmt = this._parseForLoop(parser, leftOrInit);
       }
     }
 
@@ -45,38 +40,45 @@ export default class ForStatementParser extends StatementParser {
 
     // parse body
     parser.state.pushAttribute('inLoop', true);
-    forStmt.body = parser.parseBlockOrExpression(false);
+    // must create new scope for FOR body even if it is expression statement
+    stmt.body = parser.parseBlockOrExpression(stmt.declarations, true);
     parser.state.popAttribute('inLoop');
 
-    parser.popScope();
-
-    return forStmt;
+    return stmt;
   }
 
   _parseForLoop (parser, init) {
-    var test = update = null;
-    var update = null;
+    var forStmt = new ForStatement();
 
     // must be ExpressionStatement or variable declarations list
     if (init && !(init instanceof ExpressionStatement || init instanceof DeclarationStatement)) {
       throw new SyntaxError('Unexpected init expression or declarations list.');
     }
 
+    forStmt.init = init;
+
+    // we must create temporary function scope for declarations
+    parser.pushScope(false, forStmt.declarations);
+
     // parse test expression
     if (!parser.match(Punctuator.Semicolon)) {
-      test = parser.parseExpression();
+      forStmt.test = parser.parseExpression();
     }
     parser.consume();
 
     // parse update expression
     if (!parser.match(Punctuator.RightParen)) {
-      update = parser.parseExpression();
+      forStmt.update = parser.parseExpression();
     }
 
-    return new ForStatement(init, test, update);
+    // pop temporary scope
+    parser.popScope();
+
+    return forStmt;
   }
 
   _parseForInLoop (parser, left) {
+    var forInStmt = new ForInStatement(left);
     var isIdentifier = left instanceof IdentifierExpression;
     var isDeclaration = left instanceof DeclarationStatement;
 
@@ -90,6 +92,14 @@ export default class ForStatementParser extends StatementParser {
       }
     }
 
-    return new ForInStatement(left, parser.parseExpression());
+    // we must create temporary function scope for declarations
+    parser.pushScope(false, forInStmt.declarations);
+
+    forInStmt.right = parser.parseExpression();
+
+    // pop temporary scope
+    parser.popScope();
+
+    return forInStmt;
   }
 }

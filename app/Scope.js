@@ -1,10 +1,12 @@
+import { Keyword } from './Lexer';
+
 export default class Scope {
   constructor ({ parent = null, block = false }) {
     // reference to parent scope
     this._parent = parent;
 
     // array of variables defined in this scope
-    this._vars = [];
+    this._vars = {};
 
     // array of labels (continue, break) defined in this scope
     this._labels = [];
@@ -16,18 +18,18 @@ export default class Scope {
   /**
    * Define variable in current scope (disabling variable redefinition).
    */
-  define (varName, varDeclaration = true) {
+  define (name, kind) {
     var scope = this;
 
-    if (varDeclaration) {
+    if (kind == Keyword.Var) {
       scope = this._findFunctionScope();
     }
 
-    if (scope._vars.indexOf(varName) == -1) {
-      scope._vars.push(varName);
+    if (!(name in scope._vars)) {
+      scope._vars[name] = kind;
     }
     else {
-      throw new SyntaxError(`Variable '${varName}' already defined in current scope.`);
+      throw new SyntaxError(`Variable '${name}' already defined in current scope.`);
     }
   }
 
@@ -48,11 +50,11 @@ export default class Scope {
   /**
    * Check if variable is defined (traverses scope chain)
    */
-  isVariableDefined (varName) {
+  isVariableDefined (name) {
     var currScope = this;
 
     do {
-      if (currScope._vars.indexOf(varName) > -1) {
+      if (name in currScope._vars) {
         return true;
       }
     }

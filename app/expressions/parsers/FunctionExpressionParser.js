@@ -40,7 +40,8 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     parser.state.pushAttribute('inFunction', true);
 
     // create new function scope, if function id was specified, then inject that id in the function scope
-    parser.pushScope(false, id? [id.name] : null);
+    var fnNameVar = id? { [id.name] : Keyword.Var } : null;
+    parser.pushScope(false, fnNameVar);
 
     body = parser.parseBlock();
 

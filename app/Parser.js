@@ -47,13 +47,17 @@ export default class Parser {
     });
 
     // inject some variables
-    if (Array.isArray(injectVariables)) {
-      injectVariables.forEach(function (varName) {
-        newScope.define(varName);
-      });
+    if (injectVariables) {
+      for (let name in injectVariables) {
+        if (injectVariables.hasOwnProperty(name)) {
+          newScope.define(name, injectVariables[name]);
+        }
+      }
     }
 
     this._scopeChain.push(newScope);
+
+    return newScope;
   }
 
   /**
@@ -216,22 +220,25 @@ export default class Parser {
 
   /**
    * Parse and return expression statement or block statement.
-   * @handleScope - if set and parsing block, than create new block scope
+   * @injectables - variables which should be injected into scope being created
+   * @forceScopeCreation - force new scope creation even if we are not parsing block statement (useful for FOR statement)
    */
-  parseBlockOrExpression (handleScope = true) {
+  parseBlockOrExpression (injectables = null, forceScopeCreation = false) {
     var popScope = false;
     var ret = null;
 
     // if we are parsing block, than we must create new block scope
-    if (handleScope && this.match(Punctuator.LeftCurly)) {
-      this.pushScope(true);
+    if (this.match(Punctuator.LeftCurly)) {
+      this.pushScope(true, injectables);
+      ret = this.parseBlock();
       popScope = true;
     }
-
-    if (this.match(Punctuator.LeftCurly)) {
-      ret = this.parseBlock();
-    }
     else {
+      if (forceScopeCreation) {
+        this.pushScope(true, injectables);
+        popScope = true;
+      }
+
       ret = this.parseStatement();
     }
 

@@ -12,7 +12,12 @@ var parser = new MyParser(lexer);
 var interpreter = new Interpreter();
 
 sourceInput.value =
-`var a,b,j,c;
+`var arr = [1, 2, 3, 4, 5];
+
+for (let i = 0, l = arr.length; i < l; i++) {
+  window[i] = i;
+}
+var a,b,j,c;
 
 if (true) let x = 2;
 
@@ -47,8 +52,6 @@ switch (a + b) {
   default:
     ;
 }
-
-var arr = [1, 2, 3, 4, 5];
 
 for (let i = 0, l = arr.length; i < l; i++, --j) {
   this[i] = a + 6;

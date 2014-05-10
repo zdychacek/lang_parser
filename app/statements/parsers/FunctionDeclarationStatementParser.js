@@ -1,6 +1,6 @@
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
-import { TokenType, Punctuator } from '../../Lexer';
+import { TokenType, Punctuator, Keyword } from '../../Lexer';
 import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
 
 export default class FunctionDeclarationStatementParser extends StatementParser {
@@ -8,7 +8,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     var tokenId = parser.consumeType(TokenType.Identifier);
 
     // defined variable in current scope
-    parser.scope.define(tokenId.value);
+    parser.scope.define(tokenId.value, Keyword.Var);
 
     var params = [];
     var body = null;
