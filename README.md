@@ -18,7 +18,7 @@ TODO
 - detect line terminators (some statements, eg. ```throw``` or ```return```, must not trail with new line terminator)
 - automatic semicolon insertion
 - support for octal and hexadecimal numbers
-- Try/catch statement support
-- Debugger statement support
-- Void support (??)
-- With support (??)
+- ```try/catch``` statement support
+- ```debugger``` statement support
+- ```with``` support
+- ```void``` support (??)
