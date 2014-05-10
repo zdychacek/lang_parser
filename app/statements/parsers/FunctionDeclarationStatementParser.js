@@ -6,6 +6,7 @@ import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
 export default class FunctionDeclarationStatementParser extends StatementParser {
   parse (parser, token) {
     var tokenId = parser.consumeType(TokenType.Identifier);
+    var scopeVars = {};
 
     // defined variable in current scope
     parser.scope.define(tokenId.value, Keyword.Var);
@@ -25,7 +26,8 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
           throw new SyntaxError('Unexpected token ILLEGAL.');
         }
 
-        params.push(IdentifierExpressionParser.parse(parser, paramToken));
+        scopeVars[paramToken.value] = Keyword.Var;
+        params.push(IdentifierExpressionParser.parse(parser, paramToken, true));
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }
@@ -35,7 +37,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     // parse function body
     parser.state.pushAttribute('inFunction', true);
     // create new scope
-    parser.pushScope();
+    parser.pushScope(false, scopeVars);
 
     body = parser.parseBlock();
 

@@ -19,9 +19,16 @@ sourceInput.value =
   for (let i = 0, l = arr.length; i < l; i++) {
     window[i] = i;
   }
+
+  var Error = function (message) {
+    this.message = message;
+  };
+
+  throw new Error('Error kamo.');
+
   var a,b,j,c;
 
-  // new operator test
+  // new operator priority test
   var bb = new b(a)+1()();
 
   /*
@@ -74,7 +81,7 @@ sourceInput.value =
     }
   };
 
-  var fn = function (a,b,c) {
+  var fn = function (aa,bb,cc) {
     let a = 'ahoj';
 
     b += 14 + 28 * 3;

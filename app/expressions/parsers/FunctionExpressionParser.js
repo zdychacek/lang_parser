@@ -8,6 +8,7 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     var id = null;
     var params = [];
     var body = null;
+    var scopeVars = {};
 
     // parse optional name
     if (parser.matchType(TokenType.Identifier)) {
@@ -25,19 +26,24 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
           throw new SyntaxError('Unexpected token ILLEGAL.');
         }
 
-        params.push(IdentifierExpressionParser.parse(parser, paramToken));
+        scopeVars[paramToken.value] = Keyword.Var;
+        params.push(IdentifierExpressionParser.parse(parser, paramToken, true));
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }
 
     parser.consume(Punctuator.RightParen);
 
+    // if function id was specified, then inject that id in the function scope
+    if (id) {
+      scopeVars[id.name] = Keyword.Var;
+    }
+
     // parse function body
     parser.state.pushAttribute('inFunction', true);
 
-    // create new function scope, if function id was specified, then inject that id in the function scope
-    var fnNameVar = id? { [id.name] : Keyword.Var } : null;
-    parser.pushScope(false, fnNameVar);
+    // create new function scope
+    parser.pushScope(false, scopeVars);
 
     body = parser.parseBlock();
 

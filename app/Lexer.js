@@ -68,8 +68,9 @@ export var Keyword = {
   Switch: 'switch',
   Case: 'case',
   Default: 'default',
-  New: 'new'
-  // TODO: delete, throw, try/catch, throw, debugger, with
+  New: 'new',
+  Throw: 'throw'
+  // TODO: delete, try/catch, debugger, with
 };
 
 export var Precedence = {
