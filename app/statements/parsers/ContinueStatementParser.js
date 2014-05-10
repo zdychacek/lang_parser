@@ -1,10 +1,12 @@
 import StatementParser from './StatementParser';
-import { Punctuator, TokenType } from '../../Lexer';
+import { Punctuator, TokenType, Keyword } from '../../Lexer';
 import ContinueStatement from '../ContinueStatement';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 
 export default class ContinueStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.Continue);
+
     var label = null;
 
     if (!parser.state.getAttribute('inLoop')) {

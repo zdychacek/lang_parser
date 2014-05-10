@@ -3,7 +3,9 @@ import DoWhileStatement from '../DoWhileStatement';
 import { Keyword, Punctuator } from '../../Lexer';
 
 export default class DoWhileStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.Do);
+
     parser.state.pushAttribute('inLoop', true);
     var body = parser.parseBlockOrExpression();
     parser.state.popAttribute('inLoop', true);

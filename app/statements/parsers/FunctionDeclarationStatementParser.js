@@ -4,7 +4,9 @@ import { TokenType, Punctuator, Keyword } from '../../Lexer';
 import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
 
 export default class FunctionDeclarationStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.Function);
+
     var tokenId = parser.consumeType(TokenType.Identifier);
     var scopeVars = {};
 

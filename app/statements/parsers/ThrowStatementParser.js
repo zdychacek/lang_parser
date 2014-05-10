@@ -1,9 +1,11 @@
 import StatementParser from './StatementParser';
-import { Punctuator } from '../../Lexer';
+import { Punctuator, Keyword } from '../../Lexer';
 import ThrowStatement from '../ThrowStatement';
 
 export default class ThrowStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.Throw);
+
     var argument = null;
 
     if (!parser.match(Punctuator.Semicolon)) {

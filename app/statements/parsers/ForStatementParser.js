@@ -8,6 +8,8 @@ import ExpressionStatement from '../ExpressionStatement';
 
 export default class ForStatementParser extends StatementParser {
   parse (parser) {
+    parser.consume(Keyword.For);
+
     var stmt = null;
     var leftOrInit = null;
 

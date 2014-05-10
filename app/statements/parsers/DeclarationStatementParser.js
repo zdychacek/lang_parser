@@ -4,8 +4,16 @@ import { Precedence, TokenType, Punctuator, Keyword } from '../../Lexer';
 import DeclarationStatement from '../DeclarationStatement';
 
 export default class DeclarationStatementParser extends StatementParser {
-  parse (parser, token, params) {
-    var kind = token.value;
+  parse (parser, params) {
+    var kind;
+
+    if (parser.match(Keyword.Var) || parser.match(Keyword.Let)) {
+      kind = parser.consume().value;
+    }
+    else {
+      throw new SyntaxError('Unexpected declaration statement.');
+    }
+
     var declarationStmt = new DeclarationStatement([], kind);
 
     params || (params = {});

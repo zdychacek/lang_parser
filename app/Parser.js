@@ -192,9 +192,7 @@ export default class Parser {
     }
 
     if (statementExpression) {
-      let statementToken = this.consume();
-
-      return statementExpression.parse(this, statementToken, params);
+      return statementExpression.parse(this, params);
     }
     else {
       let expr = this.parseExpression();

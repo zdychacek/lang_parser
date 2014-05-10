@@ -4,6 +4,8 @@ import { Punctuator, Keyword } from '../../Lexer';
 
 export default class SwitchStatementParser extends StatementParser {
   parse (parser, token) {
+    parser.consume(Keyword.Switch);
+
     parser.consume(Punctuator.LeftParen);
     var discriminant = parser.parseExpression();
     parser.consume(Punctuator.RightParen);
@@ -24,12 +26,12 @@ export default class SwitchStatementParser extends StatementParser {
         if (token.value != Keyword.Case && token.value != Keyword.Default) {
           throw new SyntaxError('Unexpected token.');
         }
-        
+
         let testExpr = null;
 
         // case clause
         if (token.value == Keyword.Case) {
-          testExpr = parser.parseExpression();  
+          testExpr = parser.parseExpression();
         }
         // default clause
         else {
@@ -37,13 +39,13 @@ export default class SwitchStatementParser extends StatementParser {
             throw new SyntaxError('Switch statement has already default clause defined.');
           }
           containsDefaultClause = true;
-        }       
+        }
 
         parser.consume(Punctuator.Colon);
 
         parser.state.pushAttribute('inSwitchCaseBody', true);
 
-        // parse case/default statements 
+        // parse case/default statements
         let consequentStmts = parser.parseStatements();
 
         parser.state.popAttribute('inSwitchCaseBody');

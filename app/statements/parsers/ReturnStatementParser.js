@@ -1,9 +1,11 @@
 import StatementParser from './StatementParser';
-import { Punctuator } from '../../Lexer';
+import { Punctuator, Keyword } from '../../Lexer';
 import ReturnStatement from '../ReturnStatement';
 
 export default class ReturnStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.Return);
+
     var argument = null;
 
     if (!parser.state.getAttribute('inFunction')) {

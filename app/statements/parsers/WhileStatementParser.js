@@ -1,9 +1,11 @@
 import StatementParser from './StatementParser';
 import WhileStatement from '../WhileStatement';
-import { Punctuator } from '../../Lexer';
+import { Punctuator, Keyword } from '../../Lexer';
 
 export default class WhileStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.While);
+
     parser.consume(Punctuator.LeftParen);
     var test = parser.parseExpression();
     parser.consume(Punctuator.RightParen);

@@ -4,6 +4,8 @@ import IfStatement from '../IfStatement';
 
 export default class IfStatementParser extends StatementParser {
   parse (parser) {
+    parser.consume(Keyword.If);
+
     var consequent = null;
     var alternate = null;
 

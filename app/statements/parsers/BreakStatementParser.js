@@ -1,10 +1,12 @@
 import StatementParser from './StatementParser';
-import { Punctuator } from '../../Lexer';
+import { Punctuator, Keyword } from '../../Lexer';
 import BreakStatement from '../BreakStatement';
 import IdentifierExpression from '../../expressions/IdentifierExpression';
 
 export default class BreakStatementParser extends StatementParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.Break);
+
     var label = null;
     var inLoop = parser.state.getAttribute('inLoop');
     var inSwitchCaseBody = parser.state.getAttribute('inSwitchCaseBody');
@@ -27,7 +29,7 @@ export default class BreakStatementParser extends StatementParser {
         }
       }
     }
-    
+
     parser.consume(Punctuator.Semicolon);
 
     return new BreakStatement(label);
