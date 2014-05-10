@@ -38,11 +38,13 @@ import ThrowStatementParser from './statements/parsers/ThrowStatementParser';
 export default class MyParser extends Parser {
   constructor (lexer) {
     // define some globals
-    // TODO: make it array of variables
-    var globals = {
-      'window': 'var',
-      'console': 'var'
-    };
+    var globals = [
+      'window',
+      'console',
+      'String',
+      'Number',
+      'Boolean'
+    ];
 
     super(lexer, globals);
 

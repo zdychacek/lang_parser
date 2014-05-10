@@ -20,7 +20,10 @@ export default class Parser {
     this._statements = new Map();
 
     // parser will ignore these globals
-    this._globals = globals;
+    this._globals = {};
+
+    // set globals
+    this.globals = globals;
   }
 
   /**
@@ -35,6 +38,10 @@ export default class Parser {
 
     // create global scope
     this.pushScope(false, this._globals);
+  }
+
+  set globals (globals) {
+    globals.forEach((global) => this._globals[global] = Keyword.Var);
   }
 
   /**
