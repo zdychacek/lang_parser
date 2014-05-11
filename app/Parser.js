@@ -274,7 +274,7 @@ export default class Parser {
     var token = this.peek();
 
     if (token.type != TokenType.EOF) {
-      this.throw(`Unexpected token ${token.value}`);
+      this.throw(`Unexpected token '${token.value}'`);
     }
 
     console.log('Time - parseProgram():', (new Date() - start) / 1000);
@@ -299,7 +299,7 @@ export default class Parser {
       let token = this.peek();
 
       if (!token || token.value != expected) {
-        this.throw(`Unexpected token ${token.value}`);
+        this.throw(`Unexpected token '${token.value}'`);
       }
     }
 
@@ -313,7 +313,7 @@ export default class Parser {
       let token = this.peek();
 
       if (!token || token.type != expected) {
-        this.throw(`Unexpected token ${token.value}`);
+        this.throw(`Unexpected token '${token.value}'`);
       }
     }
 
