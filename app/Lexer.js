@@ -386,60 +386,118 @@ export class Lexer {
     var number = '';
     var char = this._peekNextChar();
 
-    // whole part
-    while (this._isDigit(char)) {
+    if (this._isDigit(char)) {
       number += this._getNextChar();
-      char = this._peekNextChar();
-    }
 
-    char = this._peekNextChar();
-
-    // decimal separator
-    if (char == '.') {
-      number += this._getNextChar();
-    }
-
-    char = this._peekNextChar();
-
-    // fractional part
-    while (this._isDigit(char)) {
-      number += this._getNextChar();
-      char = this._peekNextChar();
-    }
-
-    if (number) {
-      char = this._peekNextChar();
-
-      // exponential notation
-      if (char == 'e' || char == 'E') {
-        number += this._getNextChar();
-        char = this._peekNextChar();
-
-        if (this._isDigit(char) || char == '+' || char == '-') {
+      // hex or octal number
+      if (number == '0') {
+        // hex 0x15
+        if (this._peekNextChar() == 'x') {
           number += this._getNextChar();
 
-          while (true) {
-            char = this._peekNextChar();
+          let hexPart = this._scanHexadecimalNumber();
 
-            if (!this._isDigit(char)) {
-                break;
-            }
-            number += this._getNextChar();
+          if (hexPart !== '') {
+            number += hexPart;
+          }
+          else {
+            this.throw('Bad hexadecimal number');
           }
         }
+        //octal 0x7
         else {
-          this.throw('Unexpected character after the exponent sign');
+          let octalPart = this._scanOctalNumber();
+
+          if (octalPart != '') {
+            number += octalPart;
+          }
+          else {
+            this.throw('Bad octal number');
+          }
+
+          return this._createToken(TokenType.Number, parseInt(number, 10), number);
+        }
+
+      }
+      // decimal number
+      else {
+        // whole part
+        while (this._isDigit(this._peekNextChar())) {
+          number += this._getNextChar();
+        }
+
+        char = this._peekNextChar();
+
+        // decimal separator
+        if (char == '.') {
+          number += this._getNextChar();
+        }
+
+        char = this._peekNextChar();
+
+        // fractional part
+        while (this._isDigit(char)) {
+          number += this._getNextChar();
+          char = this._peekNextChar();
+        }
+
+        if (number) {
+          char = this._peekNextChar();
+
+          // exponential notation
+          if (char == 'e' || char == 'E') {
+            number += this._getNextChar();
+            char = this._peekNextChar();
+
+            if (this._isDigit(char) || char == '+' || char == '-') {
+              number += this._getNextChar();
+
+              while (true) {
+                char = this._peekNextChar();
+
+                if (!this._isDigit(char)) {
+                    break;
+                }
+                number += this._getNextChar();
+              }
+            }
+            else {
+              this.throw('Unexpected character after the exponent sign');
+            }
+          }
+        }
+
+        if (number == '.') {
+          this.throw('Bad number');
+        }
+
+        if (number) {
+          return this._createToken(TokenType.Number, parseFloat(number), number);
         }
       }
     }
+  }
 
-    if (number == '.') {
-      this.throw('Bad number');
+  _scanOctalNumber () {
+    var numberPart = '';
+
+    while (this._isOctalDigit(this._peekNextChar())) {
+      numberPart += this._getNextChar();
     }
 
-    if (number) {
-      return this._createToken(TokenType.Number, parseFloat(number), number);
+    return numberPart;
+  }
+
+  _scanHexadecimalNumber () {
+    var numberPart = '';
+
+    while (this._isHexDigit(this._peekNextChar())) {
+      numberPart += this._getNextChar();
     }
+
+    console.log(numberPart)
+
+    return numberPart;
   }
 
   /**
@@ -694,6 +752,14 @@ export class Lexer {
    * Checks if char is number digit.
    */
   _isDigit (char) {
+    return (char >= '0') && (char <= '9');
+  }
+
+  _isOctalDigit (char) {
+    return (char >= '0') && (char <= '7');
+  }
+
+  _isHexDigit (char) {
     return (char >= '0') && (char <= '9');
   }
 
