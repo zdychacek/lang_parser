@@ -1,5 +1,5 @@
-import ExpressionParser from './ExpressionParser';
 import { Precedence } from '../../Lexer';
+import ExpressionParser from './ExpressionParser';
 import UpdateExpression from '../UpdateExpression';
 import IdentifierExpression from '../IdentifierExpression';
 

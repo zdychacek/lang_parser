@@ -1,6 +1,9 @@
+import {
+  Punctuator,
+  Keyword
+} from '../../Lexer';
 import StatementParser from './StatementParser';
 import WhileStatement from '../WhileStatement';
-import { Punctuator, Keyword } from '../../Lexer';
 
 export default class WhileStatementParser extends StatementParser {
   parse (parser) {

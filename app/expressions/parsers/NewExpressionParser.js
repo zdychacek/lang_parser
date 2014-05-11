@@ -1,5 +1,8 @@
+import {
+  Punctuator,
+  Precedence
+} from '../../Lexer';
 import PrefixExpressionParser from './PrefixExpressionParser';
-import { Punctuator, Precedence } from '../../Lexer';
 import NewExpression from '../NewExpression';
 
 export default class NewExpressionParser extends PrefixExpressionParser {

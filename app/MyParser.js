@@ -1,5 +1,10 @@
+import {
+  TokenType,
+  Keyword,
+  Punctuator,
+  Precedence
+} from './Lexer';
 import Parser from './Parser';
-import { TokenType, Keyword, Punctuator, Precedence } from './Lexer';
 
 ///// Expressions
 import IdentifierExpressionParser from './expressions/parsers/IdentifierExpressionParser';

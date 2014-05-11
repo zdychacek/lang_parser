@@ -1,5 +1,8 @@
+import {
+  Punctuator,
+  Keyword
+} from '../../Lexer';
 import StatementParser from './StatementParser';
-import { Punctuator, Keyword } from '../../Lexer';
 import IfStatement from '../IfStatement';
 
 export default class IfStatementParser extends StatementParser {

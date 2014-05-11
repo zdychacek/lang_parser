@@ -1,5 +1,9 @@
+import {
+  TokenType,
+  Precedence,
+  Punctuator
+} from '../../Lexer';
 import InfixExpressionParser from './InfixExpressionParser';
-import { TokenType, Precedence, Punctuator } from '../../Lexer';
 import ConditionalExpression from '../ConditionalExpression';
 
 export default class ConditionalExpressionParser extends InfixExpressionParser {

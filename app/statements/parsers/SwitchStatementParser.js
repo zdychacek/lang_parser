@@ -1,6 +1,9 @@
+import {
+  Punctuator,
+  Keyword
+} from '../../Lexer';
 import StatementParser from './StatementParser';
 import SwitchStatement from '../SwitchStatement';
-import { Punctuator, Keyword } from '../../Lexer';
 
 export default class SwitchStatementParser extends StatementParser {
   parse (parser, token) {

@@ -1,6 +1,10 @@
+import {
+  TokenType,
+  Punctuator,
+  Keyword
+} from '../../Lexer';
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
-import { TokenType, Punctuator, Keyword } from '../../Lexer';
 import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
 
 export default class FunctionDeclarationStatementParser extends StatementParser {

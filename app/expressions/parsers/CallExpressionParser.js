@@ -1,5 +1,9 @@
+import {
+  TokenType,
+  Precedence,
+  Punctuator
+} from '../../Lexer';
 import InfixExpressionParser from './InfixExpressionParser';
-import { TokenType, Precedence, Punctuator } from '../../Lexer';
 import CallExpression from '../CallExpression';
 
 export default class CallExpressionParser extends InfixExpressionParser {

@@ -1,5 +1,8 @@
+import {
+  Punctuator,
+  Keyword
+} from '../../Lexer';
 import StatementParser from './StatementParser';
-import { Punctuator, Keyword } from '../../Lexer';
 import BreakStatement from '../BreakStatement';
 import IdentifierExpression from '../../expressions/IdentifierExpression';
 

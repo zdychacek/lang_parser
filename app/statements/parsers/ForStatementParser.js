@@ -1,5 +1,9 @@
+import {
+  Punctuator,
+  Keyword,
+  Precedence
+} from '../../Lexer';
 import StatementParser from './StatementParser';
-import { Punctuator, Keyword, Precedence } from '../../Lexer';
 import ForStatement from '../ForStatement';
 import ForInStatement from '../ForInStatement';
 import IdentifierExpression from '../../expressions/IdentifierExpression';

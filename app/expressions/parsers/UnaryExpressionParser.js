@@ -1,5 +1,5 @@
-import PrefixExpressionParser from './PrefixExpressionParser';
 import { Precedence } from '../../Lexer';
+import PrefixExpressionParser from './PrefixExpressionParser';
 import UnaryExpression from '../UnaryExpression';
 
 export default class UnaryExpressionParser extends PrefixExpressionParser {

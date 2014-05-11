@@ -1,7 +1,11 @@
+import {
+  TokenType,
+  Precedence,
+  Punctuator
+} from '../../Lexer';
 import PrefixExpressionParser from './PrefixExpressionParser';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
 import LiteralExpressionParser from './LiteralExpressionParser';
-import { TokenType, Precedence, Punctuator } from '../../Lexer';
 import ObjectExpression from '../ObjectExpression';
 
 export default class ObjectExpressionParser extends PrefixExpressionParser {

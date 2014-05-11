@@ -1,5 +1,9 @@
+import {
+  Precedence,
+  Punctuator,
+  TokenType
+} from '../../Lexer';
 import InfixExpressionParser from './InfixExpressionParser';
-import { Precedence, Punctuator, TokenType } from '../../Lexer';
 import MemberExpression from '../MemberExpression';
 import IdentifierExpression from '../IdentifierExpression';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
@@ -19,7 +23,7 @@ export default class MemberExpressionParser extends InfixExpressionParser {
     }
     else {
       let propertyToken = parser.consumeType(TokenType.Identifier);
-      
+
       property = IdentifierExpressionParser.parse(parser, propertyToken, true);
     }
 

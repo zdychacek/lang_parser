@@ -1,4 +1,8 @@
-import { TokenType, Punctuator, Keyword } from './Lexer';
+import {
+  TokenType,
+  Punctuator,
+  Keyword
+} from './Lexer';
 import Scope from './Scope';
 import ParserState from './ParserState';
 import Program from './statements/Program';

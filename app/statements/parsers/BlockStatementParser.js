@@ -1,5 +1,5 @@
-import StatementParser from './StatementParser';
 import { Punctuator } from '../../Lexer';
+import StatementParser from './StatementParser';
 import BlockStatement from '../BlockStatement';
 
 export default class BlockStatementParser extends StatementParser {

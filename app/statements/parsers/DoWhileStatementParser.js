@@ -1,6 +1,9 @@
+import {
+  Keyword,
+  Punctuator
+} from '../../Lexer';
 import StatementParser from './StatementParser';
 import DoWhileStatement from '../DoWhileStatement';
-import { Keyword, Punctuator } from '../../Lexer';
 
 export default class DoWhileStatementParser extends StatementParser {
   parse (parser) {

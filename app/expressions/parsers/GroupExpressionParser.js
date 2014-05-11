@@ -1,5 +1,5 @@
-import PrefixExpressionParser from './PrefixExpressionParser';
 import { Punctuator } from '../../Lexer';
+import PrefixExpressionParser from './PrefixExpressionParser';
 
 export default class GroupExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {

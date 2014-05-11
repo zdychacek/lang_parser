@@ -1,5 +1,8 @@
+import {
+  TokenType,
+  Precedence
+} from '../../Lexer';
 import InfixExpressionParser from './InfixExpressionParser';
-import { TokenType, Precedence } from '../../Lexer';
 import IdentifierExpression from '../IdentifierExpression';
 import MemberExpression from '../MemberExpression'
 import AssignmentExpression from '../AssignmentExpression';

@@ -1,5 +1,9 @@
+import {
+  Punctuator,
+  TokenType,
+  Keyword
+} from '../../Lexer';
 import StatementParser from './StatementParser';
-import { Punctuator, TokenType, Keyword } from '../../Lexer';
 import ContinueStatement from '../ContinueStatement';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 
