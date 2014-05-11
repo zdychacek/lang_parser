@@ -9,7 +9,7 @@ export default class ArrayExpressionParser extends PrefixExpressionParser {
   parse (parser, token) {
     var elements = [];
 
-    if (!parser.match(Punctuator.RightSquare)) {
+    if (!parser.match(Punctuator.CloseSquare)) {
       do {
         elements.push(parser.parseExpression(Precedence.Sequence));
       }
@@ -17,7 +17,7 @@ export default class ArrayExpressionParser extends PrefixExpressionParser {
       while (parser.matchAndConsume(Punctuator.Comma));
     }
 
-    parser.consume(Punctuator.RightSquare);
+    parser.consume(Punctuator.CloseSquare);
 
     return new ArrayExpression(elements);
   }

@@ -17,7 +17,7 @@ export default class ForStatementParser extends StatementParser {
     var stmt = null;
     var leftOrInit = null;
 
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
 
     // init expression or declaration list
     if (parser.matchAndConsume(Punctuator.Semicolon)) {
@@ -42,7 +42,7 @@ export default class ForStatementParser extends StatementParser {
       }
     }
 
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     // parse body
     parser.state.pushAttribute('inLoop', true);
@@ -73,7 +73,7 @@ export default class ForStatementParser extends StatementParser {
     parser.consume();
 
     // parse update expression
-    if (!parser.match(Punctuator.RightParen)) {
+    if (!parser.match(Punctuator.CloseParen)) {
       forStmt.update = parser.parseExpression();
     }
 

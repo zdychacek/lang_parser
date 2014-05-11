@@ -10,12 +10,12 @@ export default class CallExpressionParser extends InfixExpressionParser {
   parse (parser, callee, token) {
     var args = [];
 
-    if (!parser.matchAndConsume(Punctuator.RightParen)) {
+    if (!parser.matchAndConsume(Punctuator.CloseParen)) {
       do {
         args.push(parser.parseExpression(Precedence.Sequence));
       } while (parser.matchAndConsume(Punctuator.Comma));
 
-      parser.consume(Punctuator.RightParen);
+      parser.consume(Punctuator.CloseParen);
     }
 
     return new CallExpression(callee, args);

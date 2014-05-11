@@ -11,15 +11,15 @@ export default class NewExpressionParser extends PrefixExpressionParser {
     var args = [];
 
     // try to parse optional parameters
-    if (parser.matchAndConsume(Punctuator.LeftParen)) {
-      if (!parser.match(Punctuator.RightParen)) {
+    if (parser.matchAndConsume(Punctuator.OpenParen)) {
+      if (!parser.match(Punctuator.CloseParen)) {
         do {
           args.push(parser.parseExpression(Precedence.Sequence));
         }
         while (parser.matchAndConsume(Punctuator.Comma));
       }
 
-      parser.consume(Punctuator.RightParen);
+      parser.consume(Punctuator.CloseParen);
     }
 
     return new NewExpression(callee, args);

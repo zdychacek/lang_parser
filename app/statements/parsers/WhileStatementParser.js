@@ -9,9 +9,9 @@ export default class WhileStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.While);
 
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
     var test = parser.parseExpression();
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     parser.state.pushAttribute('inLoop', true);
     var body = parser.parseBlockOrExpression();

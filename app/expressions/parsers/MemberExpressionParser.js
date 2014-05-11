@@ -19,7 +19,7 @@ export default class MemberExpressionParser extends InfixExpressionParser {
 
     if (this.computed) {
       property = parser.parseExpression();
-      parser.consume(Punctuator.RightSquare);
+      parser.consume(Punctuator.CloseSquare);
     }
     else {
       let propertyToken = parser.consumeType(TokenType.Identifier);

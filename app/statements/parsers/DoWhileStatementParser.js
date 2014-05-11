@@ -14,11 +14,11 @@ export default class DoWhileStatementParser extends StatementParser {
     parser.state.popAttribute('inLoop', true);
 
     parser.consume(Keyword.While);
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
 
     var test = parser.parseExpression();
 
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     return new DoWhileStatement(test, body);
   }

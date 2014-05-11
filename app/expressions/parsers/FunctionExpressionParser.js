@@ -19,9 +19,9 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
       id = IdentifierExpressionParser.parse(parser, parser.consume(), true);
     }
 
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
 
-    if (!parser.match(Punctuator.RightParen)) {
+    if (!parser.match(Punctuator.CloseParen)) {
       // parse parameters
       do {
         let paramToken = parser.consume();
@@ -36,7 +36,7 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
       while (parser.matchAndConsume(Punctuator.Comma));
     }
 
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     // if function id was specified, then inject that id in the function scope
     if (id) {

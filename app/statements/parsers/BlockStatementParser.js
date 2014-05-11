@@ -4,14 +4,14 @@ import BlockStatement from '../BlockStatement';
 
 export default class BlockStatementParser extends StatementParser {
   parse (parser) {
-    parser.consume(Punctuator.LeftCurly);
+    parser.consume(Punctuator.OpenCurly);
 
     // create block scope
     parser.pushScope(true);
     var statements = parser.parseStatements();
     parser.popScope();
 
-    parser.consume(Punctuator.RightCurly);
+    parser.consume(Punctuator.CloseCurly);
 
     return new BlockStatement(statements);
   }

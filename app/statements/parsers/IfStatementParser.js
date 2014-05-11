@@ -13,9 +13,9 @@ export default class IfStatementParser extends StatementParser {
     var alternate = null;
 
     // parse condition
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
     var test = parser.parseExpression();
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     consequent = parser.parseBlockOrExpression();
 

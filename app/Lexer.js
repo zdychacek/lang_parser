@@ -11,12 +11,12 @@ export var TokenType = {
 };
 
 export var Punctuator = {
-  LeftParen: '(',
-  RightParen: ')',
-  LeftCurly: '{',
-  RightCurly: '}',
-  LeftSquare: '[',
-  RightSquare: ']',
+  OpenParen: '(',
+  CloseParen: ')',
+  OpenCurly: '{',
+  CloseCurly: '}',
+  OpenSquare: '[',
+  CloseSquare: ']',
   Comma: ',',
   Assign: '=',
   PlusAssign: '+=',
@@ -70,8 +70,12 @@ export var Keyword = {
   Default: 'default',
   New: 'new',
   Throw: 'throw',
-  Delete: 'delete'
-  // TODO: try/catch, debugger, with
+  Delete: 'delete',
+  Try: 'try',
+  Catch: 'catch',
+  Finally: 'finally',
+  Debugger: 'debugger',
+  With: 'with'
 };
 
 export var Precedence = {
@@ -369,12 +373,12 @@ export class Lexer {
       case Punctuator.Tilde:
       case Punctuator.Colon:
       case Punctuator.Semicolon:
-      case Punctuator.LeftParen:
-      case Punctuator.RightParen:
-      case Punctuator.LeftCurly:
-      case Punctuator.RightCurly:
-      case Punctuator.LeftSquare:
-      case Punctuator.RightSquare:
+      case Punctuator.OpenParen:
+      case Punctuator.CloseParen:
+      case Punctuator.OpenCurly:
+      case Punctuator.CloseCurly:
+      case Punctuator.OpenSquare:
+      case Punctuator.CloseSquare:
       case Punctuator.Comma:
       case Punctuator.Dot:
         // one char operators

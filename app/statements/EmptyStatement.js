@@ -1,7 +1,7 @@
 import Statement from './Statement';
 
 export default class EmptyStatement extends Statement {
-  constructor (expression) {
+  constructor () {
     super('EmptyStatement');
   }
 

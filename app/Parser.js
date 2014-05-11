@@ -168,7 +168,7 @@ export default class Parser {
     var statements = [];
 
     while (true) {
-      if (this.match(Punctuator.RightCurly)
+      if (this.match(Punctuator.CloseCurly)
         || this.match(Keyword.Case)
         || this.match(Keyword.Default)
         || this.matchType(TokenType.EOF)
@@ -218,11 +218,11 @@ export default class Parser {
   parseBlock () {
     var token = this.peek();
 
-    this.consume(Punctuator.LeftCurly);
+    this.consume(Punctuator.OpenCurly);
 
     let body = this.parseStatements();
 
-    this.consume(Punctuator.RightCurly);
+    this.consume(Punctuator.CloseCurly);
 
     return new BlockStatement(body);
   }
@@ -237,7 +237,7 @@ export default class Parser {
     var ret = null;
 
     // if we are parsing block, than we must create new block scope
-    if (this.match(Punctuator.LeftCurly)) {
+    if (this.match(Punctuator.OpenCurly)) {
       this.pushScope(true, injectables);
       ret = this.parseBlock();
       popScope = true;

@@ -39,6 +39,7 @@ import BreakStatementParser from './statements/parsers/BreakStatementParser';
 import ForStatementParser from './statements/parsers/ForStatementParser';
 import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 import ThrowStatementParser from './statements/parsers/ThrowStatementParser';
+import DebuggerStatementParser from './statements/parsers/DebuggerStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -55,9 +56,9 @@ export default class MyParser extends Parser {
 
     this.registerPrefix(TokenType.Identifier, new IdentifierExpressionParser());
     this.registerPrefix(TokenType.Literal, new LiteralExpressionParser());
-    this.registerPrefix(Punctuator.LeftParen, new GroupExpressionParser());
-    this.registerPrefix(Punctuator.LeftCurly, new ObjectExpressionParser());
-    this.registerPrefix(Punctuator.LeftSquare, new ArrayExpressionParser());
+    this.registerPrefix(Punctuator.OpenParen, new GroupExpressionParser());
+    this.registerPrefix(Punctuator.OpenCurly, new ObjectExpressionParser());
+    this.registerPrefix(Punctuator.OpenSquare, new ArrayExpressionParser());
     this.registerPrefix(Keyword.Function, new FunctionExpressionParser());
     this.registerPrefix(Punctuator.Increment, new UpdateExpressionParser(true));
     this.registerPrefix(Punctuator.Decrement, new UpdateExpressionParser(true));
@@ -65,9 +66,9 @@ export default class MyParser extends Parser {
     this.registerPrefix(Keyword.New, new NewExpressionParser());
 
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
-    this.registerInfix(Punctuator.LeftParen, new CallExpressionParser());
+    this.registerInfix(Punctuator.OpenParen, new CallExpressionParser());
     this.registerInfix(Punctuator.Dot, new MemberExpressionParser(false));
-    this.registerInfix(Punctuator.LeftSquare, new MemberExpressionParser(true));
+    this.registerInfix(Punctuator.OpenSquare, new MemberExpressionParser(true));
     this.registerInfix(Punctuator.Comma, new SequenceExpressionParser());
     this.registerInfix(Punctuator.Increment, new UpdateExpressionParser(false));
     this.registerInfix(Punctuator.Decrement, new UpdateExpressionParser(false));
@@ -114,7 +115,7 @@ export default class MyParser extends Parser {
     this.registerInfixRightGeneric(Punctuator.Caret, Precedence.Exponent);
 
     // statements
-    this.registerStatement(Punctuator.LeftCurly, new BlockStatementParser());
+    this.registerStatement(Punctuator.OpenCurly, new BlockStatementParser());
     this.registerStatement(Punctuator.Semicolon, new EmptyStatementParser());
     this.registerStatement(Keyword.If, new IfStatementParser());
     this.registerStatement(Keyword.Var, new DeclarationStatementParser());
@@ -128,6 +129,7 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.For, new ForStatementParser());
     this.registerStatement(Keyword.Switch, new SwitchStatementParser());
     this.registerStatement(Keyword.Throw, new ThrowStatementParser());
+    this.registerStatement(Keyword.Debugger, new DebuggerStatementParser());
   }
 
   registerPostfixGeneric (token, precedence) {

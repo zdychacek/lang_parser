@@ -9,17 +9,17 @@ export default class SwitchStatementParser extends StatementParser {
   parse (parser, token) {
     parser.consume(Keyword.Switch);
 
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
     var discriminant = parser.parseExpression();
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     var switchStmt = new SwitchStatement(discriminant);
 
-    parser.consume(Punctuator.LeftCurly);
+    parser.consume(Punctuator.OpenCurly);
 
     var containsDefaultClause = false;
 
-    if (!parser.match(Punctuator.RightCurly)) {
+    if (!parser.match(Punctuator.CloseCurly)) {
       // create block scope
       parser.pushScope(true);
 
@@ -55,12 +55,12 @@ export default class SwitchStatementParser extends StatementParser {
 
         switchStmt.addCase(testExpr, consequentStmts);
       }
-      while (!parser.match(Punctuator.RightCurly));
+      while (!parser.match(Punctuator.CloseCurly));
 
       parser.popScope();
     }
 
-    parser.consume(Punctuator.RightCurly);
+    parser.consume(Punctuator.CloseCurly);
 
     return switchStmt;
   }

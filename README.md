@@ -19,6 +19,5 @@ TODO
 - automatic semicolon insertion
 - support for octal and hexadecimal numbers
 - ```try/catch``` statement support
-- ```debugger``` statement support
 - ```with``` support
 - ```void``` support (??)

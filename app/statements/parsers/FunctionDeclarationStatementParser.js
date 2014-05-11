@@ -21,9 +21,9 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     var body = null;
     var id = IdentifierExpressionParser.parse(parser, tokenId);
 
-    parser.consume(Punctuator.LeftParen);
+    parser.consume(Punctuator.OpenParen);
 
-    if (!parser.match(Punctuator.RightParen)) {
+    if (!parser.match(Punctuator.CloseParen)) {
       // parse parameters
       do {
         let paramToken = parser.consume();
@@ -38,7 +38,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
       while (parser.matchAndConsume(Punctuator.Comma));
     }
 
-    parser.consume(Punctuator.RightParen);
+    parser.consume(Punctuator.CloseParen);
 
     // parse function body
     parser.state.pushAttribute('inFunction', true);

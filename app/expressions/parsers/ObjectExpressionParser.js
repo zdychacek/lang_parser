@@ -13,7 +13,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
     var keys = {};
     var objectExpr = new ObjectExpression();
 
-    if (!parser.match(Punctuator.RightCurly)) {
+    if (!parser.match(Punctuator.CloseCurly)) {
       do {
         let keyToken = parser.consume();
         let key = keyToken.value;
@@ -44,7 +44,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
       while (parser.matchAndConsume(Punctuator.Comma));
     }
 
-    parser.consume(Punctuator.RightCurly);
+    parser.consume(Punctuator.CloseCurly);
 
     return objectExpr;
   }
