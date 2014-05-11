@@ -1,3 +1,4 @@
+// Token types
 export var TokenType = {
   Identifier: '(identifier)',
   Literal: '(literal)',
@@ -10,6 +11,7 @@ export var TokenType = {
   EOF: '(EOF)'
 };
 
+// Punctuators and operators
 export var Punctuator = {
   OpenParen: '(',
   CloseParen: ')',
@@ -49,6 +51,7 @@ export var Punctuator = {
   Decrement: '--'
 };
 
+// JavaScript keywords
 export var Keyword = {
   If: 'if',
   Else: 'else',
@@ -78,6 +81,7 @@ export var Keyword = {
   With: 'with'
 };
 
+// Expressions precedence
 export var Precedence = {
   Sequence: 5,
   Assignment: 10,
@@ -96,12 +100,14 @@ export var Precedence = {
   Member: 110
 };
 
+// Values which represent literal values
 var literalsValues = [
   'null',
   'true',
   'false'
 ];
 
+// These types are literals
 var literalsTypes = [
   TokenType.String,
   TokenType.Number,
@@ -109,24 +115,36 @@ var literalsTypes = [
   TokenType.Null
 ];
 
+/**
+ * Class that represents one token
+ */
 export class Token {
-
   constructor ({ type, value, raw = null, start, end }) {
+    // type of token (TokenType)
     this.type = type;
+    // value of token
     this.value = value;
-
     // raw value to distinguish between literals types
     this.raw = raw;
+    // index, where token starts
     this.start = start;
+    // index, where token ends
     this.end = end;
   }
 }
 
+/**
+ * Class that represents lexer
+ */
 export class Lexer {
   constructor (text = '') {
+    // source code lexer is tokenizing
     this.source = text;
   }
 
+  /**
+   * Returns next token
+   */
   next () {
     // skip whitespaces and comments
     do {
@@ -134,21 +152,27 @@ export class Lexer {
     }
     while (this._skipComments());
 
+    // note token start position
     this._marker = this._index;
 
+    // check if we hit eof
     if (this._isEndOfFile()) {
       return this._createToken(TokenType.EOF, TokenType.EOF);
     }
 
+    // try to parse punctuator
     var token = this._scanPunctuator();
     if (token) return token;
 
+    // try to parse numerical value
     token = this._scanNumber();
     if (token) return token;
 
+    // try to parse string
     token = this._scanString();
     if (token) return token;
 
+    // try to parse identifier/keyword
     token = this._scanIdentifier();
     if (token) return token;
 
@@ -157,12 +181,16 @@ export class Lexer {
     this.throw(`Unexpected token '${currChar}'`);
   }
 
+  /**
+   * Returns token ahead.
+   */
   peek (distance = 0) {
     var peeks = [];
 
     // capture lexer state for revovery purpose
     this.captureState();
 
+    // fill look ahead queue
     while (distance >= peeks.length) {
       peeks.push(this.next());
     }
@@ -174,7 +202,7 @@ export class Lexer {
   }
 
   /**
-   * Return true if there is line terminator before next token, otherwise return false.
+   * Returns true if there is line terminator before next token, otherwise returns false.
    */
   peekLineTerminator () {
     var { lineNo } = this.captureState();
@@ -187,6 +215,9 @@ export class Lexer {
     return lineNo !== nextLineNo;
   }
 
+  /**
+   * Capture lexer state (current index, line number and column number). Useful when peeking some token.
+   */
   captureState () {
     if (this._capturedState) {
       throw new Error('Trying to capture unrestored state.');
@@ -199,10 +230,14 @@ export class Lexer {
     };
   }
 
+  /**
+   * Restores previously captured state.
+   */
   restoreState () {
     if (!this._capturedState) {
       throw new Error('No state to restore.');
     }
+
     var { index, lineNo, columnNo } = this._capturedState;
 
     this._index = index;
@@ -212,44 +247,58 @@ export class Lexer {
     this._capturedState = null;
   }
 
+  /**
+   * Reset lexer state.
+   */
   reset () {
+    // current index in source code
     this._index = 0;
+    // start of currently parsed token
     this._marker = 0;
+    // current line number in source code
     this._lineNo = 1;
+    // current column number in source code
     this._columnNo = 1;
+    // reference to lexer captured state
     this._capturedState = null;
   }
 
+  /**
+   * Sets new source code and resets parser state.
+   */
   set source (src) {
     this.reset();
     this._text = src;
   }
 
+  /**
+   * Gets source code.
+   */
   get source () {
     return this._text;
   }
 
+  /**
+   * Returns array of all tokens.
+   */
   dump () {
     var dump = [];
-    var idx = this._index;
-    var token;
 
-    while (true) {
-      token = this.next();
+    this.captureState();
 
-      if (token.type == TokenType.EOF) {
-        break;
-      }
-
-      dump.push(token);
+    do {
+      dump.push(this.next());
     }
+    while (!this._isEndOfFile());
 
-
-    this._index = idx;
+    this.restoreState();
 
     return dump;
   }
 
+  /**
+   * Returns current line and column number.
+   */
   get lineAndColumn () {
     return {
       line: this._lineNo,
@@ -257,17 +306,24 @@ export class Lexer {
     };
   }
 
+  /**
+   * Throws error with line and column info.
+   */
   throw (message, _Error = SyntaxError) {
     var { line, column } = this.lineAndColumn;
 
     throw new _Error(`ln: ${line}, col: ${column} - ${message}.`);
   }
 
+  /**
+   * Tries to parse string literal.
+   */
   _scanString () {
     var str = null;
     var char = this._peekNextChar();
     var beginChar = '';
 
+    // string starts with ' or "
     if (char == '\'' || char == '"') {
       beginChar = this._getNextChar();
 
@@ -299,6 +355,9 @@ export class Lexer {
     }
   }
 
+  /**
+   * Tries to parse numeric literal.
+   */
   _scanNumber () {
     var number = '';
     var char = this._peekNextChar();
@@ -359,6 +418,9 @@ export class Lexer {
     }
   }
 
+  /**
+   * Tries to parse punctuator or operator.
+   */
   _scanPunctuator () {
     var nextToken = this._peekNextChar(), prevToken;
     var punctuator = '';
@@ -427,6 +489,9 @@ export class Lexer {
     }
   }
 
+  /**
+   * Tries to parse identifier or keyword.
+   */
   _scanIdentifier () {
     var char = this._peekNextChar();
     var identifier = '';
@@ -464,6 +529,9 @@ export class Lexer {
     }
   }
 
+  /**
+   * Returns current char and increments current index value.
+   */
   _getNextChar () {
     var char = this._text[this._index];
 
@@ -480,20 +548,27 @@ export class Lexer {
     return char;
   }
 
+  /**
+   * Returns char ahead.
+   */
   _peekNextChar (distance = 0) {
     return this._text[this._index + distance];
   }
 
+  /**
+   * Skips inline and block comments.
+   */
   _skipComments () {
     var peek = this._peekNextChar();
     var peek1 = this._peekNextChar(1);
     var char;
 
+    // comments start with // or /* sequence
     if (peek == '/' && (peek1 == '/' || peek1 == '*')) {
       this._getNextChar();
       this._getNextChar();
 
-      // inline comments //
+      // skip inline comments //
       if (peek1 == '/') {
         while (true) {
           char = this._getNextChar();
@@ -503,7 +578,7 @@ export class Lexer {
           }
         }
       }
-      // block comments /**/
+      // skip block comments /**/
       else {
         var char;
         var peek;
@@ -512,10 +587,12 @@ export class Lexer {
           char = this._getNextChar();
           peek = this._peekNextChar();
 
+          // unterminated block comment
           if (this._isEndOfFile()) {
             this.throw('Unexpected end of file');
           }
 
+          // block comment terminating sequence */
           if (char == '*' && peek == '/') {
             this._getNextChar();
             this._getNextChar();
@@ -530,16 +607,22 @@ export class Lexer {
     return false;
   }
 
+  /**
+   * Skips white spaces.
+   */
   _skipWhitespaces () {
     while (this._isWhitespace(this._peekNextChar())) {
       this._getNextChar();
     }
   }
 
-  _isKeyword (identifier) {
+  /**
+   * Checks if value is keyword.
+   */
+  _isKeyword (value) {
     for (let kw in Keyword) {
       if (Keyword.hasOwnProperty(kw)) {
-        if (Keyword[kw] == identifier) {
+        if (Keyword[kw] == value) {
           return true;
         }
       }
@@ -548,38 +631,65 @@ export class Lexer {
     return false;
   }
 
-  _isLiteralValue (identifier) {
-    return literalsValues.indexOf(identifier) > -1;
+  /**
+   * Checks if value is literal value.
+   */
+  _isLiteralValue (value) {
+    return literalsValues.indexOf(value) > -1;
   }
 
+  /**
+   * Checks if token type is literal.
+   */
   _isLiteralType (tokenType) {
     return literalsTypes.indexOf(tokenType) > -1;
   }
 
+  /**
+   * Cheks if char is whitespace.
+   */
   _isWhitespace (char) {
     return /\s/.test(char);
   }
 
+  /**
+   * Checks if char is line terminator.
+   */
   _isLineTerminator (char) {
     return char == '\n';
   }
 
+  /**
+   * Checks if we hit end of file.
+   */
   _isEndOfFile () {
     return this._index >= this._text.length;
   }
 
+  /**
+   * Checks if char is number digit.
+   */
   _isDigit (char) {
     return (char >= '0') && (char <= '9');
   }
 
+  /**
+   * Checks if char can be identifier first char.
+   */
   _isIdentifierStart (char) {
     return char == '_' || char == '$' || (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z');
   }
 
+  /**
+   * Checks if char can be contained in identifier name.
+   */
   _isIdentifierPart (char) {
     return this._isIdentifierStart(char) || this._isDigit(char);
   }
 
+  /**
+   * Helper method, creates new Token class instance.
+   */
   _createToken (type, value, raw = value) {
     var token = new Token({
       type,

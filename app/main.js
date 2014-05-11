@@ -146,6 +146,8 @@ function _do () {
   oldSource = sourceInput.value;
 
   try {
+    //console.log(lexer.dump());return;
+    
     ast = parser.parseProgram();
     $(preAST).JSONView(JSON.stringify(ast));
 

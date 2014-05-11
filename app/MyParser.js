@@ -81,7 +81,7 @@ export default class MyParser extends Parser {
       Punctuator.AsteriskAssign,
       Punctuator.SlashAssign,
       Punctuator.CaretAssign
-    ].forEach(function (tokenType) {
+    ].forEach((tokenType) => {
       this.registerInfix(tokenType, new AssignmentExpressionParser())
     }, this);
 
