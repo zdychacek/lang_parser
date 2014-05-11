@@ -1,7 +1,7 @@
 import { Keyword } from './Lexer';
 
 export default class Scope {
-  constructor ({ parent = null, block = false }) {
+  constructor ({ parent = null, block = false }, parser) {
     // reference to parent scope
     this._parent = parent;
 
@@ -13,6 +13,9 @@ export default class Scope {
 
     // block scope or not
     this._isBlock = block;
+
+    // reference to parser
+    this._parser = parser;
   }
 
   /**
@@ -29,7 +32,7 @@ export default class Scope {
       scope._vars[name] = kind;
     }
     else {
-      throw new SyntaxError(`Variable '${name}' already defined in current scope.`);
+      this._parser.throw(`Variable '${name}' already defined in current scope`, ReferenceError);
     }
   }
 

@@ -25,7 +25,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
         let paramToken = parser.consume();
 
         if (!parser.matchType(TokenType.Identifier, paramToken)) {
-          throw new SyntaxError('Unexpected token ILLEGAL.');
+          parser.throw('Unexpected token ILLEGAL');
         }
 
         scopeVars[paramToken.value] = Keyword.Var;

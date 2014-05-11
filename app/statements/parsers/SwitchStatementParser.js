@@ -24,7 +24,7 @@ export default class SwitchStatementParser extends StatementParser {
         let token = parser.consume();
 
         if (token.value != Keyword.Case && token.value != Keyword.Default) {
-          throw new SyntaxError('Unexpected token.');
+          parser.throw(`Unexpected token ${token.value}`);
         }
 
         let testExpr = null;
@@ -36,7 +36,7 @@ export default class SwitchStatementParser extends StatementParser {
         // default clause
         else {
           if (containsDefaultClause) {
-            throw new SyntaxError('Switch statement has already default clause defined.');
+            parser.throw('Switch statement has already default clause defined');
           }
           containsDefaultClause = true;
         }

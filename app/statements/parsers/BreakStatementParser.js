@@ -12,7 +12,7 @@ export default class BreakStatementParser extends StatementParser {
     var inSwitchCaseBody = parser.state.getAttribute('inSwitchCaseBody');
 
     if (!inLoop && !inSwitchCaseBody) {
-      throw new SyntaxError('Illegal break statement.');
+      parser.throw('Illegal break statement');
     }
 
     // labels are allowed only in loop bodies, NOT in switch case statement
@@ -21,11 +21,11 @@ export default class BreakStatementParser extends StatementParser {
         label = parser.parseExpression();
 
         if (!(label instanceof IdentifierExpression)) {
-          throw new SyntaxError('Unexpected break label.');
+          parser.throw('Unexpected break label');
         }
 
         if (!parser.scope.hasLabel(label.name)) {
-          throw new SyntaxError(`Undefined label ${label.name}.`);
+          parser.throw(`Undefined label ${label.name}`, ReferenceError);
         }
       }
     }

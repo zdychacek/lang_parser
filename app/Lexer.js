@@ -116,10 +116,6 @@ export class Token {
     this.start = start;
     this.end = end;
   }
-
-  error (msg, printInfo = true) {
-    throw new SyntaxError(msg + (printInfo? ` (value: "${this.value}", start: ${this.start}, end: ${this.end})` : ''));
-  }
 }
 
 export class Lexer {
@@ -136,7 +132,7 @@ export class Lexer {
 
     this._marker = this._index;
 
-    if (this._index >= this._text.length) {
+    if (this._isEndOfFile()) {
       return this._createToken(TokenType.EOF, TokenType.EOF);
     }
 
@@ -152,18 +148,25 @@ export class Lexer {
     token = this._scanIdentifier();
     if (token) return token;
 
-    throw new SyntaxError('Unexpected token \'' + this._peekNextChar() + '\'.');
+    this.throw(`Unexpected token ${this._peekNextChar()}`);
   }
 
   peek (distance = 0) {
-    var peeks = [];
+    // capture lexer state for revovery purpose
     var idx = this._index;
+    var oldLineNo = this._lineNo;
+    var oldColumnNo = this._columnNo;
+
+    var peeks = [];
 
     while (distance + 1 > peeks.length) {
       peeks.push(this.next());
     }
 
+    // restore lexer state
     this._index = idx;
+    this._lineNo = oldLineNo;
+    this._columnNo = oldColumnNo;
 
     return peeks[distance];
   }
@@ -171,6 +174,10 @@ export class Lexer {
   reset () {
     this._index = 0;
     this._marker = 0;
+    this._lineNo = 1;
+    this._columnNo = 1;
+
+    this._countLineAndColumnNo = true;
   }
 
   set source (src) {
@@ -203,22 +210,17 @@ export class Lexer {
     return dump;
   }
 
-  _isKeyword (identifier) {
-    for (let kw in Keyword) {
-      if (Keyword[kw] == identifier) {
-        return true;
-      }
-    }
-
-    return false;
+  get lineAndColumn () {
+    return {
+      line: this._lineNo,
+      column: this._columnNo
+    };
   }
 
-  _isLiteralValue (identifier) {
-    return literalsValues.indexOf(identifier) > -1;
-  }
+  throw (message, _Error = SyntaxError) {
+    var { line, column } = this.lineAndColumn;
 
-  _isLiteralType (tokenType) {
-    return literalsTypes.indexOf(tokenType) > -1;
+    throw new _Error(`ln: ${line}, col: ${column} - ${message}.`);
   }
 
   _scanString () {
@@ -238,12 +240,8 @@ export class Lexer {
           str += this._getNextChar();
           char = this._peekNextChar();
 
-          if (!char) {
-            throw new SyntaxError('Unterminated string.');
-          }
-
-          if (char == '\n') {
-            throw new SyntaxError('Multiline strings are not allowed.');
+          if (!char || this._isLineTerminator(char)) {
+            this.throw('Unterminated string');
           }
         } while (char != beginChar);
 
@@ -307,13 +305,13 @@ export class Lexer {
           }
         }
         else {
-          throw new SyntaxError('Unexpected character after the exponent sign.');
+          this.throw('Unexpected character after the exponent sign');
         }
       }
     }
 
     if (number == '.') {
-      throw new SyntaxError('Bad number.');
+      this.throw('Bad number');
     }
 
     if (number) {
@@ -429,6 +427,14 @@ export class Lexer {
   _getNextChar () {
     var char = this._text[this._index];
 
+    if (this._isLineTerminator(char)) {
+      this._lineNo++;
+      this._columnNo = 1;
+    }
+    else {
+      this._columnNo++;
+    }
+
     this._index++;
 
     return char;
@@ -452,7 +458,7 @@ export class Lexer {
         while (true) {
           char = this._getNextChar();
 
-          if (char == '\n' || this._index >= this._text.length) {
+          if (this._isLineTerminator(char) || this._isEndOfFile()) {
             break;
           }
         }
@@ -466,8 +472,8 @@ export class Lexer {
           char = this._getNextChar();
           peek = this._peekNextChar();
 
-          if (this._index >= this._text.length) {
-            throw new SyntaxError('Unexpected end of file.');
+          if (this._isEndOfFile()) {
+            this.throw('Unexpected end of file');
           }
 
           if (char == '*' && peek == '/') {
@@ -490,8 +496,36 @@ export class Lexer {
     }
   }
 
+  _isKeyword (identifier) {
+    for (let kw in Keyword) {
+      if (Keyword.hasOwnProperty(kw)) {
+        if (Keyword[kw] == identifier) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  _isLiteralValue (identifier) {
+    return literalsValues.indexOf(identifier) > -1;
+  }
+
+  _isLiteralType (tokenType) {
+    return literalsTypes.indexOf(tokenType) > -1;
+  }
+
   _isWhitespace (char) {
     return /\s/.test(char);
+  }
+
+  _isLineTerminator (char) {
+    return char == '\n';
+  }
+
+  _isEndOfFile () {
+    return this._index >= this._text.length;
   }
 
   _isDigit (char) {

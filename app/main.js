@@ -137,8 +137,7 @@ myLabel:
 })();
 
 // illegal statement
-//return;
-`;
+//return;`;
 
 var oldSource = '';
 

@@ -9,7 +9,7 @@ export default class ReturnStatementParser extends StatementParser {
     var argument = null;
 
     if (!parser.state.getAttribute('inFunction')) {
-      throw new SyntaxError('Illegal return statement.');
+      parser.throw('Illegal return statement.');
     }
 
     if (!parser.match(Punctuator.Semicolon)) {
@@ -18,7 +18,7 @@ export default class ReturnStatementParser extends StatementParser {
     }
 
     if (!parser.match(Punctuator.RightCurly)) {
-      throw new SyntaxError('Unreachable statement.');
+      parser.throw('Unreachable statement.');
     }
 
     return new ReturnStatement(argument);

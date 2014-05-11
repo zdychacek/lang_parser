@@ -51,7 +51,7 @@ export default class Parser {
     var newScope = new Scope({
       parent: this._scopeChain.length? this.scope : null,
       block
-    });
+    }, this);
 
     // inject some variables
     if (injectVariables) {
@@ -134,11 +134,11 @@ export default class Parser {
     var prefixParser = this.getPrefixExpressionParser(token);
 
     if (this.matchType(TokenType.EOF, token)) {
-      token.error('Unexpected end of file.', false);
+      this.throw('Unexpected end of file');
     }
 
     if (!prefixParser) {
-      token.error('Could not parse.');
+      this.throw(`Unexpected token ${token.value}`);
     }
 
     var left = prefixParser.parse(this, token);
@@ -263,7 +263,7 @@ export default class Parser {
     var token = this.peek();
 
     if (token.type != TokenType.EOF) {
-      token.error(`Unexpected token ${token.value}.`, false);
+      this.throw(`Unexpected token ${token.value}`);
     }
 
     console.log('Time - parseProgram():', (new Date() - start) / 1000);
@@ -288,7 +288,7 @@ export default class Parser {
       let token = this.peek();
 
       if (!token || token.value != expected) {
-        token.error(`Unexpected token ${token.value}.`, false);
+        this.throw(`Unexpected token ${token.value}`);
       }
     }
 
@@ -302,7 +302,7 @@ export default class Parser {
       let token = this.peek();
 
       if (!token || token.type != expected) {
-        token.error(`Unexpected token type ${token.type}.`, false);
+        this.throw(`Unexpected token ${token.value}`);
       }
     }
 
@@ -343,6 +343,12 @@ export default class Parser {
     var token = this._lexer.peek(distance);
 
     return this._transformToken(token);
+  }
+
+  throw (message, _Error = SyntaxError) {
+    var { line, column } = this._lexer.lineAndColumn;
+
+    throw new _Error(`ln: ${line}, col: ${column} - ${message}.`);
   }
 
   /**

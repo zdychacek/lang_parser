@@ -24,7 +24,7 @@ export default class UpdateExpressionParser extends ExpressionParser {
     }
 
     if (!(argument instanceof IdentifierExpression)) {
-      throw new SyntaxError('The left-hand side of an assignment must be an identifier.');
+      parser.throw('The left-hand side of an assignment must be an identifier.');
     }
 
     return new UpdateExpression(operator, argument, this._prefix);

@@ -11,7 +11,7 @@ export default class DeclarationStatementParser extends StatementParser {
       kind = parser.consume().value;
     }
     else {
-      throw new SyntaxError('Unexpected declaration statement.');
+      parser.throw('Unexpected declaration statement');
     }
 
     var declarationStmt = new DeclarationStatement([], kind);

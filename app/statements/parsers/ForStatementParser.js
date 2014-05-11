@@ -54,7 +54,7 @@ export default class ForStatementParser extends StatementParser {
 
     // must be ExpressionStatement or variable declarations list
     if (init && !(init instanceof ExpressionStatement || init instanceof DeclarationStatement)) {
-      throw new SyntaxError('Unexpected init expression or declarations list.');
+      parser.throw('Unexpected init expression or declarations list');
     }
 
     forStmt.init = init;
@@ -85,12 +85,12 @@ export default class ForStatementParser extends StatementParser {
     var isDeclaration = left instanceof DeclarationStatement;
 
     if (isDeclaration && left.declarations.length != 1) {
-      throw new SyntaxError('Unexpected interator.');
+      parser.throw('Unexpected interator');
     }
 
     if (!isDeclaration && !isIdentifier) {
       if (!isIdentifier) {
-        throw new SyntaxError('Invalid left-hand side in for-in.');
+        parser.throw('Invalid left-hand side in for-in');
       }
     }
 

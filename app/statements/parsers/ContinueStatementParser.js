@@ -10,20 +10,20 @@ export default class ContinueStatementParser extends StatementParser {
     var label = null;
 
     if (!parser.state.getAttribute('inLoop')) {
-      throw new SyntaxError('Illegal continue statement.');
+      parser.throw('Illegal continue statement');
     }
 
     if (!parser.match(Punctuator.Semicolon)) {
       let labelToken = parser.consume();
 
       if (labelToken.type != TokenType.Identifier) {
-        throw new SyntaxError('Unexpected continue label.');
+        parser.throw('Unexpected continue label');
       }
 
       label = IdentifierExpressionParser.parse(parser, labelToken, true);
 
       if (!parser.scope.hasLabel(label.name)) {
-        throw new SyntaxError(`Undefined label ${label.name}.`);
+        parser.throw(`Undefined label ${label.name}`, ReferenceError);
       }
     }
 

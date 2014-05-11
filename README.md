@@ -14,7 +14,6 @@ Features
 TODO
 -----------------------
 - variables hoisting (hoist ```var``` declarations to nearest function scope)
-- line and column counters (for better error reporting)
 - detect line terminators (some statements, eg. ```throw``` or ```return```, must not trail with new line terminator)
 - automatic semicolon insertion
 - support for octal and hexadecimal numbers

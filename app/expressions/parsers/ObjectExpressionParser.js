@@ -16,7 +16,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
         // check key duplicity
         if (keys[key]) {
-          keyToken.error(`Duplicate object property.`);
+          parser.throw(`Duplicate object property '${key}'`);
         }
 
         if (parser.matchType(TokenType.Identifier, keyToken)) {
@@ -26,7 +26,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
           keyToken = LiteralExpressionParser.parse(parser, keyToken);
         }
         else {
-          keyToken.error('Bad object property name.');
+          parser.throw('Bad object property name');
         }
 
         parser.consume(Punctuator.Colon);
