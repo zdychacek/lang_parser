@@ -10,6 +10,7 @@ Features
 - supports block (```let```) declarations
 - array expressions cannot contain trailing comma, detto object expressions
 - object expressions cannot contain duplicate property names
+- duplicate label names are not supported
 
 TODO
 -----------------------

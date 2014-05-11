@@ -70,7 +70,14 @@ export default class Scope {
    * Add label name definition
    */
   addLabel (name) {
-    this._labels.push(name);
+    // labels are always defined on function scope level
+    var scope = this._findFunctionScope();
+
+    if (scope.hasLabel(name)) {
+      this._parser.throw(`Label with name '${name} already defined`, ReferenceError);
+    }
+
+    scope._labels.push(name);
   }
 
   /**
