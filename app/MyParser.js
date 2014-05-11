@@ -42,6 +42,9 @@ import ThrowStatementParser from './statements/parsers/ThrowStatementParser';
 import DebuggerStatementParser from './statements/parsers/DebuggerStatementParser';
 import TryStatementParser from './statements/parsers/TryStatementParser';
 
+/**
+ * Implements specific parser
+ */
 export default class MyParser extends Parser {
   constructor (lexer) {
     // define some globals
@@ -53,8 +56,10 @@ export default class MyParser extends Parser {
       'Boolean'
     ];
 
+    // super class constructor call
     super(lexer, globals);
 
+    // refister prefix operators parsers
     this.registerPrefix(TokenType.Identifier, new IdentifierExpressionParser());
     this.registerPrefix(TokenType.Literal, new LiteralExpressionParser());
     this.registerPrefix(Punctuator.OpenParen, new GroupExpressionParser());
@@ -66,6 +71,7 @@ export default class MyParser extends Parser {
     this.registerPrefix(Keyword.This, new ThisExpressionParser());
     this.registerPrefix(Keyword.New, new NewExpressionParser());
 
+    // register infix (postfix) operators parsers
     this.registerInfix(Punctuator.Question, new ConditionalExpressionParser());
     this.registerInfix(Punctuator.OpenParen, new CallExpressionParser());
     this.registerInfix(Punctuator.Dot, new MemberExpressionParser(false));
@@ -74,7 +80,7 @@ export default class MyParser extends Parser {
     this.registerInfix(Punctuator.Increment, new UpdateExpressionParser(false));
     this.registerInfix(Punctuator.Decrement, new UpdateExpressionParser(false));
 
-    // assignments
+    // these are all assignments parsers
     [
       Punctuator.Assign,
       Punctuator.PlusAssign,
@@ -86,6 +92,7 @@ export default class MyParser extends Parser {
       this.registerInfix(tokenType, new AssignmentExpressionParser())
     }, this);
 
+    // register generic prefix operators parsers
     this.registerPrefixGeneric(Punctuator.Plus, Precedence.Prefix);
     this.registerPrefixGeneric(Punctuator.Minus, Precedence.Prefix);
     this.registerPrefixGeneric(Punctuator.Tilde, Precedence.Prefix);
@@ -93,12 +100,13 @@ export default class MyParser extends Parser {
     this.registerPrefixGeneric(Keyword.TypeOf, Precedence.Prefix);
     this.registerPrefixGeneric(Keyword.Delete, Precedence.Prefix);
 
+    // register generic infix expressions parsers (left associativity)
     this.registerInfixLeftGeneric(Punctuator.Plus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Minus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Asterisk, Precedence.Product);
     this.registerInfixLeftGeneric(Punctuator.Slash, Precedence.Product);
 
-    // relational
+    // relational operators parsers
     this.registerInfixLeftGeneric(Punctuator.Equal, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.NotEqual, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.Greater, Precedence.Relational);
@@ -108,14 +116,14 @@ export default class MyParser extends Parser {
     this.registerInfixLeftGeneric(Keyword.InstanceOf, Precedence.Relational);
     this.registerInfixLeftGeneric(Keyword.In, Precedence.Relational);
 
-    // logical
+    // logical operators parsers
     this.registerInfixLeftGeneric(Punctuator.LogicalAnd, Precedence.LogicalAnd);
     this.registerInfixLeftGeneric(Punctuator.LogicalOr, Precedence.LogicalOr);
 
-    // right associativity
+    // register generic infix expressions parsers (right associativity)
     this.registerInfixRightGeneric(Punctuator.Caret, Precedence.Exponent);
 
-    // statements
+    // register statements parsers
     this.registerStatement(Punctuator.OpenCurly, new BlockStatementParser());
     this.registerStatement(Punctuator.Semicolon, new EmptyStatementParser());
     this.registerStatement(Keyword.If, new IfStatementParser());
@@ -134,18 +142,30 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Try, new TryStatementParser());
   }
 
+  /**
+   * Registers postfix expression operator.
+   */
   registerPostfixGeneric (token, precedence) {
     this.registerInfix(token, new PostfixOperatorExpressionParser(precedence));
   }
 
+  /**
+   * Registers prefix expression operator.
+   */
   registerPrefixGeneric (token, precedence) {
     this.registerPrefix(token, new UnaryExpressionParser(precedence));
   }
 
+  /**
+   * Registers generic infix left associativity expression operator.
+   */
   registerInfixLeftGeneric (token, precedence) {
     this.registerInfix(token, new BinaryOperatorExpressionParser(precedence, false));
   }
 
+  /**
+   * Registers generic infix right associativity expression operator.
+   */
   registerInfixRightGeneric (token, precedence) {
     this.registerInfix(token, new BinaryOperatorExpressionParser(precedence, true));
   }

@@ -1,10 +1,16 @@
 import { Keyword } from './Lexer';
 
+/**
+ * Represents scope type
+ */
 export var ScopeType = {
   Block: 'Block',
   Function: 'Function'
 };
 
+/**
+ * Represents function or block scope.
+ */
 export class Scope {
   constructor ({ parent = null, type = ScopeType.Function }, parser) {
     // reference to parent scope
@@ -16,7 +22,7 @@ export class Scope {
     // array of labels (continue, break) defined in this scope
     this._labels = [];
 
-    // block or function scope
+    // tscope type (block or function)
     this._type = type;
 
     // reference to parser
@@ -29,10 +35,12 @@ export class Scope {
   define (name, kind) {
     var scope = this;
 
+    // if we are about to define variable with var, we must find nearest function scope first
     if (kind == Keyword.Var) {
       scope = this._findFunctionScope();
     }
 
+    // if variable is not defined, then define it
     if (!(name in scope._vars)) {
       scope._vars[name] = kind;
     }
@@ -78,6 +86,7 @@ export class Scope {
     // labels are always defined on function scope level
     var scope = this._findFunctionScope();
 
+    // do not allow duplicate label names in same scope
     if (scope.hasLabel(name)) {
       this._parser.throw(`Label with name '${name} already defined`, ReferenceError);
     }

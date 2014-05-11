@@ -13,8 +13,12 @@ import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
 
+/**
+ * Represents parser.
+ */
 export default class Parser {
   constructor (lexer, globals = null) {
+    // lexer reference for tokens supply
     this._lexer = lexer;
 
     // prefix expressions parsers
@@ -47,12 +51,15 @@ export default class Parser {
     this.pushScope(ScopeType.Function, this._globals);
   }
 
+  /**
+   * These globals will be defined in global scope.
+   */
   set globals (globals) {
     globals.forEach((global) => this._globals[global] = Keyword.Var);
   }
 
   /**
-   * Push new scope on stack, optionaly with some injected variables.
+   * Pushes new scope on stack, optionaly with some injected variables.
    */
   pushScope (type = ScopeType.Function, injectVariables = null) {
     var newScope = new Scope({
@@ -75,14 +82,14 @@ export default class Parser {
   }
 
   /**
-   * Pop and return current scope from stack.
+   * Pops and returns current scope from stack.
    */
   popScope () {
     return this._scopeChain.pop();
   }
 
   /**
-   * Return current scope.
+   * Returns current scope.
    */
   get scope () {
     var len = this._scopeChain.length;
@@ -91,7 +98,7 @@ export default class Parser {
   }
 
   /**
-   * Return global scope.
+   * Returns global scope.
    */
   get globalScope () {
     return this._scopeChain[0];
@@ -104,18 +111,30 @@ export default class Parser {
     return this._state;
   }
 
+  /**
+   * Registers prefix operator expression parser.
+   */
   registerPrefix (token, expression) {
     this._prefixExpressions.set(token, expression);
   }
 
+  /**
+   * Registers infix (postfix) operator expression parser.
+   */
   registerInfix (token, expression) {
     this._infixExpressions.set(token, expression);
   }
 
+  /**
+   * Registers statement parser.
+   */
   registerStatement (token, statement) {
     this._statements.set(token, statement);
   }
 
+  /**
+   * Returns prefix expression parser.
+   */
   getPrefixExpressionParser (token) {
     var key = token.type;
 
@@ -126,6 +145,9 @@ export default class Parser {
     return this._prefixExpressions.get(key);
   }
 
+  /**
+   * Returns infix expression parser.
+   */
   getInfixExpressionParser (token) {
     var key = token.type;
 
@@ -136,6 +158,9 @@ export default class Parser {
     return this._infixExpressions.get(key);
   }
 
+  /**
+   * Parses expressions.
+   */
   parseExpression (precedence = 0) {
     var token = this.consume();
     var prefixParser = this.getPrefixExpressionParser(token);
@@ -167,6 +192,9 @@ export default class Parser {
     return left;
   }
 
+  /**
+   * Parses and returns array of statements (expressions).
+   */
   parseStatements () {
     var statements = [];
 
@@ -189,6 +217,9 @@ export default class Parser {
     return statements;
   }
 
+  /**
+   * Parses one statement or expression statement.
+   */
   parseStatement (params = null) {
     var token = this.peek();
     var statementExpression = null;
@@ -218,9 +249,13 @@ export default class Parser {
     }
   }
 
+  /**
+   * Parses block of statements. Optionally creates new function/block scope and inject some variables into it.
+   */
   parseBlock (scopeType, injectables) {
     var token = this.peek();
 
+    // block starts with opening curly bracket
     this.consume(Punctuator.OpenCurly);
 
     if (scopeType) {
@@ -233,6 +268,7 @@ export default class Parser {
       this.popScope();
     }
 
+    // block ends with closing curly bracket
     this.consume(Punctuator.CloseCurly);
 
     return new BlockStatement(body);
@@ -265,6 +301,9 @@ export default class Parser {
     return ret;
   }
 
+  /**
+   * Starts parsing program.
+   */
   parseProgram () {
     var start = new Date();
 
@@ -282,6 +321,9 @@ export default class Parser {
     return new Program(body);
   }
 
+  /**
+   * Transforms tokens.
+   */
   _transformToken (token) {
     switch (token.type) {
       case TokenType.Boolean:
@@ -294,6 +336,9 @@ export default class Parser {
     return token;
   }
 
+  /**
+   * Gets next token from lexer and optionally checks expected token's value.
+   */
   consume (expected) {
     if (expected) {
       let token = this.peek();
@@ -308,6 +353,9 @@ export default class Parser {
     return this._transformToken(next);
   }
 
+  /**
+   * Gets next token from lexer and optionally checks expected token's type.
+   */
   consumeType (expected) {
     if (expected) {
       let token = this.peek();
@@ -322,6 +370,9 @@ export default class Parser {
     return this._transformToken(next);
   }
 
+  /**
+   * Checks if current (or specified) token has specific value. If so, than consumes it and returns true, otherwise false.
+   */
   matchAndConsume (expected, token = this.peek()) {
     if (token && token.value == expected) {
       this.consume();
@@ -332,6 +383,9 @@ export default class Parser {
     return false;
   }
 
+  /**
+   * Checks if current (or specified) token has specific type. If so, than consumes it and returns true, otherwise false.
+   */
   matchAndConsumeType (expected, token = this.peek()) {
     if (token && token.type == expected) {
       this.consume();
@@ -342,10 +396,16 @@ export default class Parser {
     return false;
   }
 
+  /**
+   * Checks if current token has specific value.
+   */
   match (expected, token = this.peek()) {
     return token && token.value == expected;
   }
 
+  /**
+   * Checks if current token has specific type.
+   */
   matchType (expected, token = this.peek()) {
     return token && token.type == expected;
   }
@@ -357,12 +417,15 @@ export default class Parser {
   }
 
   /**
-   * Return true if there is line terminator before next token, otherwise return false.
+   * Returns true if there is line terminator before next token, otherwise return false.
    */
   peekLineTerminator () {
     return this._lexer.peekLineTerminator();
   }
 
+  /**
+   * Throws error with line and column information.
+   */
   throw (message, _Error = SyntaxError) {
     var { line, column } = this._lexer.lineAndColumn;
 
@@ -370,7 +433,7 @@ export default class Parser {
   }
 
   /**
-   * Get precedence of current infix expression;
+   * Gets precedence of current infix expression token.
    */
   getPrecedence () {
     var exprParser = this.getInfixExpressionParser(this.peek());

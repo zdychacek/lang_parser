@@ -1,4 +1,6 @@
-// Token types
+/**
+ * Token types
+ */
 export var TokenType = {
   Identifier: '(identifier)',
   Literal: '(literal)',
@@ -11,7 +13,9 @@ export var TokenType = {
   EOF: '(EOF)'
 };
 
-// Punctuators and operators
+/**
+ * Punctuators and operators
+ */
 export var Punctuator = {
   OpenParen: '(',
   CloseParen: ')',
@@ -51,7 +55,9 @@ export var Punctuator = {
   Decrement: '--'
 };
 
-// JavaScript keywords
+/**
+ * JavaScript keywords
+ */
 export var Keyword = {
   If: 'if',
   Else: 'else',
@@ -81,7 +87,9 @@ export var Keyword = {
   With: 'with'
 };
 
-// Expressions precedence
+/**
+ * Expressions precedence
+ */
 export var Precedence = {
   Sequence: 5,
   Assignment: 10,
@@ -100,14 +108,18 @@ export var Precedence = {
   Member: 110
 };
 
-// Values which represent literal values
+/**
+ * Values which represent literal values
+ */
 var literalsValues = [
   'null',
   'true',
   'false'
 ];
 
-// These types are literals
+/**
+ * These types are literals
+ */
 var literalsTypes = [
   TokenType.String,
   TokenType.Number,
@@ -122,12 +134,16 @@ export class Token {
   constructor ({ type, value, raw = null, start, end }) {
     // type of token (TokenType)
     this.type = type;
+
     // value of token
     this.value = value;
+
     // raw value to distinguish between literals types
     this.raw = raw;
+
     // index, where token starts
     this.start = start;
+
     // index, where token ends
     this.end = end;
   }
@@ -138,6 +154,7 @@ export class Token {
  */
 export class Lexer {
   constructor (text = '') {
+
     // source code lexer is tokenizing
     this.source = text;
   }
@@ -212,6 +229,7 @@ export class Lexer {
 
     this.restoreState();
 
+    // if lines numbers are not equal, than we found new line
     return lineNo !== nextLineNo;
   }
 
@@ -253,12 +271,16 @@ export class Lexer {
   reset () {
     // current index in source code
     this._index = 0;
+
     // start of currently parsed token
     this._marker = 0;
+
     // current line number in source code
     this._lineNo = 1;
+
     // current column number in source code
     this._columnNo = 1;
+
     // reference to lexer captured state
     this._capturedState = null;
   }
@@ -267,7 +289,9 @@ export class Lexer {
    * Sets new source code and resets parser state.
    */
   set source (src) {
+    // reset state before setting new source code
     this.reset();
+
     this._text = src;
   }
 

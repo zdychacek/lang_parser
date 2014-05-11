@@ -8,6 +8,9 @@ import StatementParser from './StatementParser';
 import TryStatement from '../TryStatement';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 
+/**
+ * Implements try/catch/finally statement parser.
+ */
 export default class TryStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.Try);
