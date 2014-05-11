@@ -2,6 +2,7 @@ import {
   Punctuator,
   Keyword
 } from '../../Lexer';
+import { ScopeType } from '../../Scope';
 import StatementParser from './StatementParser';
 import SwitchStatement from '../SwitchStatement';
 
@@ -21,7 +22,7 @@ export default class SwitchStatementParser extends StatementParser {
 
     if (!parser.match(Punctuator.CloseCurly)) {
       // create block scope
-      parser.pushScope(true);
+      parser.pushScope(ScopeType.Block);
 
       do {
         let token = parser.consume();

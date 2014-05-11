@@ -1,4 +1,5 @@
 import { Punctuator } from '../../Lexer';
+import { ScopeType } from '../../Scope';
 import StatementParser from './StatementParser';
 import BlockStatement from '../BlockStatement';
 
@@ -7,7 +8,7 @@ export default class BlockStatementParser extends StatementParser {
     parser.consume(Punctuator.OpenCurly);
 
     // create block scope
-    parser.pushScope(true);
+    parser.pushScope(ScopeType.Block);
     var statements = parser.parseStatements();
     parser.popScope();
 

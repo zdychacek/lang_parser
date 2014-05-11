@@ -677,7 +677,10 @@ export class Lexer {
    * Checks if char can be identifier first char.
    */
   _isIdentifierStart (char) {
-    return char == '_' || char == '$' || (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z');
+    return char == '_'
+      || char == '$'
+      || (char >= 'a' && char <= 'z')
+      || (char >= 'A' && char <= 'Z');
   }
 
   /**

@@ -3,6 +3,7 @@ import {
   Keyword,
   Punctuator
 } from '../../Lexer';
+import { ScopeType } from '../../Scope';
 import PrefixExpressionParser from './PrefixExpressionParser';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
 import FunctionExpression from '../FunctionExpression';
@@ -46,12 +47,8 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     // parse function body
     parser.state.pushAttribute('inFunction', true);
 
-    // create new function scope
-    parser.pushScope(false, scopeVars);
+    body = parser.parseBlock(ScopeType.Function, scopeVars);
 
-    body = parser.parseBlock();
-
-    parser.popScope();
     parser.state.popAttribute('inFunction');
 
     return new FunctionExpression(id, params, body);

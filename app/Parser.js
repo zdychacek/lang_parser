@@ -3,7 +3,10 @@ import {
   Punctuator,
   Keyword
 } from './Lexer';
-import Scope from './Scope';
+import {
+  Scope,
+  ScopeType
+} from './Scope';
 import ParserState from './ParserState';
 import Program from './statements/Program';
 import BlockStatement from './statements/BlockStatement';
@@ -41,7 +44,7 @@ export default class Parser {
     this._scopeChain = [];  // of scopes
 
     // create global scope
-    this.pushScope(false, this._globals);
+    this.pushScope(ScopeType.Function, this._globals);
   }
 
   set globals (globals) {
@@ -51,10 +54,10 @@ export default class Parser {
   /**
    * Push new scope on stack, optionaly with some injected variables.
    */
-  pushScope (block = false, injectVariables = null) {
+  pushScope (type = ScopeType.Function, injectVariables = null) {
     var newScope = new Scope({
       parent: this._scopeChain.length? this.scope : null,
-      block
+      type
     }, this);
 
     // inject some variables
@@ -142,7 +145,7 @@ export default class Parser {
     }
 
     if (!prefixParser) {
-      this.throw(`Unexpected token ${token.value}`);
+      this.throw(`Unexpected token '${token.value}'`);
     }
 
     var left = prefixParser.parse(this, token);
@@ -215,12 +218,20 @@ export default class Parser {
     }
   }
 
-  parseBlock () {
+  parseBlock (scopeType, injectables) {
     var token = this.peek();
 
     this.consume(Punctuator.OpenCurly);
 
+    if (scopeType) {
+      this.pushScope(scopeType, injectables);
+    }
+
     let body = this.parseStatements();
+
+    if (scopeType) {
+      this.popScope();
+    }
 
     this.consume(Punctuator.CloseCurly);
 
@@ -232,27 +243,23 @@ export default class Parser {
    * @injectables - variables which should be injected into scope being created
    * @forceScopeCreation - force new scope creation even if we are not parsing block statement (useful for FOR statement)
    */
-  parseBlockOrExpression (injectables = null, forceScopeCreation = false) {
-    var popScope = false;
+  parseBlockOrExpression (injectables, forceScopeCreation = false) {
     var ret = null;
 
     // if we are parsing block, than we must create new block scope
     if (this.match(Punctuator.OpenCurly)) {
-      this.pushScope(true, injectables);
-      ret = this.parseBlock();
-      popScope = true;
+      ret = this.parseBlock(ScopeType.Block, injectables);
     }
     else {
       if (forceScopeCreation) {
-        this.pushScope(true, injectables);
-        popScope = true;
+        this.pushScope(ScopeType.Block, injectables);
       }
 
       ret = this.parseStatement();
-    }
 
-    if (popScope) {
-      this.popScope();
+      if (forceScopeCreation) {
+        this.popScope();
+      }
     }
 
     return ret;

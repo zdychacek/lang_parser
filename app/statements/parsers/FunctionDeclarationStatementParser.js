@@ -3,6 +3,7 @@ import {
   Punctuator,
   Keyword
 } from '../../Lexer';
+import { ScopeType } from '../../Scope';
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 import FunctionDeclarationStatement from '../FunctionDeclarationStatement';
@@ -42,12 +43,9 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
     // parse function body
     parser.state.pushAttribute('inFunction', true);
-    // create new scope
-    parser.pushScope(false, scopeVars);
 
-    body = parser.parseBlock();
+    body = parser.parseBlock(ScopeType.Function, scopeVars);
 
-    parser.popScope();
     parser.state.popAttribute('inFunction');
 
     return new FunctionDeclarationStatement(id, params, body);

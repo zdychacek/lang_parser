@@ -40,6 +40,7 @@ import ForStatementParser from './statements/parsers/ForStatementParser';
 import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 import ThrowStatementParser from './statements/parsers/ThrowStatementParser';
 import DebuggerStatementParser from './statements/parsers/DebuggerStatementParser';
+import TryStatementParser from './statements/parsers/TryStatementParser';
 
 export default class MyParser extends Parser {
   constructor (lexer) {
@@ -130,6 +131,7 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Switch, new SwitchStatementParser());
     this.registerStatement(Keyword.Throw, new ThrowStatementParser());
     this.registerStatement(Keyword.Debugger, new DebuggerStatementParser());
+    this.registerStatement(Keyword.Try, new TryStatementParser());
   }
 
   registerPostfixGeneric (token, precedence) {

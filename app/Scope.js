@@ -1,7 +1,12 @@
 import { Keyword } from './Lexer';
 
-export default class Scope {
-  constructor ({ parent = null, block = false }, parser) {
+export var ScopeType = {
+  Block: 'Block',
+  Function: 'Function'
+};
+
+export class Scope {
+  constructor ({ parent = null, type = ScopeType.Function }, parser) {
     // reference to parent scope
     this._parent = parent;
 
@@ -11,8 +16,8 @@ export default class Scope {
     // array of labels (continue, break) defined in this scope
     this._labels = [];
 
-    // block scope or not
-    this._isBlock = block;
+    // block or function scope
+    this._type = type;
 
     // reference to parser
     this._parser = parser;
@@ -43,7 +48,7 @@ export default class Scope {
     var currScope = this;
 
     do {
-      if (!currScope._isBlock) {
+      if (currScope._type == ScopeType.Function) {
         return currScope;
       }
     }

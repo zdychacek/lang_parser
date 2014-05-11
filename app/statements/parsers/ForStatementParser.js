@@ -3,6 +3,7 @@ import {
   Keyword,
   Precedence
 } from '../../Lexer';
+import { ScopeType } from '../../Scope';
 import StatementParser from './StatementParser';
 import ForStatement from '../ForStatement';
 import ForInStatement from '../ForInStatement';
@@ -64,7 +65,7 @@ export default class ForStatementParser extends StatementParser {
     forStmt.init = init;
 
     // we must create temporary function scope for declarations
-    parser.pushScope(false, forStmt.declarations);
+    parser.pushScope(ScopeType.Function, forStmt.declarations);
 
     // parse test expression
     if (!parser.match(Punctuator.Semicolon)) {
@@ -99,7 +100,7 @@ export default class ForStatementParser extends StatementParser {
     }
 
     // we must create temporary function scope for declarations
-    parser.pushScope(false, forInStmt.declarations);
+    parser.pushScope(ScopeType.Function, forInStmt.declarations);
 
     forInStmt.right = parser.parseExpression();
 
