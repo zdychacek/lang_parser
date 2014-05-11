@@ -12,6 +12,11 @@ export default class ThrowStatementParser extends StatementParser {
     var argument = null;
 
     if (!parser.match(Punctuator.Semicolon)) {
+      // throw statement must not end with new line
+      if (parser.peekLineTerminator()) {
+        parser.throw('Unexpected new line after throw statement');
+      }
+
       argument = parser.parseExpression();
       parser.consume(Punctuator.Semicolon);
     }

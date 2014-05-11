@@ -349,6 +349,13 @@ export default class Parser {
     return this._transformToken(token);
   }
 
+  /**
+   * Return true if there is line terminator before next token, otherwise return false.
+   */
+  peekLineTerminator () {
+    return this._lexer.peekLineTerminator();
+  }
+
   throw (message, _Error = SyntaxError) {
     var { line, column } = this._lexer.lineAndColumn;
 

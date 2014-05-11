@@ -12,16 +12,21 @@ export default class ReturnStatementParser extends StatementParser {
     var argument = null;
 
     if (!parser.state.getAttribute('inFunction')) {
-      parser.throw('Illegal return statement.');
+      parser.throw('Illegal return statement');
     }
 
     if (!parser.match(Punctuator.Semicolon)) {
+      // return statement must not end with new line
+      if (parser.peekLineTerminator()) {
+        parser.throw('Unexpected new line after return statement');
+      }
+
       argument = parser.parseExpression();
       parser.consume(Punctuator.Semicolon);
     }
 
     if (!parser.match(Punctuator.CloseCurly)) {
-      parser.throw('Unreachable statement.');
+      parser.throw('Unreachable statement');
     }
 
     return new ReturnStatement(argument);

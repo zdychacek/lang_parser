@@ -152,27 +152,64 @@ export class Lexer {
     token = this._scanIdentifier();
     if (token) return token;
 
-    this.throw(`Unexpected token ${this._peekNextChar()}`);
+    var currChar = this._peekNextChar();
+
+    this.throw(`Unexpected token '${currChar}'`);
   }
 
   peek (distance = 0) {
-    // capture lexer state for revovery purpose
-    var idx = this._index;
-    var oldLineNo = this._lineNo;
-    var oldColumnNo = this._columnNo;
-
     var peeks = [];
 
-    while (distance + 1 > peeks.length) {
+    // capture lexer state for revovery purpose
+    this.captureState();
+
+    while (distance >= peeks.length) {
       peeks.push(this.next());
     }
 
     // restore lexer state
-    this._index = idx;
-    this._lineNo = oldLineNo;
-    this._columnNo = oldColumnNo;
+    this.restoreState();
 
     return peeks[distance];
+  }
+
+  /**
+   * Return true if there is line terminator before next token, otherwise return false.
+   */
+  peekLineTerminator () {
+    var { lineNo } = this.captureState();
+
+    var token = this.next();
+    var nextLineNo = this._lineNo;
+
+    this.restoreState();
+
+    return lineNo !== nextLineNo;
+  }
+
+  captureState () {
+    if (this._capturedState) {
+      throw new Error('Trying to capture unrestored state.');
+    }
+
+    return this._capturedState = {
+      index: this._index,
+      lineNo: this._lineNo,
+      columnNo: this._columnNo
+    };
+  }
+
+  restoreState () {
+    if (!this._capturedState) {
+      throw new Error('No state to restore.');
+    }
+    var { index, lineNo, columnNo } = this._capturedState;
+
+    this._index = index;
+    this._lineNo = lineNo;
+    this._columnNo = columnNo;
+
+    this._capturedState = null;
   }
 
   reset () {
@@ -180,8 +217,7 @@ export class Lexer {
     this._marker = 0;
     this._lineNo = 1;
     this._columnNo = 1;
-
-    this._countLineAndColumnNo = true;
+    this._capturedState = null;
   }
 
   set source (src) {
