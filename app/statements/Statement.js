@@ -1,9 +1,7 @@
-export default class Statement {
-  constructor (type) {
-    this.type = type;
-  }
+import Node from '../Node';
 
-  eval (context) {
-    throw new Error('Not implemented.');
+export default class Statement extends Node {
+  constructor (type) {
+    super(type);
   }
 }

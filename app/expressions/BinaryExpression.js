@@ -9,7 +9,7 @@ export default class BinaryExpression extends Expression {
     this.right = right;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    visitor.visitBinaryExpression(this);
   }
 }

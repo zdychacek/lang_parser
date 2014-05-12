@@ -8,7 +8,7 @@ export default class CallExpression extends Expression {
     this.args = args;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    visitor.visitCallExpression(this);
   }
 }

@@ -8,7 +8,7 @@ import {
   ScopeType
 } from './Scope';
 import ParserState from './ParserState';
-import Program from './statements/Program';
+import Program from './Program';
 import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
