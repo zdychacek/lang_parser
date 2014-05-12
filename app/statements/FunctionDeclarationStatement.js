@@ -9,7 +9,7 @@ export default class FunctionDeclarationStatement extends Statement {
     this.body = body;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitFunctionDeclarationStatement(this);
   }
 }

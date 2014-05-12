@@ -22,8 +22,9 @@ export default class ReturnStatementParser extends StatementParser {
       }
 
       argument = parser.parseExpression();
-      parser.consume(Punctuator.Semicolon);
     }
+
+    parser.consume(Punctuator.Semicolon);
 
     if (!parser.match(Punctuator.CloseCurly)) {
       parser.throw('Unreachable statement');

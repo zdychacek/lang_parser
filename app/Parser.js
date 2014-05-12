@@ -316,7 +316,9 @@ export default class Parser {
       this.throw(`Unexpected token '${token.value}'`);
     }
 
-    console.log('Time - parseProgram():', (new Date() - start) / 1000);
+    var time = (new Date() - start) / 1000;
+
+    console.log(`parsing: ${time} s`);
 
     return new Program(body);
   }

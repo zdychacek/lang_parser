@@ -8,6 +8,6 @@ export default class Program extends Node {
   }
 
   accept (visitor) {
-    visitor.visitProgram(this);
+    return visitor.visitProgram(this);
   }
 }

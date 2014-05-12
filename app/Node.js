@@ -4,6 +4,6 @@ export default class Node {
   }
 
   accept (visitor) {
-    visitor.visitAny(this);
+    return visitor.visitAny(this);
   }
 }

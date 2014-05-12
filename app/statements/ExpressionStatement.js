@@ -7,7 +7,7 @@ export default class ExpressionStatement extends Statement {
     this.expression = expression;
   }
 
-  eval (context) {
-    
+  accept (visitor) {
+    return visitor.visitExpressionStatement(this);
   }
 }

@@ -12,8 +12,8 @@ class VariableDeclarator extends Statement {
     return this.id.name;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitVariableDeclarator(this);
   }
 }
 
@@ -33,7 +33,7 @@ export default class DeclarationStatement extends Statement {
     return this.declarations.map((decl) => decl.name);
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitDeclarationStatement(this);
   }
 }

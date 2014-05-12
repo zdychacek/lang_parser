@@ -8,7 +8,7 @@ export default class LiteralExpression extends Expression {
     this.raw = raw;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitLiteralExpression(this);
   }
 }

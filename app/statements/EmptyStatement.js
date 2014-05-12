@@ -5,7 +5,7 @@ export default class EmptyStatement extends Statement {
     super('EmptyStatement');
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitEmptyStatement(this);
   }
 }

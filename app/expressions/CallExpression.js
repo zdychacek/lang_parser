@@ -9,6 +9,6 @@ export default class CallExpression extends Expression {
   }
 
   accept (visitor) {
-    visitor.visitCallExpression(this);
+    return visitor.visitCallExpression(this);
   }
 }

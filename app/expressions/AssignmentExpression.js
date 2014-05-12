@@ -9,7 +9,7 @@ export default class AssignmentExpression extends Expression {
     this.right = right;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitAssignmentExpression(this);
   }
 }

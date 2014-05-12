@@ -10,6 +10,6 @@ export default class BinaryExpression extends Expression {
   }
 
   accept (visitor) {
-    visitor.visitBinaryExpression(this);
+    return visitor.visitBinaryExpression(this);
   }
 }

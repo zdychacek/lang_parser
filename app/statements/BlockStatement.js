@@ -7,7 +7,7 @@ export default class BlockStatement extends Statement {
     this.body = body;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitBlockStatement(this);
   }
 }
