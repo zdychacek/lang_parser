@@ -16,7 +16,7 @@ TODO
 -----------------------
 - variables hoisting (hoist ```var``` declarations to nearest function scope)
 - automatic semicolon insertion
-- support for octal and hexadecimal numbers
+- support for binary numbers
 - reqular expressions support
 - ```with``` support
 - ```void``` support (??)

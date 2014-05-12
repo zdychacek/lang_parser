@@ -384,14 +384,13 @@ export class Lexer {
    */
   _scanNumber () {
     var number = '';
-    var char = this._peekNextChar();
 
-    if (this._isDigit(char)) {
+    if (this._isDigit(this._peekNextChar())) {
       number += this._getNextChar();
 
       // hex or octal number
       if (number == '0') {
-        // hex 0x15
+        // hex number
         if (this._peekNextChar() == 'x') {
           number += this._getNextChar();
 
@@ -403,8 +402,17 @@ export class Lexer {
           else {
             this.throw('Bad hexadecimal number');
           }
+
+          return this._createToken(TokenType.Number, parseInt(number, 16), number);
         }
-        //octal 0x7
+
+        // if next char is not a number, then we have zero
+        if (!this._isDigit(this._peekNextChar())) {
+          number += this._scanDecimalNumber();
+
+          return this._createToken(TokenType.Number, parseFloat(number), number);
+        }
+        // octal number
         else {
           let octalPart = this._scanOctalNumber();
 
@@ -415,61 +423,13 @@ export class Lexer {
             this.throw('Bad octal number');
           }
 
-          return this._createToken(TokenType.Number, parseInt(number, 10), number);
+          return this._createToken(TokenType.Number, parseInt(number, 8), number);
         }
 
       }
       // decimal number
       else {
-        // whole part
-        while (this._isDigit(this._peekNextChar())) {
-          number += this._getNextChar();
-        }
-
-        char = this._peekNextChar();
-
-        // decimal separator
-        if (char == '.') {
-          number += this._getNextChar();
-        }
-
-        char = this._peekNextChar();
-
-        // fractional part
-        while (this._isDigit(char)) {
-          number += this._getNextChar();
-          char = this._peekNextChar();
-        }
-
-        if (number) {
-          char = this._peekNextChar();
-
-          // exponential notation
-          if (char == 'e' || char == 'E') {
-            number += this._getNextChar();
-            char = this._peekNextChar();
-
-            if (this._isDigit(char) || char == '+' || char == '-') {
-              number += this._getNextChar();
-
-              while (true) {
-                char = this._peekNextChar();
-
-                if (!this._isDigit(char)) {
-                    break;
-                }
-                number += this._getNextChar();
-              }
-            }
-            else {
-              this.throw('Unexpected character after the exponent sign');
-            }
-          }
-        }
-
-        if (number == '.') {
-          this.throw('Bad number');
-        }
+        number += this._scanDecimalNumber();
 
         if (number) {
           return this._createToken(TokenType.Number, parseFloat(number), number);
@@ -478,6 +438,69 @@ export class Lexer {
     }
   }
 
+  /**
+   * Tries to parse decimal number.
+   */
+  _scanDecimalNumber () {
+    var number = '';
+    var char;
+
+    // whole part
+    while (this._isDigit(this._peekNextChar())) {
+      number += this._getNextChar();
+    }
+
+    char = this._peekNextChar();
+
+    // decimal separator
+    if (char == '.') {
+      number += this._getNextChar();
+    }
+
+    char = this._peekNextChar();
+
+    // fractional part
+    while (this._isDigit(char)) {
+      number += this._getNextChar();
+      char = this._peekNextChar();
+    }
+
+    if (number) {
+      char = this._peekNextChar();
+
+      // exponential notation
+      if (char == 'e' || char == 'E') {
+        number += this._getNextChar();
+        char = this._peekNextChar();
+
+        if (this._isDigit(char) || char == '+' || char == '-') {
+          number += this._getNextChar();
+
+          while (true) {
+            char = this._peekNextChar();
+
+            if (!this._isDigit(char)) {
+                break;
+            }
+            number += this._getNextChar();
+          }
+        }
+        else {
+          this.throw('Unexpected character after the exponent sign');
+        }
+      }
+    }
+
+    if (number == '.') {
+      this.throw('Bad number');
+    }
+
+    return number;
+  }
+
+  /**
+   * Tries to parse octal number.
+   */
   _scanOctalNumber () {
     var numberPart = '';
 
@@ -488,14 +511,15 @@ export class Lexer {
     return numberPart;
   }
 
+    /**
+   * Tries to parse hexadecimal number.
+   */
   _scanHexadecimalNumber () {
     var numberPart = '';
 
     while (this._isHexDigit(this._peekNextChar())) {
       numberPart += this._getNextChar();
     }
-
-    console.log(numberPart)
 
     return numberPart;
   }
@@ -752,15 +776,23 @@ export class Lexer {
    * Checks if char is number digit.
    */
   _isDigit (char) {
-    return (char >= '0') && (char <= '9');
+    return char >= '0' && char <= '9';
   }
 
+  /**
+   * Checks if digit is allowed part of octal number;
+   */
   _isOctalDigit (char) {
-    return (char >= '0') && (char <= '7');
+    return char >= '0' && char <= '7';
   }
 
+  /**
+   * Checks if digit is allowed part of hexadecimal number;
+   */
   _isHexDigit (char) {
-    return (char >= '0') && (char <= '9');
+    return (char >= '0' && char <= '9')
+      || (char >= 'a' && char <= 'f')
+      || (char >= 'A' && char <= 'F');
   }
 
   /**

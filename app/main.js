@@ -14,7 +14,7 @@ var interpreter = new Interpreter();
 sourceInput.value =
 `(function () {
   // inline comment
-  var arr = [1, 2, 3, 4, 5];
+  var arr = [071, 0xab56, 3.25, 4.58e-10, 5.28];
 
   for (let i = 0, l = arr.length; i < l; i++) {
     window[i] = i;
