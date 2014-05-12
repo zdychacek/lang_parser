@@ -18,8 +18,9 @@ export default class ThrowStatementParser extends StatementParser {
       }
 
       argument = parser.parseExpression();
-      parser.consume(Punctuator.Semicolon);
     }
+
+    parser.consume(Punctuator.Semicolon);
 
     return new ThrowStatement(argument);
   }

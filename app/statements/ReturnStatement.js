@@ -7,7 +7,7 @@ export default class ReturnStatement extends Statement {
     this.argument = argument;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitReturnStatement(this);
   }
 }
