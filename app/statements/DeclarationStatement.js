@@ -2,7 +2,7 @@ import Statement from './Statement';
 
 class VariableDeclarator extends Statement {
   constructor (id, init) {
-    super('VariableDeclarator');
+    super('Declarator');
 
     this.id = id;
     this.init = init;
@@ -11,15 +11,11 @@ class VariableDeclarator extends Statement {
   get name () {
     return this.id.name;
   }
-
-  accept (visitor) {
-    return visitor.visitVariableDeclarator(this);
-  }
 }
 
 export default class DeclarationStatement extends Statement {
   constructor (declarations = [], kind) {
-    super('VariableDeclaration');
+    super('DeclarationStatement');
 
     this.declarations = declarations;
     this.kind = kind;
@@ -31,9 +27,5 @@ export default class DeclarationStatement extends Statement {
 
   get names () {
     return this.declarations.map((decl) => decl.name);
-  }
-
-  accept (visitor) {
-    return visitor.visitDeclarationStatement(this);
   }
 }

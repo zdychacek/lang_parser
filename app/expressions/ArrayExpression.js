@@ -6,8 +6,4 @@ export default class ArrayExpression extends Expression {
 
     this.elements = elements;
   }
-
-  accept (visitor) {
-    return visitor.visitArrayExpression(this);
-  }
 }

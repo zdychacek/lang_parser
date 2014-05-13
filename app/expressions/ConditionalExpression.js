@@ -8,8 +8,4 @@ export default class ConditionalExpression extends Expression {
     this.consequent = consequent;
     this.alternate = alternate;
   }
-
-  accept (visitor) {
-    return visitor.visitConditionalExpression(this);
-  }
 }

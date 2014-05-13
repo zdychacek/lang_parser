@@ -51,11 +51,11 @@ export default class Transformer {
     return ret;
   }
 
-  visitIdentifierExpression (node) {
+  visitIdentifier (node) {
     return node.name;
   }
 
-  visitLiteralExpression (node) {
+  visitLiteral (node) {
     return node.raw;
   }
 
@@ -65,7 +65,7 @@ export default class Transformer {
     return `${node.kind} ${declarations};`;
   }
 
-  visitVariableDeclarator (node) {
+  visitDeclarator (node) {
     var str = node.id.accept(this);
 
     if (node.init) {
@@ -137,7 +137,7 @@ export default class Transformer {
     var test = node.test.accept(this);
     var consequent = node.consequent.accept(this);
     var alternate = node.alternate.accept(this);
-    
+
     return `${test} ? ${consequent} : ${alternate}`;
   }
 
@@ -171,6 +171,10 @@ export default class Transformer {
 
   visitGroupExpressionExpression (node) {
     return `(${node.expression.accept(this)})`;
+  }
+
+  visitForInStatement (node) {
+    console.log('forin');
   }
 
   visitAny (node) {

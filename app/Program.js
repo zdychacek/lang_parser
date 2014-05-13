@@ -6,8 +6,4 @@ export default class Program extends Node {
 
     this.body = body;
   }
-
-  accept (visitor) {
-    return visitor.visitProgram(this);
-  }
 }

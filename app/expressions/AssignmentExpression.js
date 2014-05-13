@@ -8,8 +8,4 @@ export default class AssignmentExpression extends Expression {
     this.left = left;
     this.right = right;
   }
-
-  accept (visitor) {
-    return visitor.visitAssignmentExpression(this);
-  }
 }

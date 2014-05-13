@@ -6,8 +6,4 @@ export default class ExpressionStatement extends Statement {
 
     this.expression = expression;
   }
-
-  accept (visitor) {
-    return visitor.visitExpressionStatement(this);
-  }
 }

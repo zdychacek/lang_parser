@@ -8,8 +8,4 @@ export default class FunctionExpression extends Expression {
     this.params = params;
     this.body = body;
   }
-
-  accept (visitor) {
-    return visitor.visitFunctionExpression(this);
-  }
 }

@@ -6,8 +6,4 @@ export default class IdentifierExpression extends Expression {
 
     this.name = name;
   }
-
-  accept (visitor) {
-    return visitor.visitIdentifierExpression(this);
-  }
 }

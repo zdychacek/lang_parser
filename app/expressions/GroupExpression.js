@@ -6,8 +6,4 @@ export default class GroupExpression extends Expression {
 
     this.expression = expression;
   }
-
-  accept (visitor) {
-    return visitor.visitGroupExpressionExpression(this);
-  }
 }

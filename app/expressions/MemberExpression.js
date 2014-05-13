@@ -8,8 +8,4 @@ export default class MemberExpression extends Expression {
     this.property = property;
     this.computed = computed;
   }
-
-  accept (visitor) {
-    return visitor.visitMemberExpression(this);
-  }
 }
