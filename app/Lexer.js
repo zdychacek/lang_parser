@@ -2,15 +2,15 @@
  * Token types
  */
 export var TokenType = {
-  Identifier: '(identifier)',
-  Literal: '(literal)',
-  Keyword: '(keyword)',
-  Punctuator: '(punctuator)',
-  Boolean: '(boolean)',
-  String: '(string)',
-  Number: '(number)',
-  Null: '(null)',
-  EOF: '(EOF)'
+  Identifier: 'identifier',
+  Literal: 'literal',
+  Keyword: 'keyword',
+  Punctuator: 'punctuator',
+  Boolean: 'boolean',
+  String: 'string',
+  Number: 'number',
+  Null: 'null',
+  EOF: 'EOF'
 };
 
 /**
@@ -388,10 +388,12 @@ export class Lexer {
     if (this._isDigit(this._peekNextChar())) {
       number += this._getNextChar();
 
-      // hex or octal number
+      // hex, octal or binary number
       if (number == '0') {
+        let char = this._peekNextChar();
+
         // hex number
-        if (this._peekNextChar() == 'x') {
+        if (char == 'x') {
           number += this._getNextChar();
 
           let hexPart = this._scanHexadecimalNumber();
@@ -404,6 +406,21 @@ export class Lexer {
           }
 
           return this._createToken(TokenType.Number, parseInt(number, 16), number);
+        }
+        // binary number
+        else if (char == 'b') {
+          number += this._getNextChar();
+
+          let binPart = this._scanBinaryNumber();
+
+          if (binPart !== '') {
+            number += binPart;
+          }
+          else {
+            this.throw('Bad binary number');
+          }
+
+          return this._createToken(TokenType.Number, parseInt(number.replace('0b', ''), 2), number);
         }
 
         // if next char is not a number, then we have zero
@@ -511,13 +528,26 @@ export class Lexer {
     return numberPart;
   }
 
-    /**
+  /**
    * Tries to parse hexadecimal number.
    */
   _scanHexadecimalNumber () {
     var numberPart = '';
 
     while (this._isHexDigit(this._peekNextChar())) {
+      numberPart += this._getNextChar();
+    }
+
+    return numberPart;
+  }
+
+  /**
+   * Tries to parse binary number.
+   */
+  _scanBinaryNumber () {
+    var numberPart = '';
+
+    while (this._isBinaryDigit(this._peekNextChar())) {
       numberPart += this._getNextChar();
     }
 
@@ -784,6 +814,13 @@ export class Lexer {
    */
   _isOctalDigit (char) {
     return char >= '0' && char <= '7';
+  }
+
+  /**
+   * Checks if digit is allowed part of binary number;
+   */
+  _isBinaryDigit (char) {
+    return char == '0' || char == '1';
   }
 
   /**

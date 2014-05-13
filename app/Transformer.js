@@ -56,7 +56,15 @@ export default class Transformer {
   }
 
   visitLiteral (node) {
-    return node.raw;
+    var value = node.value;
+    var raw = node.raw;
+
+    // convert binary number to decimal
+    if (typeof value === 'number' && raw.indexOf('0b') == 0) {
+      return value;
+    }
+
+    return raw;
   }
 
   visitDeclarationStatement (node) {

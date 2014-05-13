@@ -18,7 +18,7 @@ let b=a+5*9;
 
 function fn(a,b) {
   let c = 28,d;
-  c+=6;
+  c+=0b11101;
 
   return a+1-2.e-10*0xabcd;
 }
