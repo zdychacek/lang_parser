@@ -1,6 +1,6 @@
 import Statement from './Statement';
 
-class VariableDeclarator extends Statement {
+export class Declarator extends Statement {
   constructor (id, init) {
     super('Declarator');
 
@@ -13,7 +13,7 @@ class VariableDeclarator extends Statement {
   }
 }
 
-export default class DeclarationStatement extends Statement {
+export class DeclarationStatement extends Statement {
   constructor (declarations = [], kind) {
     super('DeclarationStatement');
 
@@ -22,7 +22,7 @@ export default class DeclarationStatement extends Statement {
   }
 
   addDeclarator (id, init) {
-    this.declarations.push(new VariableDeclarator(id, init));
+    this.declarations.push(new Declarator(id, init));
   }
 
   get names () {

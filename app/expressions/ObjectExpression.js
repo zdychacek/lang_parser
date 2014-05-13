@@ -1,15 +1,11 @@
 import Expression from './Expression';
 
-class Property extends Expression {
+class ObjectProperty extends Expression {
   constructor (key, value) {
-    super('Property');
+    super('ObjectProperty');
 
     this.key = key;
     this.value = value;
-  }
-
-  eval (context) {
-
   }
 }
 
@@ -21,10 +17,6 @@ export default class ObjectExpression extends Expression {
   }
 
   addProperty (key, value) {
-    this.properties.push(new Property(key, value));
-  }
-
-  eval (context) {
-
+    this.properties.push(new ObjectProperty(key, value));
   }
 }

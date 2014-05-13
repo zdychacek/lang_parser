@@ -8,7 +8,7 @@ import StatementParser from './StatementParser';
 import ForStatement from '../ForStatement';
 import ForInStatement from '../ForInStatement';
 import IdentifierExpression from '../../expressions/IdentifierExpression';
-import DeclarationStatement from '../DeclarationStatement';
+import { DeclarationStatement } from '../DeclarationStatement';
 import ExpressionStatement from '../ExpressionStatement';
 
 export default class ForStatementParser extends StatementParser {

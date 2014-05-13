@@ -1,5 +1,5 @@
 import Statement from './Statement';
-import DeclarationStatement from './DeclarationStatement';
+import { DeclarationStatement } from './DeclarationStatement';
 
 export default class ForStatement extends Statement {
   constructor (init = null, test = null, update = null, body) {

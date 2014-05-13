@@ -6,7 +6,7 @@ import {
 } from '../../Lexer';
 import StatementParser from './StatementParser';
 import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
-import DeclarationStatement from '../DeclarationStatement';
+import { DeclarationStatement } from '../DeclarationStatement';
 
 export default class DeclarationStatementParser extends StatementParser {
   parse (parser, params) {

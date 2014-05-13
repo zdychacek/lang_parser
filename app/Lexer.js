@@ -31,7 +31,9 @@ export var Punctuator = {
   SlashAssign: '/=',
   CaretAssign: '^=',
   Equal: '==',
+  StrictEqual: '===',
   NotEqual: '!=',
+  StrictNotEqual: '!==',
   Greater: '>',
   GreaterEqual: '>=',
   Less: '<',
@@ -587,6 +589,11 @@ export class Lexer {
 
         if (nextToken == prevToken || nextToken == '=') {
           punctuator += this._getNextChar();
+          nextToken = this._peekNextChar();
+
+          if (nextToken == '=') {
+            punctuator += this._getNextChar();
+          }
         }
 
         break;
@@ -594,12 +601,17 @@ export class Lexer {
       case Punctuator.Slash:
       case Punctuator.Caret:
       case Punctuator.Bang:
-        // these be combined only with equal sign
+        // these be combined only with equal sign or double equal sign
         punctuator = this._getNextChar();
         nextToken = this._peekNextChar();
 
         if (nextToken == '=') {
           punctuator += this._getNextChar();
+          nextToken = this._peekNextChar();
+
+          if (nextToken == '=') {
+            punctuator += this._getNextChar();
+          }
         }
 
         break;

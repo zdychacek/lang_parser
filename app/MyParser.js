@@ -109,7 +109,9 @@ export default class MyParser extends Parser {
 
     // relational operators parsers
     this.registerInfixLeftGeneric(Punctuator.Equal, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.StrictEqual, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.NotEqual, Precedence.Relational);
+    this.registerInfixLeftGeneric(Punctuator.StrictNotEqual, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.Greater, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.Less, Precedence.Relational);
     this.registerInfixLeftGeneric(Punctuator.GreaterEqual, Precedence.Relational);

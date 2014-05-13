@@ -1,7 +1,8 @@
 import {
   TokenType,
   Keyword,
-  Punctuator
+  Punctuator,
+  Precedence
 } from '../../Lexer';
 import { ScopeType } from '../../Scope';
 import PrefixExpressionParser from './PrefixExpressionParser';
@@ -13,6 +14,10 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     var id = null;
     var params = [];
     var body = null;
+    // array of default parameter values
+    var defaults = [];
+    // if at least one parameter has default value
+    var hasDefaultValue = false;
     var scopeVars = {
       // inject arguments
       arguments: Keyword.Var
@@ -34,6 +39,16 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
           parser.throw('Unexpected token ILLEGAL');
         }
 
+        let defaultValue = null;
+
+        // try to parse parameter default value
+        if (parser.matchAndConsume(Punctuator.Assign)) {
+          defaultValue = parser.parseExpression(Precedence.Sequence);
+          hasDefaultValue = true;
+        }
+
+        defaults.push(defaultValue);
+
         scopeVars[paramToken.value] = Keyword.Var;
         params.push(IdentifierExpressionParser.parse(parser, paramToken, true));
       }
@@ -54,6 +69,6 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
 
     parser.state.popAttribute('inFunction');
 
-    return new FunctionExpression(id, params, body);
+    return new FunctionExpression(id, params, body, hasDefaultValue? defaults : []);
   }
 }

@@ -1,7 +1,8 @@
 import {
   TokenType,
   Punctuator,
-  Keyword
+  Keyword,
+  Precedence
 } from '../../Lexer';
 import { ScopeType } from '../../Scope';
 import StatementParser from './StatementParser';
@@ -13,6 +14,10 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.consume(Keyword.Function);
 
     var tokenId = parser.consumeType(TokenType.Identifier);
+    // array of default parameter values
+    var defaults = [];
+    // if at least one parameter has default value
+    var hasDefaultValue = false;
     var scopeVars = {
       // inject arguments
       arguments: Keyword.Var
@@ -36,6 +41,16 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
           parser.throw('Unexpected token ILLEGAL');
         }
 
+        let defaultValue = null;
+
+        // try to parse parameter default value
+        if (parser.matchAndConsume(Punctuator.Assign)) {
+          defaultValue = parser.parseExpression(Precedence.Sequence);
+          hasDefaultValue = true;
+        }
+
+        defaults.push(defaultValue);
+
         scopeVars[paramToken.value] = Keyword.Var;
         params.push(IdentifierExpressionParser.parse(parser, paramToken, true));
       }
@@ -51,6 +66,6 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
     parser.state.popAttribute('inFunction');
 
-    return new FunctionDeclarationStatement(id, params, body);
+    return new FunctionDeclarationStatement(id, params, body, hasDefaultValue? defaults : []);
   }
 }

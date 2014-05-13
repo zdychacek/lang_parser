@@ -1,5 +1,13 @@
+import {
+  Keyword,
+  Punctuator
+} from './Lexer';
 import ExpressionStatement from './statements/ExpressionStatement';
 import Statement from './statements/Statement';
+import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
+import IdentifierExpression from './expressions/IdentifierExpression';
+import ConditionalExpression from './expressions/ConditionalExpression';
+import BinaryExpression from './expressions/BinaryExpression';
 
 export default class Transformer {
   constructor () {
@@ -102,6 +110,11 @@ export default class Transformer {
   visitFunctionDeclarationStatement (node) {
     var params = node.params.map((param) => param.accept(this)).join(', ');
     var id = node.id.accept(this);
+    var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
+
+    if (paramsDefValuesDecl) {
+      node.body.prepend(paramsDefValuesDecl);
+    }
 
     return `function ${id} (${params}) ` + node.body.accept(this);
   }
@@ -149,9 +162,53 @@ export default class Transformer {
     return `${test} ? ${consequent} : ${alternate}`;
   }
 
+  /**
+   * Creates DeclrationStatement for function parameters default values.
+   */
+  _createParamsDefValuesDeclaration (params, defaults) {
+    var declarators = [];
+
+    // default values
+    if (defaults && defaults.length) {
+      defaults.forEach((decl, i) => {
+        if (decl) {
+          let idName = params[i].name;
+          let identifier = new IdentifierExpression(idName);
+
+          // e.g. var a = a !== undefined ? a : 'huhu'
+          declarators.push(
+            new Declarator(
+              identifier,
+              new ConditionalExpression(
+                new BinaryExpression(
+                  Punctuator.StrictNotEqual,
+                  identifier,
+                  new IdentifierExpression('undefined')
+                ),
+                identifier,
+                decl
+              )
+            )
+          );
+        }
+      });
+    }
+
+    if (declarators.length) {
+     return new DeclarationStatement(declarators, Keyword.Var);
+    }
+
+    return null;
+  }
+
   visitFunctionExpression (node) {
     var params = node.params.map((param) => param.accept(this)).join(', ');
     var id = node.id? ' ' + node.id.accept(this) : '';
+    var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
+
+    if (paramsDefValuesDecl) {
+      node.body.prepend(paramsDefValuesDecl);
+    }
 
     return `function${id} (${params}) ` + node.body.accept(this);
   }
@@ -177,13 +234,24 @@ export default class Transformer {
     return `new ${callee}(${args})`;
   }
 
-  visitGroupExpressionExpression (node) {
+  visitGroupExpression (node) {
     return `(${node.expression.accept(this)})`;
   }
 
-  visitForInStatement (node) {
-    console.log('forin');
+  visitObjectProperty (node) {
+    var key = node.key.accept(this);
+    var value = node.value.accept(this);
+
+    return `${key}: ${value}`;
   }
+
+  visitObjectExpression (node) {
+    return '{\n' + node.properties.map((prop) => prop.accept(this)).join(',\n') + '\n}';
+  }
+
+  /*visitForInStatement (node) {
+
+  }*/
 
   visitAny (node) {
     return `${node.type}_not_implemented`;
