@@ -60,20 +60,9 @@ export default class Transformer {
   }
 
   visitDeclarationStatement (node) {
-    var str = `${node.kind} `;
-    var lastIndex = node.declarations.length - 1;
+    var declarations = node.declarations.map((decl) => decl.accept(this)).join(', ')
 
-    node.declarations.forEach((decl, i) => {
-      str += decl.accept(this);
-
-      if (i != lastIndex) {
-        str += ', ';
-      }
-    }, this);
-
-    str += ';'
-
-    return str;
+    return `${node.kind} ${declarations};`;
   }
 
   visitVariableDeclarator (node) {
@@ -103,10 +92,7 @@ export default class Transformer {
   }
 
   visitFunctionDeclarationStatement (node) {
-    var params = node.params
-      .map((param) => param.accept(this))
-      .join(', ');
-
+    var params = node.params.map((param) => param.accept(this)).join(', ');
     var id = node.id.accept(this);
 
     return `function ${id} (${params}) ` + node.body.accept(this);
@@ -128,9 +114,7 @@ export default class Transformer {
 
   visitCallExpression (node) {
     var id = node.callee.accept(this);
-    var args = node.args
-      .map((param) => param.accept(this))
-      .join(', ');
+    var args = node.args.map((param) => param.accept(this)).join(', ');
 
     return `${id}(${args})`;
   }
@@ -143,6 +127,50 @@ export default class Transformer {
     ret += ' ' + node.right.accept(this);
 
     return ret;
+  }
+
+  visitArrayExpression (node) {
+    return '[' + node.elements.map((el) => el.accept(this)).join(', ') + ']';
+  }
+
+  visitConditionalExpression (node) {
+    var test = node.test.accept(this);
+    var consequent = node.consequent.accept(this);
+    var alternate = node.alternate.accept(this);
+    
+    return `${test} ? ${consequent} : ${alternate}`;
+  }
+
+  visitFunctionExpression (node) {
+    var params = node.params.map((param) => param.accept(this)).join(', ');
+    var id = node.id? ' ' + node.id.accept(this) : '';
+
+    return `function${id} (${params}) ` + node.body.accept(this);
+  }
+
+  visitMemberExpression (node) {
+    var str = node.object.accept(this);
+    var prop = node.property.accept(this);
+
+    if (node.computed) {
+      str += `[${prop}]`;
+    }
+    else {
+      str += `.${prop}`;
+    }
+
+    return str;
+  }
+
+  visitNewExpression (node) {
+    var callee = node.callee.accept(this);
+    var args = node.args.map((arg) => arg.accept(this)).join(', ');
+
+    return `new ${callee}(${args})`;
+  }
+
+  visitGroupExpressionExpression (node) {
+    return `(${node.expression.accept(this)})`;
   }
 
   visitAny (node) {

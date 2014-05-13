@@ -9,7 +9,7 @@ export default class FunctionExpression extends Expression {
     this.body = body;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitFunctionExpression(this);
   }
 }

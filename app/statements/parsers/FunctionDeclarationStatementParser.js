@@ -13,7 +13,10 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.consume(Keyword.Function);
 
     var tokenId = parser.consumeType(TokenType.Identifier);
-    var scopeVars = {};
+    var scopeVars = {
+      // inject arguments
+      arguments: Keyword.Var
+    };
 
     // defined variable in current scope
     parser.scope.define(tokenId.value, Keyword.Var);

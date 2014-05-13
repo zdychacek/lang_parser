@@ -9,7 +9,7 @@ export default class ConditionalExpression extends Expression {
     this.alternate = alternate;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitConditionalExpression(this);
   }
 }

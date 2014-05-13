@@ -13,7 +13,10 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
     var id = null;
     var params = [];
     var body = null;
-    var scopeVars = {};
+    var scopeVars = {
+      // inject arguments
+      arguments: Keyword.Var
+    };
 
     // parse optional name
     if (parser.matchType(TokenType.Identifier)) {
@@ -28,7 +31,7 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
         let paramToken = parser.consume();
 
         if (!parser.matchType(TokenType.Identifier, paramToken)) {
-          parser.throw('Unexpected token ILLEGAL.');
+          parser.throw('Unexpected token ILLEGAL');
         }
 
         scopeVars[paramToken.value] = Keyword.Var;

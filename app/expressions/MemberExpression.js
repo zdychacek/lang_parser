@@ -9,7 +9,7 @@ export default class MemberExpression extends Expression {
     this.computed = computed;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitMemberExpression(this);
   }
 }

@@ -7,7 +7,7 @@ export default class ArrayExpression extends Expression {
     this.elements = elements;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitArrayExpression(this);
   }
 }

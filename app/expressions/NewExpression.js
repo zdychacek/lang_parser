@@ -8,7 +8,7 @@ export default class NewExpression extends Expression {
     this.args = args;
   }
 
-  eval (context) {
-
+  accept (visitor) {
+    return visitor.visitNewExpression(this);
   }
 }

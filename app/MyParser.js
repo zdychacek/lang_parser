@@ -53,7 +53,8 @@ export default class MyParser extends Parser {
       'console',
       'String',
       'Number',
-      'Boolean'
+      'Boolean',
+      'Array'
     ];
 
     // super class constructor call
