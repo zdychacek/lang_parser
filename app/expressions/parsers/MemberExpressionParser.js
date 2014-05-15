@@ -13,7 +13,9 @@ export default class MemberExpressionParser extends InfixExpressionParser {
     this.computed = computed;
   }
 
-  parse (parser, left, token) {
+  parse (parser, left) {
+    var token = parser.consume();
+
     var object = left;
     var property = null;
 
@@ -22,9 +24,7 @@ export default class MemberExpressionParser extends InfixExpressionParser {
       parser.consume(Punctuator.CloseSquare);
     }
     else {
-      let propertyToken = parser.consumeType(TokenType.Identifier);
-
-      property = IdentifierExpressionParser.parse(parser, propertyToken, true);
+      property = IdentifierExpressionParser.parse(parser, true);
     }
 
     return new MemberExpression(object, property, this.computed);

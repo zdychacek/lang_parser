@@ -26,11 +26,11 @@ export default class DeclarationStatementParser extends StatementParser {
     var withoutDefinition = params.withoutDefinition;
 
     do {
-      let idToken = parser.consumeType(TokenType.Identifier);
+      let idToken = IdentifierExpressionParser.parse(parser, true);
 
       // define variable in current scope
       if (!withoutDefinition) {
-        parser.scope.define(idToken.value, kind);
+        parser.scope.define(idToken.name, kind);
       }
 
       let init = null;
@@ -39,7 +39,7 @@ export default class DeclarationStatementParser extends StatementParser {
         init = parser.parseExpression(Precedence.Sequence);
       }
 
-      declarationStmt.addDeclarator(IdentifierExpressionParser.parse(parser, idToken, true), init);
+      declarationStmt.addDeclarator(idToken.name, init);
     }
     while (parser.matchAndConsume(Punctuator.Comma));
 

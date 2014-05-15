@@ -7,7 +7,8 @@ export default class BinaryOperatorExpressionParser extends InfixExpressionParse
     this._isRight = isRight;
   }
 
-  parse (parser, left, token) {
+  parse (parser, left) {
+    var token = parser.consume();
     var right = parser.parseExpression(this.precedence - (this._isRight ? 1 : 0));
 
     return new BinaryExpression(token.value, left, right);

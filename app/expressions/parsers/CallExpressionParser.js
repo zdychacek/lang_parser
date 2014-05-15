@@ -7,7 +7,8 @@ import InfixExpressionParser from './InfixExpressionParser';
 import CallExpression from '../CallExpression';
 
 export default class CallExpressionParser extends InfixExpressionParser {
-  parse (parser, callee, token) {
+  parse (parser, callee) {
+    var token = parser.consume(Punctuator.OpenParen);
     var args = [];
 
     if (!parser.matchAndConsume(Punctuator.CloseParen)) {

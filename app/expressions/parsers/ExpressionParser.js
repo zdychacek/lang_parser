@@ -1,5 +1,5 @@
 export default class ExpressionParser {
-  parse (parser, token) {
+  parse (parser) {
     throw new Error('Not implemented.');
   }
 

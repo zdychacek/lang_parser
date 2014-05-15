@@ -8,7 +8,9 @@ export default class UpdateExpressionParser extends ExpressionParser {
     this._prefix = prefix;
   }
 
-  parse (parser, leftOrToken, token) {
+  parse (parser, leftOrToken) {
+    var token = parser.consume();
+
     var argument = null;
     var operator = null;
 

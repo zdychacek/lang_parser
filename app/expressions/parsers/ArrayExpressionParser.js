@@ -6,8 +6,10 @@ import PrefixExpressionParser from './PrefixExpressionParser';
 import ArrayExpression from '../ArrayExpression';
 
 export default class ArrayExpressionParser extends PrefixExpressionParser {
-  parse (parser, token) {
+  parse (parser) {
     var elements = [];
+
+    parser.consume(Punctuator.OpenParen);
 
     if (!parser.match(Punctuator.CloseSquare)) {
       do {

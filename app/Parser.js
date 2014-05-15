@@ -182,11 +182,11 @@ export default class Parser {
         break;
       }
 
-      token = this.consume();
+      //token = this.consume();
 
       let infixParser = this.getInfixExpressionParser(token);
 
-      left = infixParser.parse(this, left, token);
+      left = infixParser.parse(this, left/*, token*/);
     }
 
     return left;

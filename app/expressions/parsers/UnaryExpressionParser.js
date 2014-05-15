@@ -7,7 +7,9 @@ export default class UnaryExpressionParser extends PrefixExpressionParser {
     this._precedence = precedence;
   }
 
-  parse (parser, token) {
+  parse (parser) {
+    var token = parser.consume();
+
     var right = parser.parseExpression(this.precedence);
 
     return new UnaryExpression(token.value, right);

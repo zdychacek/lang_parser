@@ -8,7 +8,8 @@ import MemberExpression from '../MemberExpression'
 import AssignmentExpression from '../AssignmentExpression';
 
 export default class AssignmentExpressionParser extends InfixExpressionParser {
-  parse (parser, left, token) {
+  parse (parser, left) {
+    var token = parser.consume();
     var right = parser.parseExpression(this.precedence - 1);
 
     if (!(left instanceof IdentifierExpression) && !(left instanceof MemberExpression)) {

@@ -3,7 +3,9 @@ import PrefixExpressionParser from './PrefixExpressionParser';
 import GroupExpression from '../GroupExpression';
 
 export default class GroupExpressionParser extends PrefixExpressionParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Punctuator.OpenParen);
+
     var expression = parser.parseExpression();
     parser.consume(Punctuator.CloseParen);
 

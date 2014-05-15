@@ -6,7 +6,9 @@ import InfixExpressionParser from './InfixExpressionParser';
 import SequenceExpression from '../SequenceExpression';
 
 export default class SequenceExpressionParser extends InfixExpressionParser {
-  parse (parser, left, token) {
+  parse (parser, left) {
+    var token = parser.consume(Punctuator.Comma);
+
     var sequenceExpr = new SequenceExpression();
 
     sequenceExpr.addExpression(left);

@@ -6,7 +6,9 @@ export default class PostfixOperatorExpressionParser extends InfixExpressionPars
     this._precedence = precedence;
   }
 
-  parse (parser, left, token) {
+  parse (parser, left) {
+    var token = parser.consume();
+
     return new PostfixExpression(token.value, left);
   }
 

@@ -1,12 +1,15 @@
 import {
   Punctuator,
-  Precedence
+  Precedence,
+  Keyword
 } from '../../Lexer';
 import PrefixExpressionParser from './PrefixExpressionParser';
 import NewExpression from '../NewExpression';
 
 export default class NewExpressionParser extends PrefixExpressionParser {
-  parse (parser, token) {
+  parse (parser) {
+    parser.consume(Keyword.New);
+
     var callee = parser.parseExpression(Precedence.Call);
     var args = [];
 

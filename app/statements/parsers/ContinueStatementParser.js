@@ -18,13 +18,7 @@ export default class ContinueStatementParser extends StatementParser {
     }
 
     if (!parser.match(Punctuator.Semicolon)) {
-      let labelToken = parser.consume();
-
-      if (labelToken.type != TokenType.Identifier) {
-        parser.throw('Unexpected continue label');
-      }
-
-      label = IdentifierExpressionParser.parse(parser, labelToken, true);
+      label = IdentifierExpressionParser.parse(parser, true);
 
       if (!parser.scope.hasLabel(label.name)) {
         parser.throw(`Undefined label ${label.name}`, ReferenceError);
