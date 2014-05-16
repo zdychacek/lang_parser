@@ -8,8 +8,7 @@ import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpr
 
 export default class LabeledStatementParser extends StatementParser {
   parse (parser) {
-    var labelToken = parser.consumeType(TokenType.Identifier);
-    var label = IdentifierExpressionParser.parse(parser, labelToken, true);
+    var label = IdentifierExpressionParser.parse(parser, true);
     var body = null;
 
     parser.consume(Punctuator.Colon);

@@ -9,7 +9,7 @@ export default class ArrayExpressionParser extends PrefixExpressionParser {
   parse (parser) {
     var elements = [];
 
-    parser.consume(Punctuator.OpenParen);
+    parser.consume(Punctuator.OpenSquare);
 
     if (!parser.match(Punctuator.CloseSquare)) {
       do {

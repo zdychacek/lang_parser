@@ -36,11 +36,6 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
       // parse parameters
       do {
         let param = IdentifierExpressionParser.parse(parser, true);
-
-        /*if (!parser.matchType(TokenType.Identifier, paramToken)) {
-          parser.throw('Unexpected token ILLEGAL');
-        }*/
-
         let defaultValue = null;
 
         // try to parse parameter default value
@@ -49,10 +44,11 @@ export default class FunctionExpressionParser extends PrefixExpressionParser {
           hasDefaultValue = true;
         }
 
+        // push parameter default value
         defaults.push(defaultValue);
 
         scopeVars[param.name] = Keyword.Var;
-        params.push();
+        params.push(param);
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }

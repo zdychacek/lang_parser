@@ -162,7 +162,7 @@ export default class Parser {
    * Parses expressions.
    */
   parseExpression (precedence = 0) {
-    var token = this.consume();
+    var token = this.peek();
     var prefixParser = this.getPrefixExpressionParser(token);
 
     if (this.matchType(TokenType.EOF, token)) {
@@ -173,7 +173,7 @@ export default class Parser {
       this.throw(`Unexpected token '${token.value}'`);
     }
 
-    var left = prefixParser.parse(this, token);
+    var left = prefixParser.parse(this);
 
     while (precedence < this.getPrecedence()) {
       token = this.peek();
@@ -182,11 +182,8 @@ export default class Parser {
         break;
       }
 
-      //token = this.consume();
-
       let infixParser = this.getInfixExpressionParser(token);
-
-      left = infixParser.parse(this, left/*, token*/);
+      left = infixParser.parse(this, left);
     }
 
     return left;

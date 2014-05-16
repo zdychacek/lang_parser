@@ -8,25 +8,24 @@ export default class UpdateExpressionParser extends ExpressionParser {
     this._prefix = prefix;
   }
 
-  parse (parser, leftOrToken) {
+  parse (parser, left) {
     var token = parser.consume();
-
     var argument = null;
     var operator = null;
 
     // prefix
     if (this._prefix) {
       argument = parser.parseExpression(this.precedence);
-      operator = leftOrToken.value;
+      operator = token.value;
     }
     // postfix
     else {
-      argument = leftOrToken;
+      argument = left;
       operator = token.value;
     }
 
     if (!(argument instanceof IdentifierExpression)) {
-      parser.throw('The left-hand side of an assignment must be an identifier.');
+      parser.throw('The left-hand side of an assignment must be an identifier');
     }
 
     return new UpdateExpression(operator, argument, this._prefix);

@@ -24,8 +24,7 @@ export default class TryStatementParser extends StatementParser {
     if (parser.matchAndConsume(Keyword.Catch)) {
       parser.consume(Punctuator.OpenParen);
 
-      let catchParamToken = parser.consumeType(TokenType.Identifier);
-      let catchParam = IdentifierExpressionParser.parse(parser, catchParamToken, true);
+      let catchParam = IdentifierExpressionParser.parse(parser, true);
 
       parser.consume(Punctuator.CloseParen);
 

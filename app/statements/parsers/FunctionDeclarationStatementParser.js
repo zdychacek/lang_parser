@@ -13,7 +13,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
   parse (parser) {
     parser.consume(Keyword.Function);
 
-    var tokenId = parser.consumeType(TokenType.Identifier);
+    var id = IdentifierExpressionParser.parse(parser, true);
     // array of default parameter values
     var defaults = [];
     // if at least one parameter has default value
@@ -24,23 +24,17 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     };
 
     // defined variable in current scope
-    parser.scope.define(tokenId.value, Keyword.Var);
+    parser.scope.define(id.name, Keyword.Var);
 
     var params = [];
     var body = null;
-    var id = IdentifierExpressionParser.parse(parser, tokenId);
 
     parser.consume(Punctuator.OpenParen);
 
     if (!parser.match(Punctuator.CloseParen)) {
       // parse parameters
       do {
-        let paramToken = parser.consume();
-
-        if (!parser.matchType(TokenType.Identifier, paramToken)) {
-          parser.throw('Unexpected token ILLEGAL');
-        }
-
+        let param = IdentifierExpressionParser.parse(parser, true);
         let defaultValue = null;
 
         // try to parse parameter default value
@@ -49,10 +43,11 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
           hasDefaultValue = true;
         }
 
+        // push parameter default value
         defaults.push(defaultValue);
 
-        scopeVars[paramToken.value] = Keyword.Var;
-        params.push(IdentifierExpressionParser.parse(parser, paramToken, true));
+        scopeVars[param.name] = Keyword.Var;
+        params.push(param);
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }

@@ -13,8 +13,7 @@ var parser = new MyParser(lexer);
 var transformer = new Transformer();
 
 sourceInput.value =
-`var a='ahoj';
-let b=a+5*9;
+`let a, b=a+5*9;
 
 // function defaults parameters
 function fn(bb=b+1,b='ahoj') {
