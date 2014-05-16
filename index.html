@@ -2,31 +2,53 @@
 <html>
 <head>
   <title>Lang Parser</title>
-  <link rel="stylesheet" href="css/jquery.jsonview.css" />
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/jquery.jsonview.css"/>
+  <link rel="stylesheet" href="css/app.css"/>
+
   <script src="lib/jquery-1.11.1.min.js"></script>
+  <script src="lib/bootstrap.min.js"></script>
   <script src="lib/jquery.jsonview.js"></script>
   <script src="lib/traceur-runtime.min.js"></script>
   <script src="lib/es6-module-loader.min.js"></script>
   <script src="lib/system.js"></script>
 </head>
 <body>
-
-<div>
-  <div style="float:left">
-    <h3>Code</h3>
-    <textarea id="source" style="height:800px;width:600px;"></textarea>
+  <div id="code">
+    <h3>Input</h3>
+    <textarea id="source"></textarea>
   </div>
 
-  <div style="float:left;padding-left:20px;">
-    <h3>AST</h3>
-    <pre id="ast" ></pre>
-  </div>
+  <div id="tabs-container">
+    <h3>Output</h3>
 
-  <div style="float:left;padding-left:20px;">
-    <h3>Compiled</h3>
-    <pre id="output" ></pre>
+    <div id="warns" class="alert alert-warning"></div>
+    <div id="errors" class="alert alert-danger"></div>
+
+    <ul id="tabs" class="nav nav-tabs">
+      <li>
+        <a href="#ast" data-toggle="tab">AST</a>
+      </li>
+      <li>
+        <a href="#tokens" data-toggle="tab">Tokens</a>
+      </li>
+      <li>
+        <a href="#compiled-code" data-toggle="tab">Compiled code</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane" id="ast">
+        <div id="ast-area"></div>
+      </div>
+      <div class="tab-pane" id="tokens">
+        <div id="tokens-area"></div>
+      </div>
+      <div class="tab-pane" id="compiled-code">
+        <pre id="output-area"></pre>
+      </div>
+    </div>
   </div>
-</div>
 
   <script>
     (function (prodMode) {

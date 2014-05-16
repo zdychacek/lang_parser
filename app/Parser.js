@@ -47,6 +47,9 @@ export default class Parser {
     // scope chain for identifier lookup
     this._scopeChain = [];  // of scopes
 
+    // list of accumulated warnings
+    this._warnings = [];
+
     // create global scope
     this.pushScope(ScopeType.Function, this._globals);
   }
@@ -112,6 +115,22 @@ export default class Parser {
   }
 
   /**
+   * Returns list of warnings.
+   */
+  get warnings () {
+    return this._warnings;
+  }
+
+  /**
+   * Adds and formats warning message.
+   */
+  addWarning (message) {
+    message = this._formatMessage(message);
+
+    this._warnings.push(message);
+  }
+
+  /**
    * Registers prefix operator expression parser.
    */
   registerPrefix (token, expression) {
@@ -173,6 +192,7 @@ export default class Parser {
       this.throw(`Unexpected token '${token.value}'`);
     }
 
+    // get prexix parser
     var left = prefixParser.parse(this);
 
     while (precedence < this.getPrecedence()) {
@@ -182,7 +202,9 @@ export default class Parser {
         break;
       }
 
+      // get infix parser
       let infixParser = this.getInfixExpressionParser(token);
+
       left = infixParser.parse(this, left);
     }
 
@@ -426,9 +448,15 @@ export default class Parser {
    * Throws error with line and column information.
    */
   throw (message, _Error = SyntaxError) {
+    message = this._formatMessage(message);
+
+    throw new _Error(message);
+  }
+
+  _formatMessage (message) {
     var { line, column } = this._lexer.lineAndColumn;
 
-    throw new _Error(`ln: ${line}, col: ${column} - ${message}.`);
+    return `ln: ${line}, col: ${column} - ${message}.`;
   }
 
   /**

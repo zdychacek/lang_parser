@@ -55,12 +55,11 @@ gulp.task('serve', function() {
 });
 
 gulp.task('clean', function() {
-  return gulp.src(distFolder, {force: true})
-    .pipe(clean());
+  return gulp.src(distFolder, { force: true }).pipe(clean());
 });
 
 gulp.task('watch', function() {
-  return gulp.watch(srcFolder + '/**/*.js', ['scripts']);
+  return gulp.watch([ srcFolder + '/**/*.js', '*.js' ], ['scripts']);
 });
 
 gulp.task('default', ['scripts', 'serve', 'watch']);

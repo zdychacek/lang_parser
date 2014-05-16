@@ -195,7 +195,7 @@ export default class Transformer {
     }
 
     if (declarators.length) {
-     return new DeclarationStatement(declarators, Keyword.Var);
+      return new DeclarationStatement(declarators, Keyword.Var);
     }
 
     return null;

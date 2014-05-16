@@ -22,12 +22,11 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
       // inject arguments
       arguments: Keyword.Var
     };
+    var params = [];
+    var body = null;
 
     // defined variable in current scope
     parser.scope.define(id.name, Keyword.Var);
-
-    var params = [];
-    var body = null;
 
     parser.consume(Punctuator.OpenParen);
 
