@@ -5,8 +5,10 @@ import {
 import EmptyStatement from './statements/EmptyStatement';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
 import IdentifierExpression from './expressions/IdentifierExpression';
+import LiteralExpression from './expressions/LiteralExpression';
 import ConditionalExpression from './expressions/ConditionalExpression';
 import BinaryExpression from './expressions/BinaryExpression';
+import MemberExpression from './expressions/MemberExpression';
 
 export default class Transformer {
   constructor () {
@@ -57,7 +59,7 @@ export default class Transformer {
     var raw = node.raw;
 
     // convert binary number to decimal
-    if (typeof value === 'number' && raw.indexOf('0b') == 0) {
+    if (typeof value === 'number' && typeof raw === 'string' && raw.indexOf('0b') == 0) {
       return value;
     }
 
@@ -102,21 +104,53 @@ export default class Transformer {
   }
 
   visitFunctionDeclarationStatement (node) {
-    var params = node.params.map((param) => param.accept(this)).join(', ');
+    var params = [];
     var id = node.id.accept(this);
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
 
+    // if we have some default values, then we remove all parameters definition
+    // and we create parameters declaration manually
     if (paramsDefValuesDecl) {
+      // expand declarators to separate declarations
       node.body.prepend(paramsDefValuesDecl.expandToSeparateDeclarations());
+    }
+    // otherwise we parse parse function parameters
+    else {
+      params = node.params.map((param) => param.accept(this)).join(', ');
     }
 
     return `function ${id} (${params}) ` + node.body.accept(this);
   }
 
+  visitFunctionExpression (node) {
+    var params = [];
+    var id = node.id? ' ' + node.id.accept(this) : '';
+    var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
+
+    // if we have some default values, then we remove all parameters definition
+    // and we create parameters declaration manually
+    if (paramsDefValuesDecl) {
+      // expand declarators to separate declarations
+      node.body.prepend(paramsDefValuesDecl.expandToSeparateDeclarations());
+    }
+    // otherwise we parse parse function parameters
+    else {
+      params = node.params.map((param) => param.accept(this)).join(', ');
+    }
+
+    return `function${id} (${params}) ` + node.body.accept(this);
+  }
+
+  /**
+   * Transforms EmptyStatement into ';'.
+   */
   visitEmptyStatement (node) {
     return ';'
   }
 
+  /**
+   * Transforms ReturnStatement.
+   */
   visitReturnStatement (node) {
     var argument = '';
 
@@ -127,6 +161,9 @@ export default class Transformer {
     return `return${argument};`;
   }
 
+  /**
+   * Transforms CallExpression.
+   */
   visitCallExpression (node) {
     var id = node.callee.accept(this);
     var args = node.args.map((param) => param.accept(this)).join(', ');
@@ -151,34 +188,41 @@ export default class Transformer {
   }
 
   /**
-   * Creates DeclrationStatement for function parameters default values.
+   * Creates DeclarationStatement for function parameters default values.
    */
   _createParamsDefValuesDeclaration (params, defaults) {
     var declarators = [];
 
     // default values
     if (defaults && defaults.length) {
-      defaults.forEach((decl, i) => {
-        if (decl) {
-          let idName = params[i].name;
-          let identifier = new IdentifierExpression(idName);
-
-          // e.g. var a = a !== undefined ? a : 'huhu'
-          declarators.push(
-            new Declarator(
-              identifier,
-              new ConditionalExpression(
-                new BinaryExpression(
-                  Punctuator.StrictNotEqual,
-                  identifier,
-                  new IdentifierExpression('undefined')
-                ),
-                identifier,
-                decl
-              )
-            )
+      params.forEach((param, i) => {
+        let declInit =
+          new MemberExpression(
+            new IdentifierExpression('arguments'),
+            new LiteralExpression(i),
+            true
           );
+
+        if (defaults[i]) {
+          declInit =
+            new ConditionalExpression(
+              new BinaryExpression(
+                Punctuator.StrictNotEqual,
+                declInit,
+                new IdentifierExpression('undefined')
+              ),
+              declInit,
+              defaults[i]
+            );
         }
+
+        // e.g. var b = arguments[1] !== undefined ? arguments[1] : 'huhu';
+        declarators.push(
+          new Declarator(
+            new IdentifierExpression(param.name),
+            declInit
+          )
+        );
       });
     }
 
@@ -187,18 +231,6 @@ export default class Transformer {
     }
 
     return null;
-  }
-
-  visitFunctionExpression (node) {
-    var params = node.params.map((param) => param.accept(this)).join(', ');
-    var id = node.id? ' ' + node.id.accept(this) : '';
-    var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
-
-    if (paramsDefValuesDecl) {
-      node.body.prepend(paramsDefValuesDecl.expandToSeparateDeclarations());
-    }
-
-    return `function${id} (${params}) ` + node.body.accept(this);
   }
 
   visitMemberExpression (node) {

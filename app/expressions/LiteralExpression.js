@@ -1,7 +1,7 @@
 import Expression from './Expression';
 
 export default class LiteralExpression extends Expression {
-  constructor (value, raw) {
+  constructor (value, raw = value) {
     super('Literal');
 
     this.value = value;
