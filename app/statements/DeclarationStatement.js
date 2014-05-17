@@ -28,4 +28,8 @@ export class DeclarationStatement extends Statement {
   get names () {
     return this.declarations.map((decl) => decl.name);
   }
+
+  expandToSeparateDeclarations () {
+    return this.declarations.map((declarator) => new DeclarationStatement([declarator], this.kind));
+  }
 }

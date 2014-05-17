@@ -107,7 +107,7 @@ export default class Transformer {
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
 
     if (paramsDefValuesDecl) {
-      node.body.prepend(paramsDefValuesDecl);
+      node.body.prepend(paramsDefValuesDecl.expandToSeparateDeclarations());
     }
 
     return `function ${id} (${params}) ` + node.body.accept(this);
@@ -195,7 +195,7 @@ export default class Transformer {
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
 
     if (paramsDefValuesDecl) {
-      node.body.prepend(paramsDefValuesDecl);
+      node.body.prepend(paramsDefValuesDecl.expandToSeparateDeclarations());
     }
 
     return `function${id} (${params}) ` + node.body.accept(this);

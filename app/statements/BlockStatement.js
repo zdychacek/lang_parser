@@ -8,10 +8,18 @@ export default class BlockStatement extends Statement {
   }
 
   prepend (stmtOrExpression) {
-    this.body.unshift(stmtOrExpression);
+    if (!Array.isArray(stmtOrExpression)) {
+      stmtOrExpression = [ stmtOrExpression ];
+    }
+
+    this.body = stmtOrExpression.concat(this.body);
   }
 
   append (stmtOrExpression) {
-    this.body.push(stmtOrExpression);
+    if (!Array.isArray(stmtOrExpression)) {
+      stmtOrExpression = [ stmtOrExpression ];
+    }
+
+    this.body = this.body.concat(stmtOrExpression);
   }
 }

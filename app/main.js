@@ -9,6 +9,7 @@ var sourceInput = document.getElementById('source');
 var tokensArea = document.getElementById('tokens-area');
 var astArea = document.getElementById('ast-area');
 var outputArea = document.getElementById('output-area');
+var btnEval = document.getElementById('eval-code');
 var $tabs = $('#tabs');
 
 var warns = document.getElementById('warns');
@@ -137,4 +138,9 @@ $(function () {
   $tabs.on('click', 'a', function (e) {
     localStorage.setItem(LOCAL_STORAGE_KEY_SEL_TAB, e.target.getAttribute('href'));
   })
+});
+
+btnEval.addEventListener('click', () => {
+  // eval code in global scope
+  eval.call(null, outputArea.innerHTML);
 });
