@@ -28,7 +28,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
         // check key duplicity
         if (keys[property.keyName]) {
-          parser.throw(`Duplicate object property '${property.keyName}'`);
+          parser.addWarning(`Duplicate object property '${property.keyName}'`);
         }
 
         // note property name to avoid key duplicity
@@ -93,6 +93,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
         }
       }
     }
+    // literal property key
     else if (parser.matchType(TokenType.Literal)) {
       objectProperty.key = LiteralExpressionParser.parse(parser);
       parser.consume(Punctuator.Colon);

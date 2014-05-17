@@ -1,11 +1,9 @@
-import Expression from './Expression';
+import UnaryExpression from './UnaryExpression';
 
-export default class UpdateExpression extends Expression {
+export default class UpdateExpression extends UnaryExpression {
   constructor (operator, argument, prefix = false) {
-    super('UpdateExpression');
+    super(...arguments);
 
-    this.operator = operator;
-    this.argument = argument;
-    this.prefix = prefix;
+    this.type = 'UpdateExpression';
   }
 }
