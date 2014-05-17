@@ -1,8 +1,10 @@
 import {
   TokenType,
   Precedence,
-  Punctuator
+  Punctuator,
+  Keyword
 } from '../../Lexer';
+import { ScopeType } from '../../Scope';
 import PrefixExpressionParser from './PrefixExpressionParser';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
 import LiteralExpressionParser from './LiteralExpressionParser';
@@ -10,6 +12,7 @@ import {
   ObjectExpression,
   ObjectProperty
 } from '../ObjectExpression';
+import FunctionExpression from '../FunctionExpression';
 
 export default class ObjectExpressionParser extends PrefixExpressionParser {
   parse (parser) {
@@ -46,17 +49,49 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
     if (parser.matchType(TokenType.Identifier)) {
       objectProperty.key = IdentifierExpressionParser.parse(parser, true);
+
+      // object expression method definition shorthand
+      if (parser.matchAndConsume(Punctuator.OpenParen)) {
+        let functionExpr = new FunctionExpression();
+        let scopeVars = {
+          arguments: Keyword.Var
+        };
+
+        if (!parser.matchAndConsume(Punctuator.CloseParen)) {
+          let { params, defaults } = parser.parseArguments();
+
+          parser.consume(Punctuator.CloseParen);
+
+          functionExpr.params = params;
+          functionExpr.defaults = defaults || [];
+
+          // register parameters names to scope
+          for (let param of functionExpr.params) {
+            scopeVars[param.name] = Keyword.Var;
+          }
+        }
+
+        // parse function body
+        parser.state.pushAttribute('inFunction', true);
+        functionExpr.body = parser.parseBlock(ScopeType.Function, scopeVars);
+        parser.state.popAttribute('inFunction');
+
+        objectProperty.value = functionExpr;
+      }
+      // classic property
+      else {
+        parser.consume(Punctuator.Colon);
+        objectProperty.value = parser.parseExpression(Precedence.Sequence);
+      }
     }
     else if (parser.matchType(TokenType.Literal)) {
       objectProperty.key = LiteralExpressionParser.parse(parser);
+      parser.consume(Punctuator.Colon);
+      objectProperty.value = parser.parseExpression(Precedence.Sequence);
     }
     else {
       parser.throw('Bad object property name');
     }
-
-    parser.consume(Punctuator.Colon);
-
-    objectProperty.value = parser.parseExpression(Precedence.Sequence);
 
     return objectProperty;
   }

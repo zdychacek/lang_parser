@@ -1,12 +1,13 @@
 JavaScript like language parser
 =====================
-Builds AST tree from JavaScript code in same format like esprima produces. Transpiles that code back to JavaScript.
+Builds AST tree from JavaScript code in same format like esprima produces. Transpiles that code back to JavaScript. Supports some ES6 features.
 
 Features
 -----------------------
 - all variables should be declared with ```var``` or ```let``` keyword
 - supports block (```let```) declarations
 - supports function parameters default values
+- supports shorthand for methods definition in object expressions
 - array expressions cannot contain trailing comma, detto object expressions
 - object expressions cannot contain duplicate property names
 - duplicate label names are not supported
@@ -20,3 +21,4 @@ TODO
 - include comments into AST tree
 - proper indentation in compiled source code
 - add bitwise operators support (a & b)
+- add support for ES5 getters and setters

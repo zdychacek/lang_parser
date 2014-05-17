@@ -1,5 +1,4 @@
 export default code =
-
 `(function () {
   // inline comment
   var arr = [071, 0xab56, 3.25, 4.58e-10, 5.28];
@@ -94,6 +93,10 @@ myLabel:
     age: 26,
     // duplicate property name are not allowed
     //age: 25,
+    // function definition shorthand
+    getName (a=5) {
+      return this.age;
+    },
     data: {
       a: function (name) {
         console.log('huhu' + name);
