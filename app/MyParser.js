@@ -15,7 +15,6 @@ import ConditionalExpressionParser from './expressions/parsers/ConditionalExpres
 import GroupExpressionParser from './expressions/parsers/GroupExpressionParser';
 import CallExpressionParser from './expressions/parsers/CallExpressionParser';
 import UnaryExpressionParser from './expressions/parsers/UnaryExpressionParser';
-import PostfixOperatorExpressionParser from './expressions/parsers/PostfixOperatorExpressionParser';
 import BinaryOperatorExpressionParser from './expressions/parsers/BinaryOperatorExpressionParser';
 import FunctionExpressionParser from './expressions/parsers/FunctionExpressionParser';
 import ObjectExpressionParser from './expressions/parsers/ObjectExpressionParser';
@@ -147,13 +146,6 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Throw, new ThrowStatementParser());
     this.registerStatement(Keyword.Debugger, new DebuggerStatementParser());
     this.registerStatement(Keyword.Try, new TryStatementParser());
-  }
-
-  /**
-   * Registers postfix expression operator.
-   */
-  registerPostfixGeneric (token, precedence) {
-    this.registerInfix(token, new PostfixOperatorExpressionParser(precedence));
   }
 
   /**

@@ -8,8 +8,4 @@ export default class UpdateExpression extends Expression {
     this.argument = argument;
     this.prefix = prefix;
   }
-
-  eval (context) {
-
-  }
 }

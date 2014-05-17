@@ -6,8 +6,4 @@ export default class ThrowStatement extends Statement {
 
     this.argument = argument;
   }
-
-  eval (context) {
-
-  }
 }

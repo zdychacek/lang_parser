@@ -7,8 +7,4 @@ export default class LabeledStatement extends Statement {
     this.label = label;
     this.body = body;
   }
-
-  eval (context) {
-
-  }
 }

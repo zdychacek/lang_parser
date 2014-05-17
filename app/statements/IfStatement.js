@@ -8,8 +8,4 @@ export default class IfStatement extends Statement {
     this.consequent = consequent;
     this.alternate = alternate;
   }
-
-  eval (context) {
-
-  }
 }

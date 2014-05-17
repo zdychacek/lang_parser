@@ -7,8 +7,4 @@ export default class DoWhileStatement extends Statement {
     this.test = test;
     this.body = body;
   }
-
-  eval (context) {
-    
-  }
 }

@@ -6,8 +6,4 @@ export default class BreakStatement extends Statement {
 
     this.label = label;
   }
-
-  eval (context) {
-
-  }
 }

@@ -2,8 +2,7 @@ import {
   Keyword,
   Punctuator
 } from './Lexer';
-import ExpressionStatement from './statements/ExpressionStatement';
-import Statement from './statements/Statement';
+import EmptyStatement from './statements/EmptyStatement';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
 import IdentifierExpression from './expressions/IdentifierExpression';
 import ConditionalExpression from './expressions/ConditionalExpression';
@@ -18,17 +17,7 @@ export default class Transformer {
   _processStatement (stmt) {
     var strStmt = stmt.accept(this);
 
-    // ExpressionStatement
-    if (stmt instanceof ExpressionStatement) {
-      return `${this._indent()}${strStmt};`;
-    }
-    // Statement
-    else if (stmt instanceof Statement) {
-      return `${this._indent()}${strStmt}`;
-    }
-    else {
-      throw new Error('You shall not pass.');
-    }
+    return `${this._indent()}${strStmt}`;
   }
 
   _indent () {
@@ -46,7 +35,7 @@ export default class Transformer {
   }
 
   visitExpressionStatement (node) {
-    return node.expression.accept(this);
+    return node.expression.accept(this) + ';';
   }
 
   visitBinaryExpression (node) {
@@ -75,10 +64,15 @@ export default class Transformer {
     return raw;
   }
 
-  visitDeclarationStatement (node) {
+  visitDeclarationStatement (node, withoutSemicolon = false) {
     var declarations = node.declarations.map((decl) => decl.accept(this)).join(', ')
+    var str = `${node.kind} ${declarations}`;
 
-    return `${node.kind} ${declarations};`;
+    if (!withoutSemicolon) {
+      str += ';';
+    }
+
+    return str;
   }
 
   visitDeclarator (node) {
@@ -249,9 +243,176 @@ export default class Transformer {
     return '{\n' + node.properties.map((prop) => prop.accept(this)).join(',\n') + '\n}';
   }
 
-  /*visitForInStatement (node) {
+  visitLabeledStatement (node) {
+    var label = node.label.accept(this);
+    var body = node.body.accept(this);
 
-  }*/
+    return `${label}:\n${body}`;
+  }
+
+  visitBreakStatement (node) {
+    if (node.label) {
+      return `break ${node.label.accept(this)};`;
+    }
+    else {
+      return 'break;'
+    }
+  }
+
+  visitContinueStatement (node) {
+    if (node.label) {
+      return `continue ${node.label.accept(this)};`;
+    }
+    else {
+      return 'continue;'
+    }
+  }
+
+  visitWhileStatement (node) {
+    var test = node.test.accept(this);
+    var body = node.body.accept(this);
+
+    return `while (${test}) ${body}`;
+  }
+
+  visitDoWhileStatement (node) {
+    var test = node.test.accept(this);
+    var body = node.body.accept(this);
+
+    return `do ${body} while (${test});`;
+  }
+
+  visitThrowStatement (node) {
+    return `throw ${node.argument.accept(this)};`;
+  }
+
+  visitUpdateExpression (node) {
+    var argument = node.argument.accept(this);
+
+    if (node.prefix) {
+      return `${node.operator}${argument}`;
+    }
+    else {
+      return `${argument}${node.operator}`;
+    }
+  }
+
+  visitIfStatement (node) {
+    var test = node.test.accept(this);
+    var consequent = node.consequent.accept(this);
+
+    var str = `if (${test}) ${consequent}`;
+
+    if (node.alternate) {
+      let alternate = node.alternate.accept(this);
+
+      str += `\nelse ${alternate}`;
+    }
+
+    return str;
+  }
+
+  visitThisExpression (node) {
+    return 'this';
+  }
+
+  visitForStatement (node) {
+    var str = '';
+
+    if (node.init) {
+      str += `${node.init.accept(this, true)}`;
+    }
+
+    str += ';';
+
+    if (node.test) {
+      str += ` ${node.test.accept(this)}`;
+    }
+
+    str += ';';
+
+    if (node.update) {
+      str += ` ${node.update.accept(this)}`;
+    }
+
+    str = `for (${str})`;
+
+    if (!(node.body instanceof EmptyStatement)) {
+      str += ' ';
+    }
+
+    return `${str}${node.body.accept(this)}`;
+  }
+
+  visitForInStatement (node) {
+    var left = node.left.accept(this, true);
+    var right = node.right.accept(this);
+    var str = `for (${left} in ${right})`;
+
+    if (!(node.body instanceof EmptyStatement)) {
+      str += ' ';
+    }
+
+    var body = node.body.accept(this);
+
+    return `${str}${body}`;
+  }
+
+  visitDebuggerStatement (node) {
+    return 'debugger;';
+  }
+
+  visitTryStatement (node) {
+    var body = node.block.accept(this);
+    var handlers = node.handlers.map((handler) => handler.accept(this));
+    var finalizer = node.finalizer.accept(this);
+
+    return `try ${body}${handlers}\nfinally${finalizer}`;
+  }
+
+  visitCatchClause (node) {
+    return `\ncatch (${node.param.accept(this)})${node.body.accept(this)}`;
+  }
+
+  visitUnaryExpression (node) {
+    var argument = node.argument.accept(this);
+
+    if (node.prefix) {
+      switch (node.operator) {
+        // with space before argument
+        case Keyword.Delete:
+          return `${node.operator} ${argument}`;
+        // without space before argument
+        default:
+          return `${node.operator}${argument}`;
+      }
+    }
+    else {
+      return `${argument}${node.operator}`;
+    }
+  }
+
+  visitSequenceExpression (node) {
+    return node.expressions.map((expr) => expr.accept(this)).join(', ');
+  }
+
+  visitSwitchStatement (node) {
+    var cases = node.cases.map((ccase) => ccase.accept(this)).join('\n');
+
+    return `switch (${node.discriminant.accept(this)}) {\n${cases}\n}`;
+  }
+
+  visitSwitchCase (node) {
+    var consequent = node.consequent.map((stmt) => stmt.accept(this)).join('\n');
+
+    // case
+    if (node.test) {
+      return `case ${node.test.accept(this)}:\n${consequent}`;
+    }
+    else {
+      return `default:\n${consequent}`;
+    }
+  }
 
   visitAny (node) {
     return `${node.type}_not_implemented`;

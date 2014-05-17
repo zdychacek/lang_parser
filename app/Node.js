@@ -3,9 +3,9 @@ export default class Node {
     this.type = type;
   }
 
-  accept (visitor) {
+  accept (visitor, ...params) {
     var visitMethod = 'visit' + (visitor['visit' + this.type]? this.type : 'Any');
 
-    return visitor[visitMethod](this);
+    return visitor[visitMethod](this, ...params);
   }
 }

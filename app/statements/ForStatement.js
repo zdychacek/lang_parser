@@ -24,8 +24,4 @@ export default class ForStatement extends Statement {
 
     return names;
   }
-
-  eval (context) {
-
-  }
 }

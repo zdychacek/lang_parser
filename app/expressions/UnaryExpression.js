@@ -8,8 +8,4 @@ export default class UnaryExpression extends Expression {
     this.argument = argument;
     this.prefix = prefix;
   }
-
-  eval (context) {
-
-  }
 }

@@ -6,8 +6,4 @@ export default class ContinueStatement extends Statement {
 
     this.label = label;
   }
-
-  eval (context) {
-
-  }
 }

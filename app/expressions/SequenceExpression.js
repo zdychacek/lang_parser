@@ -10,8 +10,4 @@ export default class SequenceExpression extends Expression {
   addExpression (expr) {
     this.expressions.push(expr);
   }
-
-  eval (context) {
-
-  }
 }

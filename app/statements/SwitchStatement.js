@@ -7,10 +7,6 @@ class SwitchCase extends Statement {
     this.test = test;
     this.consequent = consequent;
   }
-
-  eval (context) {
-    
-  }
 }
 
 export default class SwitchStatement extends Statement {
@@ -23,9 +19,5 @@ export default class SwitchStatement extends Statement {
 
   addCase (test, consequent) {
     this.cases.push(new SwitchCase(test, consequent));
-  }
-
-  eval (context) {
-
   }
 }

@@ -71,7 +71,8 @@ export default class ForStatementParser extends StatementParser {
     if (!parser.match(Punctuator.Semicolon)) {
       forStmt.test = parser.parseExpression();
     }
-    parser.consume();
+
+    parser.consume(Punctuator.Semicolon);
 
     // parse update expression
     if (!parser.match(Punctuator.CloseParen)) {
@@ -101,9 +102,7 @@ export default class ForStatementParser extends StatementParser {
 
     // we must create temporary function scope for declarations
     parser.pushScope(ScopeType.Function, forInStmt.declarations);
-
     forInStmt.right = parser.parseExpression();
-
     // pop temporary scope
     parser.popScope();
 

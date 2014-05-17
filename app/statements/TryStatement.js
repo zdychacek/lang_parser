@@ -21,8 +21,4 @@ export default class TryStatement extends Statement {
   addHandler (param, body) {
     this.handlers.push(new CatchClause(param, body));
   }
-
-  eval (context) {
-
-  }
 }
