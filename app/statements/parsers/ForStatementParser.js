@@ -9,7 +9,7 @@ import ForStatement from '../ForStatement';
 import ForInStatement from '../ForInStatement';
 import IdentifierExpression from '../../expressions/IdentifierExpression';
 import { DeclarationStatement } from '../DeclarationStatement';
-import ExpressionStatement from '../ExpressionStatement';
+import Expression from '../../expressions/Expression';
 
 export default class ForStatementParser extends StatementParser {
   parse (parser) {
@@ -25,7 +25,6 @@ export default class ForStatementParser extends StatementParser {
       stmt = this._parseForLoop(parser, leftOrInit);
     }
     else {
-      // FIX: now it is impossible to have an expresion in init clause
       if (parser.match(Keyword.Var) || parser.match(Keyword.Let)) {
         leftOrInit = parser.parseStatement({ consumeSemicolon: false, withoutDefinition: true });
       }
@@ -59,7 +58,7 @@ export default class ForStatementParser extends StatementParser {
     var forStmt = new ForStatement();
 
     // must be ExpressionStatement or variable declarations list
-    if (init && !(init instanceof ExpressionStatement || init instanceof DeclarationStatement)) {
+    if (init && !(init instanceof Expression || init instanceof DeclarationStatement)) {
       parser.throw('Unexpected init expression or declarations list');
     }
 
