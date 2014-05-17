@@ -45,7 +45,7 @@ export class Scope {
       scope._vars[name] = kind;
     }
     else {
-      this._parser.throw(`Variable '${name}' already defined in current scope`, ReferenceError);
+      this._parser.addWarning(`Variable '${name}' already defined in current scope`);
     }
   }
 
@@ -88,7 +88,7 @@ export class Scope {
 
     // do not allow duplicate label names in same scope
     if (scope.hasLabel(name)) {
-      this._parser.throw(`Label with name '${name} already defined`, ReferenceError);
+      this._parser.addWarning(`Label with name '${name} already defined`);
     }
 
     scope._labels.push(name);

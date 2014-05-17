@@ -24,7 +24,13 @@ export default class DeclarationStatementParser extends StatementParser {
     var withoutDefinition = params.withoutDefinition;
 
     do {
-      let id = IdentifierExpressionParser.parse(parser, true);
+      let id = parser.peek();
+
+      if (id.type != TokenType.Identifier) {
+        parser.throw(`Unexpected token ${id.value}`);
+      }
+
+      id = IdentifierExpressionParser.parse(parser, true);
 
       // define variable in current scope
       if (!withoutDefinition) {
@@ -42,7 +48,7 @@ export default class DeclarationStatementParser extends StatementParser {
     while (parser.matchAndConsume(Punctuator.Comma));
 
     if (params.consumeSemicolon !== false) {
-      parser.consume(Punctuator.Semicolon);
+      parser.consumeSemicolon();
     }
 
     return declarationStmt;

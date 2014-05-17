@@ -5,7 +5,7 @@ import DebuggerStatement from '../DebuggerStatement';
 export default class DebuggerStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.Debugger);
-    parser.consume(Punctuator.Semicolon);
+    parser.consumeSemicolon();
 
     return new DebuggerStatement();
   }

@@ -9,17 +9,20 @@ export default class DoWhileStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.Do);
 
+    var doWhileStmt = new DoWhileStatement();
+
     parser.state.pushAttribute('inLoop', true);
-    var body = parser.parseBlockOrExpression();
-    parser.state.popAttribute('inLoop', true);
+    doWhileStmt.body = parser.parseBlockOrExpression();
+    parser.state.popAttribute('inLoop');
 
     parser.consume(Keyword.While);
+
     parser.consume(Punctuator.OpenParen);
-
-    var test = parser.parseExpression();
-
+    doWhileStmt.test = parser.parseExpression();
     parser.consume(Punctuator.CloseParen);
 
-    return new DoWhileStatement(test, body);
+    parser.matchAndConsume(Punctuator.Semicolon);
+
+    return doWhileStmt;
   }
 }

@@ -30,6 +30,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
     parser.consume(Punctuator.OpenParen);
 
+    // TODO: refactor this into separate method (parseArguments)
     if (!parser.match(Punctuator.CloseParen)) {
       // parse parameters
       do {
@@ -55,9 +56,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
     // parse function body
     parser.state.pushAttribute('inFunction', true);
-
     body = parser.parseBlock(ScopeType.Function, scopeVars);
-
     parser.state.popAttribute('inFunction');
 
     return new FunctionDeclarationStatement(id, params, body, hasDefaultValue? defaults : []);

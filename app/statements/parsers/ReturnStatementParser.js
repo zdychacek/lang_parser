@@ -15,19 +15,25 @@ export default class ReturnStatementParser extends StatementParser {
       parser.throw('Illegal return statement');
     }
 
-    if (!parser.match(Punctuator.Semicolon)) {
-      // return statement must not end with new line
-      if (parser.peekLineTerminator()) {
-        parser.throw('Unexpected new line after return statement');
+    if (parser.peekLineTerminator()) {
+      if (!parser.match(Punctuator.CloseCurly)) {
+        parser.addWarning('Unreachable statement');
       }
 
-      argument = parser.parseExpression();
+      return new ReturnStatement(null);
     }
 
-    parser.consume(Punctuator.Semicolon);
+    if (!parser.match(Punctuator.Semicolon)) {
+      // return statement must not end with new line
+      if (!parser.peekLineTerminator()) {
+        argument = parser.parseExpression();
+      }
+    }
+
+    parser.consumeSemicolon();
 
     if (!parser.match(Punctuator.CloseCurly)) {
-      parser.throw('Unreachable statement');
+      parser.addWarning('Unreachable statement');
     }
 
     return new ReturnStatement(argument);

@@ -261,8 +261,11 @@ export default class Parser {
     else {
       let expr = this.parseExpression();
 
+      // optional semicolon
+      this.consumeSemicolon();
+
       // required semicolon
-      this.consume(Punctuator.Semicolon);
+      //this.consume(Punctuator.Semicolon);
 
       return new ExpressionStatement(expr);
     }
@@ -381,7 +384,7 @@ export default class Parser {
     if (expected) {
       let token = this.peek();
 
-      if (!token || token.type != expected) {
+      if (!token && token.type != expected) {
         this.throw(`Unexpected token '${token.value}'`);
       }
     }
@@ -389,6 +392,25 @@ export default class Parser {
     var next = this._lexer.next();
 
     return this._transformToken(next);
+  }
+
+  /**
+   * Consumes semicolon, if there is some.
+   */
+  consumeSemicolon () {
+    if (this.match(Punctuator.Semicolon)) {
+      return this.consume(Punctuator.Semicolon);
+    }
+
+    if (this.matchType(TokenType.EOF) || this.match(Punctuator.CloseCurly)) {
+      return;
+    }
+
+    if (!this.peekLineTerminator()) {
+      let token = this.peek().value;
+
+      this.throw(`Unexpected token '${token}'`);
+    }
   }
 
   /**

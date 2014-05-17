@@ -8,21 +8,22 @@ import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpr
 
 export default class LabeledStatementParser extends StatementParser {
   parse (parser) {
-    var label = IdentifierExpressionParser.parse(parser, true);
-    var body = null;
+    var labelStmt = new LabeledStatement();
+
+    labelStmt.label = IdentifierExpressionParser.parse(parser, true);
 
     parser.consume(Punctuator.Colon);
 
     // save label name
-    parser.scope.addLabel(label.name);
+    parser.scope.addLabel(labelStmt.label.name);
 
     if (parser.match(Punctuator.OpenCurly)) {
-      body = parser.parseBlock();
+      labelStmt.body = parser.parseBlock();
     }
     else {
-      body = parser.parseStatement();
+      labelStmt.body = parser.parseStatement();
     }
 
-    return new LabeledStatement(label, body);
+    return labelStmt;
   }
 }

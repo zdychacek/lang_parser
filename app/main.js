@@ -43,29 +43,55 @@ function loadSelectedTab () {
 }
 
 function process () {
+  var tokens;
+  var ast;
+  var output;
+
   lexer.source = sourceInput.value;
   oldSource = sourceInput.value;
 
+  // hide errors and warnings
+  showWarnings(null);
+  showError(false);
+
+  // tokenize
   try {
-    let tokens = lexer.dump();
-    let ast = parser.parseProgram();
-
-    // show warnings
-    showWarnings(parser.warnings);
-
-    $(astArea).JSONView(JSON.stringify(ast));
+    tokens = lexer.dump();
     $(tokensArea).JSONView(tokens);
-    outputArea.innerHTML = transformer.visitProgram(ast);
-
-    // hide error
-    showError(false);
   }
   catch (ex) {
-    // show error
+    showError(ex.message);
+
+    tokensArea.innerHTML = '';
+    astArea.innerHTML = '';
+    outputArea.innerHTML = '';
+    console.log(ex);
+    return;
+  }
+
+  // parsing
+  try {
+    ast = parser.parseProgram();
+    $(astArea).JSONView(JSON.stringify(ast));
+    showWarnings(parser.warnings);
+  }
+  catch (ex) {
     showError(ex.message);
 
     astArea.innerHTML = '';
-    tokensArea.innerHTML = '';
+    outputArea.innerHTML = '';
+    console.log(ex);
+    return;
+  }
+
+  // transforming
+  try {
+    output = transformer.visitProgram(ast);
+    outputArea.innerHTML = output;
+  }
+  catch (ex) {
+    showError(ex.message);
+
     outputArea.innerHTML = '';
     console.log(ex);
   }
@@ -85,7 +111,7 @@ function showWarnings (warnings) {
 
   if (warnings && warnings.length) {
     warns.style.display = 'block';
-    warns.innerHTML = warnings;
+    warns.innerHTML = warnings.join('</br>');
   }
 }
 
@@ -110,7 +136,5 @@ $(function () {
 
   $tabs.on('click', 'a', function (e) {
     localStorage.setItem(LOCAL_STORAGE_KEY_SEL_TAB, e.target.getAttribute('href'));
-
-    console.log(localStorage.getItem(LOCAL_STORAGE_KEY_SEL_TAB));
   })
 });

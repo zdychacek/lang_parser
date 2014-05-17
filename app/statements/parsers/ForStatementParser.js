@@ -25,6 +25,7 @@ export default class ForStatementParser extends StatementParser {
       stmt = this._parseForLoop(parser, leftOrInit);
     }
     else {
+      // FIX: now it is impossible to have an expresion in init clause
       if (parser.match(Keyword.Var) || parser.match(Keyword.Let)) {
         leftOrInit = parser.parseStatement({ consumeSemicolon: false, withoutDefinition: true });
       }

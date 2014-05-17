@@ -11,13 +11,27 @@ export default class ContinueStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.Continue);
 
-    var label = null;
+    var inLoop = parser.state.getAttribute('inLoop');
 
-    if (!parser.state.getAttribute('inLoop')) {
-      parser.throw('Illegal continue statement');
+    if (parser.matchAndConsume(Punctuator.Semicolon)) {
+      if (!inLoop) {
+        parser.throw('Illegal continue statement');
+      }
+
+      return new ContinueStatement(null);
     }
 
-    if (!parser.match(Punctuator.Semicolon)) {
+    if (parser.peekLineTerminator()) {
+      if (!inLoop) {
+        parser.throw('Illegal continue statement');
+      }
+
+      return new ContinueStatement(null);
+    }
+
+    var label = null;
+
+    if (parser.matchType(TokenType.Identifier)) {
       label = IdentifierExpressionParser.parse(parser, true);
 
       if (!parser.scope.hasLabel(label.name)) {
@@ -25,7 +39,11 @@ export default class ContinueStatementParser extends StatementParser {
       }
     }
 
-    parser.consume(Punctuator.Semicolon);
+    if (!inLoop) {
+      parser.throw('Illegal continue statement');
+    }
+
+    parser.consumeSemicolon();
 
     return new ContinueStatement(label);
   }

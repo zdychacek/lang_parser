@@ -1,39 +1,54 @@
 import {
   Punctuator,
-  Keyword
+  Keyword,
+  TokenType
 } from '../../Lexer';
 import StatementParser from './StatementParser';
 import BreakStatement from '../BreakStatement';
-import IdentifierExpression from '../../expressions/IdentifierExpression';
+import IdentifierExpressionParser from '../../expressions/parsers/IdentifierExpressionParser';
 
 export default class BreakStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.Break);
 
-    var label = null;
     var inLoop = parser.state.getAttribute('inLoop');
     var inSwitchCaseBody = parser.state.getAttribute('inSwitchCaseBody');
 
-    if (!inLoop && !inSwitchCaseBody) {
-      parser.throw('Illegal break statement');
+    if (parser.matchAndConsume(Punctuator.Semicolon)) {
+      if (!inLoop && !inSwitchCaseBody) {
+        parser.throw('Illegal break statement');
+      }
+
+      return new BreakStatement(null);
     }
 
-    // labels are allowed only in loop bodies, NOT in switch case statement
-    if (inLoop) {
-      if (!parser.match(Punctuator.Semicolon)) {
-        label = parser.parseExpression();
+    if (parser.peekLineTerminator()) {
+      if (!inLoop && !inSwitchCaseBody) {
+        parser.throw('Illegal break statement');
+      }
 
-        if (!(label instanceof IdentifierExpression)) {
-          parser.throw('Unexpected break label');
-        }
+      return new BreakStatement(null);
+    }
 
-        if (!parser.scope.hasLabel(label.name)) {
-          parser.throw(`Undefined label ${label.name}`, ReferenceError);
-        }
+    var label = null;
+
+    if (parser.matchType(TokenType.Identifier)) {
+      if (inSwitchCaseBody) {
+        parser.throw('Unexpected break label');
+      }
+
+      label = IdentifierExpressionParser.parse(parser, true);
+
+      if (!parser.scope.hasLabel(label.name)) {
+        parser.throw(`Undefined label ${label.name}`, ReferenceError);
       }
     }
 
-    parser.consume(Punctuator.Semicolon);
+    if (!inLoop) {
+      parser.throw('Illegal break statement');
+    }
+
+    parser.consumeSemicolon();
 
     return new BreakStatement(label);
   }

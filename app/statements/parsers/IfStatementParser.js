@@ -9,15 +9,14 @@ export default class IfStatementParser extends StatementParser {
   parse (parser) {
     parser.consume(Keyword.If);
 
-    var consequent = null;
-    var alternate = null;
+    var ifStmt = new IfStatement();
 
     // parse condition
     parser.consume(Punctuator.OpenParen);
-    var test = parser.parseExpression();
+    ifStmt.test = parser.parseExpression();
     parser.consume(Punctuator.CloseParen);
 
-    consequent = parser.parseBlockOrExpression();
+    ifStmt.consequent = parser.parseBlockOrExpression();
 
     // try to parse else clause
     if (parser.match(Keyword.Else)) {
@@ -25,13 +24,13 @@ export default class IfStatementParser extends StatementParser {
 
       // try to parse else if clause
       if (parser.match(Keyword.If)) {
-        alternate = parser.parseStatement();
+        ifStmt.alternate = parser.parseStatement();
       }
       else {
-        alternate = parser.parseBlockOrExpression();
+        ifStmt.alternate = parser.parseBlockOrExpression();
       }
     }
 
-    return new IfStatement(test, consequent, alternate);
+    return ifStmt;
   }
 }

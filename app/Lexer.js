@@ -54,7 +54,8 @@ export var Punctuator = {
   Semicolon: ';',
   Dot: '.',
   Increment: '++',
-  Decrement: '--'
+  Decrement: '--',
+  Modulus: '%'
 };
 
 /**
@@ -86,7 +87,8 @@ export var Keyword = {
   Catch: 'catch',
   Finally: 'finally',
   Debugger: 'debugger',
-  With: 'with'
+  With: 'with',
+  Void: 'void'
 };
 
 /**
@@ -627,6 +629,7 @@ export class Lexer {
       case Punctuator.CloseSquare:
       case Punctuator.Comma:
       case Punctuator.Dot:
+      case Punctuator.Modulus:
         // one char operators
         punctuator += this._getNextChar();
         break;

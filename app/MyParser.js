@@ -100,12 +100,16 @@ export default class MyParser extends Parser {
     this.registerPrefixGeneric(Punctuator.Bang, Precedence.Prefix);
     this.registerPrefixGeneric(Keyword.TypeOf, Precedence.Prefix);
     this.registerPrefixGeneric(Keyword.Delete, Precedence.Prefix);
+    this.registerPrefixGeneric(Keyword.Void, Precedence.Prefix);
 
     // register generic infix expressions parsers (left associativity)
     this.registerInfixLeftGeneric(Punctuator.Plus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Minus, Precedence.Sum);
     this.registerInfixLeftGeneric(Punctuator.Asterisk, Precedence.Product);
     this.registerInfixLeftGeneric(Punctuator.Slash, Precedence.Product);
+    this.registerInfixLeftGeneric(Punctuator.Modulus, Precedence.Product);
+
+    // TODO: register bitwise operators
 
     // relational operators parsers
     this.registerInfixLeftGeneric(Punctuator.Equal, Precedence.Relational);
