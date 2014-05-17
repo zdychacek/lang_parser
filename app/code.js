@@ -1,5 +1,7 @@
 export default code =
-`(function () {
+`var a;
+
+(function () {
   // inline comment
   var arr = [071, 0xab56, 3.25, 4.58e-10, 5.28];
 
@@ -20,6 +22,7 @@ export default code =
   };
 
   // try/catch/finnaly example
+function h () {
   try {
     var myError = window.myError = new Error('Huhu error');
 
@@ -31,7 +34,7 @@ export default code =
   finally {
     delete window.myError;
   }
-
+}
   var a,b,j,c;
 
   // new operator priority test
@@ -85,21 +88,14 @@ myLabel:
   // for example
   for (let i = 0, l = arr.length; i < l; i++, --j) {
     this[i] = a + 6;
-  };
-
-  var name = 'Ondrej';
+  }
 
   // object expression example
   var person = {
-    // member definition shorthand
-    name,
+    name: 'Ondrej',
     age: 26,
     // duplicate property name are not allowed
     //age: 25,
-    // function definition shorthand
-    getName (a=5) {
-      return this.age;
-    },
     data: {
       a: function (name) {
         console.log('huhu' + name);

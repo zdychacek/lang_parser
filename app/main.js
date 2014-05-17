@@ -87,7 +87,7 @@ function process () {
 
   // transforming
   try {
-    output = transformer.visitProgram(ast);
+    output = transformer.transform(ast);
     outputArea.innerHTML = output;
   }
   catch (ex) {

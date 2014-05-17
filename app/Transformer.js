@@ -2,6 +2,7 @@ import {
   Keyword,
   Punctuator
 } from './Lexer';
+import FunctionBodyTransformer from './FunctionBodyTransformer';
 import EmptyStatement from './statements/EmptyStatement';
 import BlockStatement from './statements/BlockStatement';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
@@ -11,17 +12,31 @@ import ConditionalExpression from './expressions/ConditionalExpression';
 import BinaryExpression from './expressions/BinaryExpression';
 import MemberExpression from './expressions/MemberExpression';
 
+/**
+ * Transforms AST to JavaScript code.
+ */
 export default class Transformer {
   constructor () {
+    // some state information
     this._state = {};
+
+    // current indentation level for output
     this._indentationLevel = 0;
   }
 
+  /**
+   * Indents source line code;
+   */
   _indent () {
     return '   '.repeat(this._indentationLevel);
   }
 
-  visitProgram (node) {
+  transform (node) {
+    // hoist variables
+    var functionBodyTransformer = new FunctionBodyTransformer(node);
+    functionBodyTransformer.transform();
+
+    // reset indentation level
     this._indentationLevel = 0;
 
     var start = new Date();
@@ -50,7 +65,10 @@ export default class Transformer {
     var raw = node.raw;
 
     // convert binary number to decimal
-    if (typeof value === 'number' && typeof raw === 'string' && raw.indexOf('0b') == 0) {
+    if (typeof value === 'number'
+      && typeof raw === 'string'
+      && raw.indexOf('0b') == 0)
+    {
       return value;
     }
 
@@ -68,6 +86,9 @@ export default class Transformer {
     return str;
   }
 
+  /**
+   * Transforms Declarator.
+   */
   visitDeclarator (node) {
     var str = node.id.accept(this);
 
@@ -78,25 +99,39 @@ export default class Transformer {
     return str;
   }
 
-  visitBlockStatement (node, indentFirstLine = true) {
-    var str = `${this._indent()}{\n`;
+  /**
+   * Transforms BlockStatement.
+   */
+  visitBlockStatement (node, indent = true) {
+    if (node.body.length) {
+      var str = `${this._indent()}{\n`;
 
-    if (!indentFirstLine) {
-      str = '{\n';
+      if (!indent) {
+        str = '{\n';
+      }
+
+      this._indentationLevel++;
+      str += node.body.map((stmt) => stmt.accept(this)).join('\n');
+      this._indentationLevel--;
+
+      str += `\n${this._indent()}}`;
+
+      return str;
     }
-
-    this._indentationLevel++;
-
-    str += node.body.map((stmt) => stmt.accept(this)).join('\n');
-
-    this._indentationLevel--;
-
-    str += `\n${this._indent()}}`;
-
-    return str;
+    // empty block
+    else {
+      return (indent? this._indent() : '') + '{}';
+    }
   }
 
+  /**
+   * Transforms FunctionDeclarationStatement.
+   */
   visitFunctionDeclarationStatement (node) {
+    // hoist variables
+    var functionBodyTransformer = new FunctionBodyTransformer(node);
+    functionBodyTransformer.transform();
+
     var params = [];
     var id = node.id.accept(this);
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
@@ -115,7 +150,14 @@ export default class Transformer {
     return `${this._indent()}function ${id} (${params}) ` + node.body.accept(this, false);
   }
 
+  /**
+   * Transforms FunctionExpression.
+   */
   visitFunctionExpression (node, indent = true) {
+    // hoist variables
+    var functionBodyTransformer = new FunctionBodyTransformer(node);
+    functionBodyTransformer.transform();
+
     var params = [];
     var id = node.id? ' ' + node.id.accept(this) : '';
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
@@ -417,9 +459,16 @@ export default class Transformer {
   visitTryStatement (node) {
     var body = node.block.accept(this, false);
     var handlers = node.handlers.map((handler) => handler.accept(this));
-    var finalizer = node.finalizer.accept(this, false);
 
-    return `${this._indent()}try ${body}${handlers}\n${this._indent()}finally ${finalizer}`;
+    var str = `${this._indent()}try ${body}${handlers}`;
+
+    if (node.finalizer) {
+      let finalizer = node.finalizer.accept(this, false);
+
+      str += `\n${this._indent()}finally ${finalizer}`;
+    }
+
+    return str;
   }
 
   visitCatchClause (node, indent = true) {
