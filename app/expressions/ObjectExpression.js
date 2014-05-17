@@ -1,15 +1,25 @@
 import Expression from './Expression';
+import IdentifierExpression from './IdentifierExpression';
 
-class ObjectProperty extends Expression {
+export class ObjectProperty extends Expression {
   constructor (key, value) {
     super('ObjectProperty');
 
     this.key = key;
     this.value = value;
   }
+
+  get keyName () {
+    if (this.key instanceof IdentifierExpression) {
+      return this.key.name;
+    }
+    else {
+      return this.key.value;
+    }
+  }
 }
 
-export default class ObjectExpression extends Expression {
+export class ObjectExpression extends Expression {
   constructor (properties = []) {
     super('ObjectExpression');
 

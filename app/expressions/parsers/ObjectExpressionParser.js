@@ -6,7 +6,10 @@ import {
 import PrefixExpressionParser from './PrefixExpressionParser';
 import IdentifierExpressionParser from './IdentifierExpressionParser';
 import LiteralExpressionParser from './LiteralExpressionParser';
-import ObjectExpression from '../ObjectExpression';
+import {
+  ObjectExpression,
+  ObjectProperty
+} from '../ObjectExpression';
 
 export default class ObjectExpressionParser extends PrefixExpressionParser {
   parse (parser) {
@@ -17,30 +20,18 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
     if (!parser.match(Punctuator.CloseCurly)) {
       do {
-        let key = null;
-
-        if (parser.matchType(TokenType.Identifier)) {
-          key = IdentifierExpressionParser.parse(parser, true);
-        }
-        else if (parser.matchType(TokenType.Literal)) {
-          key = LiteralExpressionParser.parse(parser);
-        }
-        else {
-          parser.throw('Bad object property name');
-        }
+        let property = this._parseObjectProperty(parser);
 
         // check key duplicity
-        if (keys[key]) {
-          parser.throw(`Duplicate object property '${key}'`);
+        if (keys[property.keyName]) {
+          parser.throw(`Duplicate object property '${property.keyName}'`);
         }
 
-        parser.consume(Punctuator.Colon);
+        // note property name to avoid key duplicity
+        keys[property.keyName] = true;
 
         // add new property
-        objectExpr.addProperty(key, parser.parseExpression(Precedence.Sequence));
-
-        // note property name to avoid key duplicity
-        keys[key.name] = true;
+        objectExpr.properties.push(property);
       }
       while (parser.matchAndConsume(Punctuator.Comma));
     }
@@ -48,5 +39,25 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
     parser.consume(Punctuator.CloseCurly);
 
     return objectExpr;
+  }
+
+  _parseObjectProperty (parser) {
+    var objectProperty = new ObjectProperty();
+
+    if (parser.matchType(TokenType.Identifier)) {
+      objectProperty.key = IdentifierExpressionParser.parse(parser, true);
+    }
+    else if (parser.matchType(TokenType.Literal)) {
+      objectProperty.key = LiteralExpressionParser.parse(parser);
+    }
+    else {
+      parser.throw('Bad object property name');
+    }
+
+    parser.consume(Punctuator.Colon);
+
+    objectProperty.value = parser.parseExpression(Precedence.Sequence);
+
+    return objectProperty;
   }
 }

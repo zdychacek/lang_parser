@@ -1,7 +1,7 @@
 import Expression from './Expression';
 
 export default class FunctionExpression extends Expression {
-  constructor (id, params, body, defaults = []) {
+  constructor (id = null, params = [], body, defaults = []) {
     super('FunctionExpression');
 
     this.id = id;

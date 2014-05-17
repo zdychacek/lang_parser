@@ -1,7 +1,8 @@
 import {
   TokenType,
   Punctuator,
-  Keyword
+  Keyword,
+  Precedence
 } from './Lexer';
 import {
   Scope,
@@ -12,6 +13,7 @@ import Program from './Program';
 import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
+import IdentifierExpressionParser from './expressions/parsers/IdentifierExpressionParser';
 
 /**
  * Represents parser.
@@ -324,6 +326,43 @@ export default class Parser {
   }
 
   /**
+   * Parses function parameters.
+   */
+  parseArguments () {
+    var params = [];
+    // array of default parameter values
+    var defaults = [];
+    // if at least one parameter has default value
+    var hasDefaultValue = false;
+
+    // parse parameters
+    do {
+      let param = IdentifierExpressionParser.parse(this, true);
+      let defaultValue = null;
+
+      // try to parse parameter default value
+      if (this.matchAndConsume(Punctuator.Assign)) {
+        defaultValue = this.parseExpression(Precedence.Sequence);
+        hasDefaultValue = true;
+      }
+
+      // push parameter default value
+      defaults.push(defaultValue);
+      params.push(param);
+    }
+    while (this.matchAndConsume(Punctuator.Comma));
+
+    if (!hasDefaultValue) {
+      defaults = null;
+    }
+
+    return {
+      params,
+      defaults
+    }
+  }
+
+  /**
    * Starts parsing program.
    */
   parseProgram () {
@@ -384,7 +423,7 @@ export default class Parser {
     if (expected) {
       let token = this.peek();
 
-      if (!token && token.type != expected) {
+      if (!token || token.type != expected) {
         this.throw(`Unexpected token '${token.value}'`);
       }
     }

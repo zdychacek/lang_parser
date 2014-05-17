@@ -13,52 +13,38 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
   parse (parser) {
     parser.consume(Keyword.Function);
 
-    var id = IdentifierExpressionParser.parse(parser, true);
-    // array of default parameter values
-    var defaults = [];
-    // if at least one parameter has default value
-    var hasDefaultValue = false;
+    var functionDeclStmt = new FunctionDeclarationStatement();
     var scopeVars = {
-      // inject arguments
       arguments: Keyword.Var
     };
-    var params = [];
-    var body = null;
 
+    // parse function name
+    functionDeclStmt.id = IdentifierExpressionParser.parse(parser, true);
     // defined variable in current scope
-    parser.scope.define(id.name, Keyword.Var);
+    parser.scope.define(functionDeclStmt.id.name, Keyword.Var);
 
     parser.consume(Punctuator.OpenParen);
 
-    // TODO: refactor this into separate method (parseArguments)
+    // parse parameters
     if (!parser.match(Punctuator.CloseParen)) {
-      // parse parameters
-      do {
-        let param = IdentifierExpressionParser.parse(parser, true);
-        let defaultValue = null;
+      let { params, defaults } = parser.parseArguments();
 
-        // try to parse parameter default value
-        if (parser.matchAndConsume(Punctuator.Assign)) {
-          defaultValue = parser.parseExpression(Precedence.Sequence);
-          hasDefaultValue = true;
-        }
+      functionDeclStmt.params = params;
+      functionDeclStmt.defaults = defaults || [];
 
-        // push parameter default value
-        defaults.push(defaultValue);
-
+      // register parameters names to scope
+      for (let param of functionDeclStmt.params) {
         scopeVars[param.name] = Keyword.Var;
-        params.push(param);
       }
-      while (parser.matchAndConsume(Punctuator.Comma));
     }
 
     parser.consume(Punctuator.CloseParen);
 
     // parse function body
     parser.state.pushAttribute('inFunction', true);
-    body = parser.parseBlock(ScopeType.Function, scopeVars);
+    functionDeclStmt.body = parser.parseBlock(ScopeType.Function, scopeVars);
     parser.state.popAttribute('inFunction');
 
-    return new FunctionDeclarationStatement(id, params, body, hasDefaultValue? defaults : []);
+    return functionDeclStmt;
   }
 }

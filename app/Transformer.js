@@ -135,13 +135,7 @@ export default class Transformer {
   }
 
   visitAssignmentExpression (node) {
-    var ret = '';
-
-    ret += node.left.accept(this) + ' ';
-    ret += node.operator;
-    ret += ' ' + node.right.accept(this);
-
-    return ret;
+    return `${node.left.accept(this)} ${node.operator} ${node.right.accept(this)}`;
   }
 
   visitArrayExpression (node) {

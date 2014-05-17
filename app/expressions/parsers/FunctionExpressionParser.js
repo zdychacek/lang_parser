@@ -11,62 +11,43 @@ import FunctionExpression from '../FunctionExpression';
 
 export default class FunctionExpressionParser extends PrefixExpressionParser {
   parse (parser) {
-    var token = parser.consume(Keyword.Function);
+    parser.consume(Keyword.Function);
 
-    var id = null;
-    var params = [];
-    var body = null;
-    // array of default parameter values
-    var defaults = [];
-    // if at least one parameter has default value
-    var hasDefaultValue = false;
+    var functionExpr = new FunctionExpression();
     var scopeVars = {
-      // inject arguments
       arguments: Keyword.Var
     };
 
     // parse optional name
     if (parser.matchType(TokenType.Identifier)) {
-      id = IdentifierExpressionParser.parse(parser, true);
+      functionExpr.id = IdentifierExpressionParser.parse(parser, true);
+
+      // if function id was specified, then inject that id in the function scope
+      scopeVars[functionExpr.id.name] = Keyword.Var;
     }
 
     parser.consume(Punctuator.OpenParen);
 
+    // parse parameters
     if (!parser.match(Punctuator.CloseParen)) {
-      // parse parameters
-      do {
-        let param = IdentifierExpressionParser.parse(parser, true);
-        let defaultValue = null;
+      let { params, defaults } = parser.parseArguments();
 
-        // try to parse parameter default value
-        if (parser.matchAndConsume(Punctuator.Assign)) {
-          defaultValue = parser.parseExpression(Precedence.Sequence);
-          hasDefaultValue = true;
-        }
+      functionExpr.params = params;
+      functionExpr.defaults = defaults || [];
 
-        // push parameter default value
-        defaults.push(defaultValue);
-
+      // register parameters names to scope
+      for (let param of functionExpr.params) {
         scopeVars[param.name] = Keyword.Var;
-        params.push(param);
       }
-      while (parser.matchAndConsume(Punctuator.Comma));
     }
 
     parser.consume(Punctuator.CloseParen);
 
-    // if function id was specified, then inject that id in the function scope
-    if (id) {
-      scopeVars[id.name] = Keyword.Var;
-    }
-
     // parse function body
     parser.state.pushAttribute('inFunction', true);
-
-    body = parser.parseBlock(ScopeType.Function, scopeVars);
-
+    functionExpr.body = parser.parseBlock(ScopeType.Function, scopeVars);
     parser.state.popAttribute('inFunction');
 
-    return new FunctionExpression(id, params, body, hasDefaultValue? defaults : []);
+    return functionExpr;
   }
 }
