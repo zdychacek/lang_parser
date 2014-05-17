@@ -22,6 +22,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
     var objectExpr = new ObjectExpression();
 
     if (!parser.match(Punctuator.CloseCurly)) {
+      // parse object properties
       do {
         let property = this._parseObjectProperty(parser);
 
@@ -44,6 +45,9 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
     return objectExpr;
   }
 
+  /**
+   * Parses and returns one object property.
+   */
   _parseObjectProperty (parser) {
     var objectProperty = new ObjectProperty();
 
@@ -78,10 +82,15 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
         objectProperty.value = functionExpr;
       }
-      // classic property
       else {
-        parser.consume(Punctuator.Colon);
-        objectProperty.value = parser.parseExpression(Precedence.Sequence);
+        // classic property
+        if (parser.matchAndConsume(Punctuator.Colon)) {
+          objectProperty.value = parser.parseExpression(Precedence.Sequence);
+        }
+        // member definition shorthand
+        else {
+          objectProperty.value = objectProperty.key;
+        }
       }
     }
     else if (parser.matchType(TokenType.Literal)) {

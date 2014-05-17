@@ -87,9 +87,12 @@ myLabel:
     this[i] = a + 6;
   };
 
+  var name = 'Ondrej';
+
   // object expression example
   var person = {
-    name: 'Ondrej',
+    // member definition shorthand
+    name,
     age: 26,
     // duplicate property name are not allowed
     //age: 25,
