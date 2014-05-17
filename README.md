@@ -19,6 +19,5 @@ TODO
 - reqular expressions support
 - ```with``` support
 - include comments into AST tree
-- proper indentation in compiled source code
 - add bitwise operators support (a & b)
 - add support for ES5 getters and setters

@@ -3,6 +3,7 @@ import {
   Punctuator
 } from './Lexer';
 import EmptyStatement from './statements/EmptyStatement';
+import BlockStatement from './statements/BlockStatement';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
 import IdentifierExpression from './expressions/IdentifierExpression';
 import LiteralExpression from './expressions/LiteralExpression';
@@ -16,19 +17,15 @@ export default class Transformer {
     this._indentationLevel = 0;
   }
 
-  _processStatement (stmt) {
-    var strStmt = stmt.accept(this);
-
-    return `${this._indent()}${strStmt}`;
-  }
-
   _indent () {
-    return '  '.repeat(this._indentationLevel);
+    return '   '.repeat(this._indentationLevel);
   }
 
   visitProgram (node) {
+    this._indentationLevel = 0;
+
     var start = new Date();
-    var body = node.body.map(this._processStatement.bind(this));
+    var body = node.body.map((stmt) => stmt.accept(this));
     var time = (new Date() - start) / 1000;
 
     console.log(`compiling: ${time} s`);
@@ -36,18 +33,12 @@ export default class Transformer {
     return body.join('\n');
   }
 
-  visitExpressionStatement (node) {
-    return node.expression.accept(this) + ';';
+  visitExpressionStatement (node, indent = true) {
+    return (indent? this._indent() : '') + node.expression.accept(this) + ';';
   }
 
   visitBinaryExpression (node) {
-    var ret = '';
-
-    ret += node.left.accept(this) + ' ';
-    ret += node.operator;
-    ret += ' ' + node.right.accept(this);
-
-    return ret;
+    return `${node.left.accept(this)} ${node.operator} ${node.right.accept(this)}`;
   }
 
   visitIdentifier (node) {
@@ -66,9 +57,9 @@ export default class Transformer {
     return raw;
   }
 
-  visitDeclarationStatement (node, withoutSemicolon = false) {
+  visitDeclarationStatement (node, indent = true, withoutSemicolon = false) {
     var declarations = node.declarations.map((decl) => decl.accept(this)).join(', ')
-    var str = `${node.kind} ${declarations}`;
+    var str = (indent? this._indent() : '') + `${node.kind} ${declarations}`;
 
     if (!withoutSemicolon) {
       str += ';';
@@ -81,24 +72,26 @@ export default class Transformer {
     var str = node.id.accept(this);
 
     if (node.init) {
-      str += ' = ' + node.init.accept(this);
+      str += ' = ' + node.init.accept(this, false);
     }
 
     return str;
   }
 
-  visitBlockStatement (node) {
+  visitBlockStatement (node, indentFirstLine = true) {
     var str = `${this._indent()}{\n`;
 
-    //this._indentationLevel++;
+    if (!indentFirstLine) {
+      str = '{\n';
+    }
 
-    str += node.body
-      .map((stmt) => '  ' + this._processStatement(stmt), this)
-      .join('\n');
+    this._indentationLevel++;
 
-    //this._indentationLevel--;
+    str += node.body.map((stmt) => stmt.accept(this)).join('\n');
 
-    str += `${this._indent()}\n}`;
+    this._indentationLevel--;
+
+    str += `\n${this._indent()}}`;
 
     return str;
   }
@@ -119,10 +112,10 @@ export default class Transformer {
       params = node.params.map((param) => param.accept(this)).join(', ');
     }
 
-    return `function ${id} (${params}) ` + node.body.accept(this);
+    return `${this._indent()}function ${id} (${params}) ` + node.body.accept(this, false);
   }
 
-  visitFunctionExpression (node) {
+  visitFunctionExpression (node, indent = true) {
     var params = [];
     var id = node.id? ' ' + node.id.accept(this) : '';
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
@@ -138,14 +131,14 @@ export default class Transformer {
       params = node.params.map((param) => param.accept(this)).join(', ');
     }
 
-    return `function${id} (${params}) ` + node.body.accept(this);
+    return (indent? this._indent() : '') + `function${id} (${params}) ` + node.body.accept(this, false);
   }
 
   /**
    * Transforms EmptyStatement into ';'.
    */
   visitEmptyStatement (node) {
-    return ';'
+    return this._indent() + ';'
   }
 
   /**
@@ -158,7 +151,7 @@ export default class Transformer {
       argument += ' ' + node.argument.accept(this);
     }
 
-    return `return${argument};`;
+    return `${this._indent()}return${argument};`;
   }
 
   /**
@@ -216,7 +209,7 @@ export default class Transformer {
             );
         }
 
-        // e.g. var b = arguments[1] !== undefined ? arguments[1] : 'huhu';
+        // e.g.: var b = arguments[1] !== undefined ? arguments[1] : 'huhu';
         declarators.push(
           new Declarator(
             new IdentifierExpression(param.name),
@@ -233,6 +226,12 @@ export default class Transformer {
     return null;
   }
 
+  /**
+   * Transforms MemberExpression.
+   * e.g.:
+   *   obj.prop
+   *   obj[prop]
+   */
   visitMemberExpression (node) {
     var str = node.object.accept(this);
     var prop = node.property.accept(this);
@@ -247,6 +246,11 @@ export default class Transformer {
     return str;
   }
 
+  /**
+   * Transforms NewExpression.
+   * e.g.:
+   *   new expr
+   */
   visitNewExpression (node) {
     var callee = node.callee.accept(this);
     var args = node.args.map((arg) => arg.accept(this)).join(', ');
@@ -260,56 +264,78 @@ export default class Transformer {
 
   visitObjectProperty (node) {
     var key = node.key.accept(this);
-    var value = node.value.accept(this);
+    var value = node.value.accept(this, false);
 
-    return `${key}: ${value}`;
+    return `${this._indent()}${key}: ${value}`;
   }
 
   visitObjectExpression (node) {
-    return '{\n' + node.properties.map((prop) => prop.accept(this)).join(',\n') + '\n}';
+    if (node.properties.length) {
+      let str = '{\n';
+
+      this._indentationLevel++;
+      str += node.properties.map((prop) => prop.accept(this)).join(',\n');
+      this._indentationLevel--;
+
+      str += `\n${this._indent()}}`;
+
+      return str;
+    }
+    else {
+      return '{}';
+    }
   }
 
   visitLabeledStatement (node) {
     var label = node.label.accept(this);
-    var body = node.body.accept(this);
+    var str = `${this._indent()}${label}:`;
 
-    return `${label}:\n${body}`;
+    if (node.body instanceof BlockStatement) {
+      str += node.body.accept(this, false);
+    }
+    else {
+      this._indentationLevel++;
+      str += `\n${node.body.accept(this)}`;
+      this._indentationLevel--;
+    }
+
+    return str;
   }
 
   visitBreakStatement (node) {
     if (node.label) {
-      return `break ${node.label.accept(this)};`;
+      return `${this._indent()}break ${node.label.accept(this)};`;
     }
     else {
-      return 'break;'
+      return `${this._indent()}break;`;
     }
   }
 
   visitContinueStatement (node) {
     if (node.label) {
-      return `continue ${node.label.accept(this)};`;
+      return `${this._indent()}continue ${node.label.accept(this)};`;
     }
     else {
-      return 'continue;'
+      return `${this._indent()}continue;`;
     }
   }
 
   visitWhileStatement (node) {
     var test = node.test.accept(this);
-    var body = node.body.accept(this);
+    var body = node.body.accept(this, false);
 
-    return `while (${test}) ${body}`;
+    return `${this._indent()}while (${test}) ${body}`;
   }
 
   visitDoWhileStatement (node) {
     var test = node.test.accept(this);
-    var body = node.body.accept(this);
+    var body = node.body.accept(this, false);
 
-    return `do ${body} while (${test});`;
+    return `${this._indent()}do ${body}\n${this._indent()}while (${test});`;
   }
 
   visitThrowStatement (node) {
-    return `throw ${node.argument.accept(this)};`;
+    return `${this._indent()}throw ${node.argument.accept(this)};`;
   }
 
   visitUpdateExpression (node) {
@@ -325,14 +351,14 @@ export default class Transformer {
 
   visitIfStatement (node) {
     var test = node.test.accept(this);
-    var consequent = node.consequent.accept(this);
+    var consequent = node.consequent.accept(this, false);
 
-    var str = `if (${test}) ${consequent}`;
+    var str = `${this._indent()}if (${test}) ${consequent}`;
 
     if (node.alternate) {
-      let alternate = node.alternate.accept(this);
+      let alternate = node.alternate.accept(this, false);
 
-      str += `\nelse ${alternate}`;
+      str += `\n${this._indent()}else ${alternate}`;
     }
 
     return str;
@@ -346,7 +372,7 @@ export default class Transformer {
     var str = '';
 
     if (node.init) {
-      str += `${node.init.accept(this, true)}`;
+      str += `${node.init.accept(this, false, true)}`;
     }
 
     str += ';';
@@ -367,11 +393,11 @@ export default class Transformer {
       str += ' ';
     }
 
-    return `${str}${node.body.accept(this)}`;
+    return `${this._indent()}${str}${node.body.accept(this, false)}`;
   }
 
   visitForInStatement (node) {
-    var left = node.left.accept(this, true);
+    var left = node.left.accept(this, false, true);
     var right = node.right.accept(this);
     var str = `for (${left} in ${right})`;
 
@@ -379,25 +405,25 @@ export default class Transformer {
       str += ' ';
     }
 
-    var body = node.body.accept(this);
+    var body = node.body.accept(this, false);
 
-    return `${str}${body}`;
+    return `${this._indent()}${str}${body}`;
   }
 
   visitDebuggerStatement (node) {
-    return 'debugger;';
+    return '${this._indent()}debugger;';
   }
 
   visitTryStatement (node) {
-    var body = node.block.accept(this);
+    var body = node.block.accept(this, false);
     var handlers = node.handlers.map((handler) => handler.accept(this));
-    var finalizer = node.finalizer.accept(this);
+    var finalizer = node.finalizer.accept(this, false);
 
-    return `try ${body}${handlers}\nfinally${finalizer}`;
+    return `${this._indent()}try ${body}${handlers}\n${this._indent()}finally ${finalizer}`;
   }
 
-  visitCatchClause (node) {
-    return `\ncatch (${node.param.accept(this)})${node.body.accept(this)}`;
+  visitCatchClause (node, indent = true) {
+    return `\n${(indent? this._indent() : '')}catch (${node.param.accept(this)}) ${node.body.accept(this, false)}`;
   }
 
   visitUnaryExpression (node) {
@@ -423,24 +449,28 @@ export default class Transformer {
   }
 
   visitSwitchStatement (node) {
+    this._indentationLevel++;
     var cases = node.cases.map((ccase) => ccase.accept(this)).join('\n');
+    this._indentationLevel--;
 
-    return `switch (${node.discriminant.accept(this)}) {\n${cases}\n}`;
+    return `${this._indent()}switch (${node.discriminant.accept(this)}) {\n${cases}\n${this._indent()}}`;
   }
 
   visitSwitchCase (node) {
+    this._indentationLevel++;
     var consequent = node.consequent.map((stmt) => stmt.accept(this)).join('\n');
+    this._indentationLevel--;
 
     // case
     if (node.test) {
-      return `case ${node.test.accept(this)}:\n${consequent}`;
+      return `${this._indent()}case ${node.test.accept(this)}:\n${consequent}`;
     }
     else {
-      return `default:\n${consequent}`;
+      return `${this._indent()}default:\n${consequent}`;
     }
   }
 
   visitAny (node) {
-    return `${node.type}_not_implemented`;
+    return `${this._indent()}${node.type}_not_implemented`;
   }
 }
