@@ -46,67 +46,8 @@ export default class Parser {
     // parser state
     this._state = new ParserState();
 
-    // scope chain for identifier lookup
-    this._scopeChain = [];  // of scopes
-
     // list of accumulated warnings
     this._warnings = [];
-
-    // create global scope
-    //this.pushScope(ScopeType.Function, this._globals);
-  }
-
-  /**
-   * These globals will be defined in global scope.
-   */
-  set globals (globals) {
-    globals.forEach((global) => this._globals[global] = Keyword.Var);
-  }
-
-  /**
-   * Pushes new scope on stack, optionaly with some injected variables.
-   */
-  pushScope (type = ScopeType.Function, injectVariables = null) {
-    var newScope = new Scope({
-      parent: this._scopeChain.length? this.scope : null,
-      type
-    }, this);
-
-    // inject some variables
-    if (injectVariables) {
-      for (let name in injectVariables) {
-        if (injectVariables.hasOwnProperty(name)) {
-          newScope.define(name, injectVariables[name]);
-        }
-      }
-    }
-
-    this._scopeChain.push(newScope);
-
-    return newScope;
-  }
-
-  /**
-   * Pops and returns current scope from stack.
-   */
-  popScope () {
-    return this._scopeChain.pop();
-  }
-
-  /**
-   * Returns current scope.
-   */
-  get scope () {
-    var len = this._scopeChain.length;
-
-    return this._scopeChain[len - 1];
-  }
-
-  /**
-   * Returns global scope.
-   */
-  get globalScope () {
-    return this._scopeChain[0];
   }
 
   /**
@@ -265,9 +206,6 @@ export default class Parser {
 
       // optional semicolon
       this.consumeSemicolon();
-
-      // required semicolon
-      //this.consume(Punctuator.Semicolon);
 
       return new ExpressionStatement(expr);
     }

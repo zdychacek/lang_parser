@@ -2,11 +2,12 @@ import Expression from './Expression';
 import IdentifierExpression from './IdentifierExpression';
 
 export class ObjectProperty extends Expression {
-  constructor (key, value) {
+  constructor (key, value, shorthand = false) {
     super('ObjectProperty');
 
     this.key = key;
     this.value = value;
+    this.shorthand = shorthand;
   }
 
   get keyName () {

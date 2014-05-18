@@ -55,7 +55,7 @@ function process () {
 
   // hide errors and warnings
   showWarnings(null);
-  showError(false);
+  showErrors(null);
 
   // tokenize
   try {
@@ -63,7 +63,7 @@ function process () {
     $(tokensArea).JSONView(tokens);
   }
   catch (ex) {
-    showError(ex.message);
+    showErrors(ex.message);
 
     tokensArea.innerHTML = '';
     astArea.innerHTML = '';
@@ -76,10 +76,9 @@ function process () {
   try {
     ast = parser.parseProgram();
     $(astArea).JSONView(JSON.stringify(ast));
-    showWarnings(parser.warnings);
   }
   catch (ex) {
-    showError(ex.message);
+    showErrors(ex.message);
 
     astArea.innerHTML = '';
     outputArea.innerHTML = '';
@@ -88,6 +87,8 @@ function process () {
   }
 
   validationVisitor.visitProgram(ast);
+  showWarnings(validationVisitor._warnings);
+  showErrors(validationVisitor._errors);
 
   // transforming
   try {
@@ -95,19 +96,23 @@ function process () {
     outputArea.innerHTML = output;
   }
   catch (ex) {
-    showError(ex.message);
+    showErrors(ex.message);
 
     outputArea.innerHTML = '';
     console.log(ex);
   }
 }
 
-function showError (err) {
+function showErrors (errs) {
   errors.style.display = 'none';
 
-  if (err) {
+  if (!Array.isArray(errs)) {
+    errs = [ errs ];
+  }
+
+  if (errs && errs.length) {
     errors.style.display = 'block';
-    errors.innerHTML = err;
+    errors.innerHTML = errs.join('</br>');
   }
 }
 

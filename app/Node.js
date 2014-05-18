@@ -1,6 +1,9 @@
 export default class Node {
-  constructor (type) {
+  constructor (type, line, column) {
     this.type = type;
+
+    this.line = line;
+    this.column = column;
   }
 
   accept (visitor, ...params) {

@@ -81,6 +81,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
         parser.state.popAttribute('inFunction');
 
         objectProperty.value = functionExpr;
+        objectProperty.shorthand = true;
       }
       else {
         // classic property
@@ -90,6 +91,7 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
         // member definition shorthand
         else {
           objectProperty.value = objectProperty.key;
+          objectProperty.shorthand = true;
         }
       }
     }

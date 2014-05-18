@@ -135,7 +135,7 @@ var literalsTypes = [
  * Class that represents one token
  */
 export class Token {
-  constructor ({ type, value, raw = null, start, end }) {
+  constructor ({ type, value, raw = null, start, end, line, column }) {
     // type of token (TokenType)
     this.type = type;
 
@@ -150,6 +150,10 @@ export class Token {
 
     // index, where token ends
     this.end = end;
+
+    //this.line = line;
+
+    //this.column = column;
   }
 }
 
@@ -746,7 +750,6 @@ export class Lexer {
           // block comment terminating sequence */
           if (char == '*' && peek == '/') {
             this._getNextChar();
-            this._getNextChar();
             break;
           }
         }
@@ -873,7 +876,9 @@ export class Lexer {
       value,
       raw,
       start: this._marker,
-      end: this._index
+      end: this._index,
+      line: this._lineNo,
+      column: this._columnNo
     });
 
     return token;

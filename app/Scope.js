@@ -1,4 +1,6 @@
 import { Keyword } from './Lexer';
+import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
+import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
 
 /**
  * Represents scope type
@@ -16,36 +18,56 @@ export class Scope {
     // reference to parent scope
     this._parent = parent;
 
-    // array of variables defined in this scope
-    this._vars = {};
+    // map of declarators defined in this scope
+    this._vars = Object.create(null);
 
-    // array of labels (continue, break) defined in this scope
-    this._labels = [];
+    // map of labels (continue, break) defined in this scope
+    this._labels = Object.create(null);
 
     // tscope type (block or function)
     this._type = type;
-
-    // reference to parser
-    this._parser = parser;
   }
 
   /**
    * Define variable in current scope (disabling variable redefinition).
    */
-  define (name, kind) {
+  define (declarationStatement) {
     var scope = this;
+    var kind = declarationStatement.kind;
 
     // if we are about to define variable with var, we must find nearest function scope first
     if (kind == Keyword.Var) {
       scope = this._findFunctionScope();
     }
 
-    // if variable is not defined, then define it
-    if (!(name in scope._vars)) {
-      scope._vars[name] = kind;
+    if (declarationStatement instanceof DeclarationStatement) {
+      //debugger;
+      for (let declarator of declarationStatement.declarations) {
+        this._defineDeclarator(declarator, scope);
+      }
+    }
+    else if (declarationStatement instanceof Declarator) {
+      this._defineDeclarator(declarationStatement, scope);
+    }
+    else if (declarationStatement instanceof FunctionDeclarationStatement) {
+      let declaratorName = declarationStatement.id.name;
+
+      scope._vars[declaratorName] = declarationStatement;
     }
     else {
-      this._parser.addWarning(`Variable '${name}' already defined in current scope`);
+      throw new Error('You shall not pass.');
+    }
+  }
+
+  _defineDeclarator (declarator, scope) {
+    let declaratorName = declarator.id.name;
+
+    // if variable is not defined, then define it
+    if (!(declaratorName in scope._vars)) {
+      scope._vars[declaratorName] = declarator;
+    }
+    else {
+      throw new Error(`Variable '${declaratorName}' already defined in current scope.`);
     }
   }
 
@@ -82,16 +104,17 @@ export class Scope {
   /**
    * Add label name definition
    */
-  addLabel (name) {
+  addLabel (labelStatement) {
     // labels are always defined on function scope level
     var scope = this._findFunctionScope();
+    var labelName = labelStatement.label.name;
 
     // do not allow duplicate label names in same scope
-    if (scope.hasLabel(name)) {
-      this._parser.addWarning(`Label with name '${name} already defined`);
+    if (scope.hasLabel(labelName)) {
+      throw new Error(`Label with name '${labelName} already defined`);
     }
 
-    scope._labels.push(name);
+    scope._labels[labelName] = labelStatement;
   }
 
   /**
@@ -101,6 +124,6 @@ export class Scope {
     // labels are always defined on function scope level
     var scope = this._findFunctionScope();
 
-    return scope._labels.indexOf(name) > -1;
+    return name in scope._labels;
   }
 }
