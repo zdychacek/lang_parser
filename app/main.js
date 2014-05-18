@@ -1,6 +1,7 @@
 import { Lexer } from './Lexer';
 import MyParser from './MyParser';
 import Transformer from './Transformer';
+import ValidationVisitor from './ValidationVisitor';
 
 // import some code for textarea
 import defaultCode from './code';
@@ -21,6 +22,7 @@ var LOCAL_STORAGE_KEY_SEL_TAB = 'lang_parser_sel_tab';
 var lexer = new Lexer();
 var parser = new MyParser(lexer);
 var transformer = new Transformer();
+var validationVisitor = new ValidationVisitor();
 
 function loadCode () {
   var fromStorage = localStorage.getItem(LOCAL_STORAGE_KEY_CODE);
@@ -84,6 +86,8 @@ function process () {
     console.log(ex);
     return;
   }
+
+  validationVisitor.visitProgram(ast);
 
   // transforming
   try {

@@ -38,7 +38,7 @@ export default class FunctionBodyTransformer {
     }
 
     // TODO: remove
-    console.log(this._declarations);
+    //console.log(this._declarations);
   }
 
   visitBlockStatement (node) {

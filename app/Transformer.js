@@ -129,8 +129,8 @@ export default class Transformer {
    */
   visitFunctionDeclarationStatement (node) {
     // hoist variables
-    var functionBodyTransformer = new FunctionBodyTransformer(node);
-    functionBodyTransformer.transform();
+    //var functionBodyTransformer = new FunctionBodyTransformer(node);
+    //functionBodyTransformer.transform();
 
     var params = [];
     var id = node.id.accept(this);
@@ -155,8 +155,8 @@ export default class Transformer {
    */
   visitFunctionExpression (node, indent = true) {
     // hoist variables
-    var functionBodyTransformer = new FunctionBodyTransformer(node);
-    functionBodyTransformer.transform();
+    //var functionBodyTransformer = new FunctionBodyTransformer(node);
+    //functionBodyTransformer.transform();
 
     var params = [];
     var id = node.id? ' ' + node.id.accept(this) : '';
@@ -453,7 +453,7 @@ export default class Transformer {
   }
 
   visitDebuggerStatement (node) {
-    return '${this._indent()}debugger;';
+    return `${this._indent()}debugger;`;
   }
 
   visitTryStatement (node) {
