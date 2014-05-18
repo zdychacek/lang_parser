@@ -53,7 +53,7 @@ export default class Parser {
     this._warnings = [];
 
     // create global scope
-    this.pushScope(ScopeType.Function, this._globals);
+    //this.pushScope(ScopeType.Function, this._globals);
   }
 
   /**
@@ -282,15 +282,15 @@ export default class Parser {
     // block starts with opening curly bracket
     this.consume(Punctuator.OpenCurly);
 
-    if (scopeType) {
+    /*if (scopeType) {
       this.pushScope(scopeType, injectables);
-    }
+    }*/
 
     let body = this.parseStatements();
 
-    if (scopeType) {
+    /*if (scopeType) {
       this.popScope();
-    }
+    }*/
 
     // block ends with closing curly bracket
     this.consume(Punctuator.CloseCurly);
@@ -317,9 +317,9 @@ export default class Parser {
 
       ret = this.parseStatement();
 
-      if (forceScopeCreation) {
+      /*if (forceScopeCreation) {
         this.popScope();
-      }
+      }*/
     }
 
     return ret;

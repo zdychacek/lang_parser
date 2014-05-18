@@ -39,9 +39,9 @@ export default class BreakStatementParser extends StatementParser {
 
       label = IdentifierExpressionParser.parse(parser, true);
 
-      if (!parser.scope.hasLabel(label.name)) {
+      /*if (!parser.scope.hasLabel(label.name)) {
         parser.throw(`Undefined label ${label.name}`, ReferenceError);
-      }
+      }*/
     }
 
     if (!inLoop) {

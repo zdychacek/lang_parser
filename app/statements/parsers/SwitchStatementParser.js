@@ -22,7 +22,7 @@ export default class SwitchStatementParser extends StatementParser {
 
     if (!parser.match(Punctuator.CloseCurly)) {
       // create block scope
-      parser.pushScope(ScopeType.Block);
+      //parser.pushScope(ScopeType.Block);
 
       do {
         let token = parser.consume();
@@ -58,7 +58,7 @@ export default class SwitchStatementParser extends StatementParser {
       }
       while (!parser.match(Punctuator.CloseCurly));
 
-      parser.popScope();
+      //parser.popScope();
     }
 
     parser.consume(Punctuator.CloseCurly);

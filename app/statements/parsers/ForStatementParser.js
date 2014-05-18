@@ -65,7 +65,7 @@ export default class ForStatementParser extends StatementParser {
     forStmt.init = init;
 
     // we must create temporary function scope for declarations
-    parser.pushScope(ScopeType.Function, forStmt.declarations);
+    //parser.pushScope(ScopeType.Function, forStmt.declarations);
 
     // parse test expression
     if (!parser.match(Punctuator.Semicolon)) {
@@ -80,7 +80,7 @@ export default class ForStatementParser extends StatementParser {
     }
 
     // pop temporary scope
-    parser.popScope();
+    //parser.popScope();
 
     return forStmt;
   }
@@ -101,10 +101,10 @@ export default class ForStatementParser extends StatementParser {
     }
 
     // we must create temporary function scope for declarations
-    parser.pushScope(ScopeType.Function, forInStmt.declarations);
+    //parser.pushScope(ScopeType.Function, forInStmt.declarations);
     forInStmt.right = parser.parseExpression();
     // pop temporary scope
-    parser.popScope();
+    //parser.popScope();
 
     return forInStmt;
   }

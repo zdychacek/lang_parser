@@ -15,7 +15,7 @@ export default class LabeledStatementParser extends StatementParser {
     parser.consume(Punctuator.Colon);
 
     // save label name
-    parser.scope.addLabel(labelStmt.label.name);
+    //parser.scope.addLabel(labelStmt.label.name);
 
     if (parser.match(Punctuator.OpenCurly)) {
       labelStmt.body = parser.parseBlock();

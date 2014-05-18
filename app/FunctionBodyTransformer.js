@@ -14,7 +14,7 @@ export default class FunctionBodyTransformer {
 
   /**
    * Find declarations and hoist them to the of function.
-   * 1. Find declaration and transform it to assignment statement
+   * 1. Find declaration and transform it to assignment expression.
    * 2. Create new declaration and save it to the stack.
    */
   transform () {

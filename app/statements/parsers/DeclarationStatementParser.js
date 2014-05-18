@@ -33,9 +33,9 @@ export default class DeclarationStatementParser extends StatementParser {
       id = IdentifierExpressionParser.parse(parser, true);
 
       // define variable in current scope
-      if (!withoutDefinition) {
+      /*if (!withoutDefinition) {
         parser.scope.define(id.name, kind);
-      }
+      }*/
 
       let init = null;
 

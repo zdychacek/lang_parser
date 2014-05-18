@@ -21,7 +21,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     // parse function name
     functionDeclStmt.id = IdentifierExpressionParser.parse(parser, true);
     // defined variable in current scope
-    parser.scope.define(functionDeclStmt.id.name, Keyword.Var);
+    //parser.scope.define(functionDeclStmt.id.name, Keyword.Var);
 
     parser.consume(Punctuator.OpenParen);
 

@@ -8,9 +8,9 @@ export default class BlockStatementParser extends StatementParser {
     parser.consume(Punctuator.OpenCurly);
 
     // create block scope
-    parser.pushScope(ScopeType.Block);
+    //parser.pushScope(ScopeType.Block);
     var statements = parser.parseStatements();
-    parser.popScope();
+    //parser.popScope();
 
     parser.consume(Punctuator.CloseCurly);
 
