@@ -26,7 +26,7 @@ export default class ForStatementParser extends StatementParser {
     }
     else {
       if (parser.match(Keyword.Var) || parser.match(Keyword.Let)) {
-        leftOrInit = parser.parseStatement({ consumeSemicolon: false, withoutDefinition: true });
+        leftOrInit = parser.parseStatement({ consumeSemicolon: false });
       }
       else {
         parser.state.pushAttribute('allowIn', false);
@@ -47,8 +47,7 @@ export default class ForStatementParser extends StatementParser {
 
     // parse body
     parser.state.pushAttribute('inLoop', true);
-    // must create new scope for FOR body even if it is expression statement
-    stmt.body = parser.parseBlockOrExpression(stmt.declarations, true);
+    stmt.body = parser.parseBlockOrExpression();
     parser.state.popAttribute('inLoop');
 
     return stmt;
@@ -64,9 +63,6 @@ export default class ForStatementParser extends StatementParser {
 
     forStmt.init = init;
 
-    // we must create temporary function scope for declarations
-    //parser.pushScope(ScopeType.Function, forStmt.declarations);
-
     // parse test expression
     if (!parser.match(Punctuator.Semicolon)) {
       forStmt.test = parser.parseExpression();
@@ -78,9 +74,6 @@ export default class ForStatementParser extends StatementParser {
     if (!parser.match(Punctuator.CloseParen)) {
       forStmt.update = parser.parseExpression();
     }
-
-    // pop temporary scope
-    //parser.popScope();
 
     return forStmt;
   }
@@ -100,11 +93,7 @@ export default class ForStatementParser extends StatementParser {
       }
     }
 
-    // we must create temporary function scope for declarations
-    //parser.pushScope(ScopeType.Function, forInStmt.declarations);
     forInStmt.right = parser.parseExpression();
-    // pop temporary scope
-    //parser.popScope();
 
     return forInStmt;
   }

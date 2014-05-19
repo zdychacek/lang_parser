@@ -20,24 +20,17 @@ export default class DeclarationStatementParser extends StatementParser {
       parser.throw('Unexpected declaration statement');
     }
 
-    var declarationStmt = new DeclarationStatement([], kind);
-    var withoutDefinition = params.withoutDefinition;
+    var declarationStmt = new DeclarationStatement(kind);
 
     do {
       let id = parser.peek();
+      let init = null;
 
       if (id.type != TokenType.Identifier) {
         parser.throw(`Unexpected token ${id.value}`);
       }
 
-      id = IdentifierExpressionParser.parse(parser, true);
-
-      // define variable in current scope
-      /*if (!withoutDefinition) {
-        parser.scope.define(id.name, kind);
-      }*/
-
-      let init = null;
+      id = IdentifierExpressionParser.parse(parser);
 
       if (parser.matchAndConsume(Punctuator.Assign)) {
         init = parser.parseExpression(Precedence.Sequence);

@@ -2,7 +2,6 @@ import {
   Keyword,
   Punctuator
 } from './Lexer';
-import FunctionBodyTransformer from './FunctionBodyTransformer';
 import EmptyStatement from './statements/EmptyStatement';
 import BlockStatement from './statements/BlockStatement';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
@@ -32,10 +31,6 @@ export default class Transformer {
   }
 
   transform (node) {
-    // hoist variables
-    var functionBodyTransformer = new FunctionBodyTransformer(node);
-    functionBodyTransformer.transform();
-
     // reset indentation level
     this._indentationLevel = 0;
 
@@ -128,10 +123,6 @@ export default class Transformer {
    * Transforms FunctionDeclarationStatement.
    */
   visitFunctionDeclarationStatement (node) {
-    // hoist variables
-    //var functionBodyTransformer = new FunctionBodyTransformer(node);
-    //functionBodyTransformer.transform();
-
     var params = [];
     var id = node.id.accept(this);
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
@@ -154,10 +145,6 @@ export default class Transformer {
    * Transforms FunctionExpression.
    */
   visitFunctionExpression (node, indent = true) {
-    // hoist variables
-    //var functionBodyTransformer = new FunctionBodyTransformer(node);
-    //functionBodyTransformer.transform();
-
     var params = [];
     var id = node.id? ' ' + node.id.accept(this) : '';
     var paramsDefValuesDecl = this._createParamsDefValuesDeclaration(node.params, node.defaults);
@@ -262,7 +249,7 @@ export default class Transformer {
     }
 
     if (declarators.length) {
-      return new DeclarationStatement(declarators, Keyword.Var);
+      return new DeclarationStatement(Keyword.Var, declarators);
     }
 
     return null;

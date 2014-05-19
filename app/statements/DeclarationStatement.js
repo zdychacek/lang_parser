@@ -4,6 +4,7 @@ export class Declarator extends Statement {
   constructor (id, init) {
     super('Declarator');
 
+    // IdentifierExpression
     this.id = id;
     this.init = init;
   }
@@ -14,7 +15,7 @@ export class Declarator extends Statement {
 }
 
 export class DeclarationStatement extends Statement {
-  constructor (declarations = [], kind) {
+  constructor (kind, declarations = []) {
     super('DeclarationStatement');
 
     this.declarations = declarations;
@@ -30,6 +31,6 @@ export class DeclarationStatement extends Statement {
   }
 
   expandToSeparateDeclarations () {
-    return this.declarations.map((declarator) => new DeclarationStatement([declarator], this.kind));
+    return this.declarations.map((declarator) => new DeclarationStatement(this.kind, [ declarator ]));
   }
 }

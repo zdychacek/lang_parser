@@ -1,7 +1,6 @@
 import { Lexer } from './Lexer';
 import MyParser from './MyParser';
 import Transformer from './Transformer';
-import ValidationVisitor from './ValidationVisitor';
 
 // import some code for textarea
 import defaultCode from './code';
@@ -22,7 +21,6 @@ var LOCAL_STORAGE_KEY_SEL_TAB = 'lang_parser_sel_tab';
 var lexer = new Lexer();
 var parser = new MyParser(lexer);
 var transformer = new Transformer();
-var validationVisitor = new ValidationVisitor();
 
 function loadCode () {
   var fromStorage = localStorage.getItem(LOCAL_STORAGE_KEY_CODE);
@@ -74,8 +72,11 @@ function process () {
 
   // parsing
   try {
-    ast = parser.parseProgram();
+    ast = parser.parseProgram(true);
     $(astArea).JSONView(JSON.stringify(ast));
+
+    showWarnings(parser.warnings);
+    showErrors(parser.errors);
   }
   catch (ex) {
     showErrors(ex.message);
@@ -85,10 +86,6 @@ function process () {
     console.log(ex);
     return;
   }
-
-  validationVisitor.visitProgram(ast);
-  showWarnings(validationVisitor._warnings);
-  showErrors(validationVisitor._errors);
 
   // transforming
   try {
@@ -106,7 +103,7 @@ function process () {
 function showErrors (errs) {
   errors.style.display = 'none';
 
-  if (!Array.isArray(errs)) {
+  if (errs && !Array.isArray(errs)) {
     errs = [ errs ];
   }
 

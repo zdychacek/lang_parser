@@ -10,12 +10,9 @@ export default class LabeledStatementParser extends StatementParser {
   parse (parser) {
     var labelStmt = new LabeledStatement();
 
-    labelStmt.label = IdentifierExpressionParser.parse(parser, true);
+    labelStmt.label = IdentifierExpressionParser.parse(parser);
 
     parser.consume(Punctuator.Colon);
-
-    // save label name
-    //parser.scope.addLabel(labelStmt.label.name);
 
     if (parser.match(Punctuator.OpenCurly)) {
       labelStmt.body = parser.parseBlock();

@@ -24,7 +24,7 @@ export default class MemberExpressionParser extends InfixExpressionParser {
       parser.consume(Punctuator.CloseSquare);
     }
     else {
-      property = IdentifierExpressionParser.parse(parser, true);
+      property = IdentifierExpressionParser.parse(parser);
     }
 
     return new MemberExpression(object, property, this.computed);

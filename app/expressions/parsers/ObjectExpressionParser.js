@@ -18,21 +18,12 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
   parse (parser) {
     var token = parser.consume(Punctuator.OpenCurly);
 
-    var keys = {};
     var objectExpr = new ObjectExpression();
 
     if (!parser.match(Punctuator.CloseCurly)) {
       // parse object properties
       do {
         let property = this._parseObjectProperty(parser);
-
-        // check key duplicity
-        if (keys[property.keyName]) {
-          parser.addWarning(`Duplicate object property '${property.keyName}'`);
-        }
-
-        // note property name to avoid key duplicity
-        keys[property.keyName] = true;
 
         // add new property
         objectExpr.properties.push(property);
@@ -52,14 +43,11 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
     var objectProperty = new ObjectProperty();
 
     if (parser.matchType(TokenType.Identifier)) {
-      objectProperty.key = IdentifierExpressionParser.parse(parser, true);
+      objectProperty.key = IdentifierExpressionParser.parse(parser);
 
       // object expression method definition shorthand
       if (parser.matchAndConsume(Punctuator.OpenParen)) {
         let functionExpr = new FunctionExpression();
-        let scopeVars = {
-          arguments: Keyword.Var
-        };
 
         if (!parser.matchAndConsume(Punctuator.CloseParen)) {
           let { params, defaults } = parser.parseArguments();
@@ -68,16 +56,11 @@ export default class ObjectExpressionParser extends PrefixExpressionParser {
 
           functionExpr.params = params;
           functionExpr.defaults = defaults || [];
-
-          // register parameters names to scope
-          for (let param of functionExpr.params) {
-            scopeVars[param.name] = Keyword.Var;
-          }
         }
 
         // parse function body
         parser.state.pushAttribute('inFunction', true);
-        functionExpr.body = parser.parseBlock(ScopeType.Function, scopeVars);
+        functionExpr.body = parser.parseBlock();
         parser.state.popAttribute('inFunction');
 
         objectProperty.value = functionExpr;

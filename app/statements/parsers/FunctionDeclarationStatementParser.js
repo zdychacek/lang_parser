@@ -14,14 +14,9 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
     parser.consume(Keyword.Function);
 
     var functionDeclStmt = new FunctionDeclarationStatement();
-    var scopeVars = {
-      arguments: Keyword.Var
-    };
 
     // parse function name
-    functionDeclStmt.id = IdentifierExpressionParser.parse(parser, true);
-    // defined variable in current scope
-    //parser.scope.define(functionDeclStmt.id.name, Keyword.Var);
+    functionDeclStmt.id = IdentifierExpressionParser.parse(parser);
 
     parser.consume(Punctuator.OpenParen);
 
@@ -31,18 +26,13 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
       functionDeclStmt.params = params;
       functionDeclStmt.defaults = defaults || [];
-
-      // register parameters names to scope
-      for (let param of functionDeclStmt.params) {
-        scopeVars[param.name] = Keyword.Var;
-      }
     }
 
     parser.consume(Punctuator.CloseParen);
 
     // parse function body
     parser.state.pushAttribute('inFunction', true);
-    functionDeclStmt.body = parser.parseBlock(ScopeType.Function, scopeVars);
+    functionDeclStmt.body = parser.parseBlock();
     parser.state.popAttribute('inFunction');
 
     return functionDeclStmt;

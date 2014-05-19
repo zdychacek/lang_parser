@@ -18,27 +18,25 @@ export default class TryStatementParser extends StatementParser {
     var tryStmt = new TryStatement();
 
     // parse try block
-    tryStmt.block = parser.parseBlock(ScopeType.Block);
+    tryStmt.block = parser.parseBlock();
 
     // try to parse catch clause
     if (parser.matchAndConsume(Keyword.Catch)) {
       parser.consume(Punctuator.OpenParen);
 
-      let catchParam = IdentifierExpressionParser.parse(parser, true);
+      let catchParam = IdentifierExpressionParser.parse(parser);
 
       parser.consume(Punctuator.CloseParen);
 
       // create block scope and inject catch param in it
-      let catchBody = parser.parseBlock(ScopeType.Block, {
-        [ catchParam.name ]: Keyword.Let
-      });
+      let catchBody = parser.parseBlock();
 
       tryStmt.addHandler(catchParam, catchBody);
     }
 
     // try to parse finally block
     if (parser.matchAndConsume(Keyword.Finally)) {
-      tryStmt.finalizer = parser.parseBlock(ScopeType.Block);
+      tryStmt.finalizer = parser.parseBlock();
     }
     // there must be catch clause or finally block defined
     else if (!tryStmt.handlers.length) {

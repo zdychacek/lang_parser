@@ -7,7 +7,10 @@ import {
   ScopeType
 } from './Scope';
 import AbstractVisitor from './AbstractVisitor';
+import FunctionBodyTransformer from './FunctionBodyTransformer';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
+import IdentifierExpression from './expressions/IdentifierExpression';
+import BlockStatement from './statements/BlockStatement';
 
 /**
  * Validates AST.
@@ -16,13 +19,11 @@ export default class ValidationVisitor extends AbstractVisitor {
   constructor (globals) {
     this._globals = globals;
 
-    // scope chain for identifier lookup
-    this._scopeChain = [];  // of scopes
-
     this.reset();
   }
 
   reset () {
+    // scope chain for identifier lookup
     this._scopeChain = [];
     this._warnings = [];
     this._errors = [];
@@ -61,11 +62,28 @@ export default class ValidationVisitor extends AbstractVisitor {
     return this._scopeChain[0];
   }
 
+  hoistVariables (node) {
+    return FunctionBodyTransformer.transform(node);
+  }
+
   visitProgram (node) {
     this.reset();
 
+    var result = this.hoistVariables(node);
+    console.log(result);
+
+    var globalsDeclarations = new DeclarationStatement(Keyword.Var);
+
+    // create globals
+    if (this._globals) {
+      globalsDeclarations.declarations =
+        this._globals.map((gl) => new Declarator(new IdentifierExpression(gl), null));
+    }
+
     // create global scope
     this._pushFunctionScope();
+    // extend global scope with globals
+    this.scope.define(globalsDeclarations);
 
     for (var stmt of node.body) {
       stmt.accept(this);
@@ -165,7 +183,7 @@ export default class ValidationVisitor extends AbstractVisitor {
       this.scope.define(node);
     }
     catch (ex) {
-      this._errors.push(ex.message);
+      this._warnings.push(ex.message);
     }
 
     // visit function name
@@ -272,25 +290,49 @@ export default class ValidationVisitor extends AbstractVisitor {
   }
 
   visitObjectExpression (node) {
+    // map for properties names
+    var propsName = Object.create(null);
+
     for (var prop of node.properties) {
+      let propKey = prop.keyName;
+
+      if (propKey in propsName) {
+        this._warnings.push(`Duplicate object property '${propKey}'`)
+      }
+
+      // visit object property
       prop.accept(this);
+
+      propsName[propKey] = true;
     }
   }
 
   visitLabeledStatement (node) {
-    node.label.accept(this);
+    this.scope.addLabel(node);
+
+    node.label.accept(this, false);
     node.body.accept(this);
   }
 
   visitBreakStatement (node) {
     if (node.label) {
-      node.label.accept(this);
+      let labelName = node.label.name;
+
+      if (!this.scope.hasLabel(labelName)) {
+        this._warnings.push(`Undefined label ${labelName}`);
+      }
+      node.label.accept(this, false);
     }
   }
 
   visitContinueStatement (node) {
     if (node.label) {
-      node.label.accept(this);
+      let labelName = node.label.name;
+
+      if (!this.scope.hasLabel(labelName)) {
+        this._warnings.push(`Undefined label ${labelName}`);
+      }
+      node.label.accept(this, false);
     }
   }
 
@@ -326,6 +368,8 @@ export default class ValidationVisitor extends AbstractVisitor {
   }
 
   visitForStatement (node) {
+    this._pushFunctionScope();
+
     if (node.init) {
       node.init.accept(this);
     }
@@ -338,13 +382,53 @@ export default class ValidationVisitor extends AbstractVisitor {
       node.update.accept(this);
     }
 
-    node.body.accept(this);
+    this._popScope();
+
+    var blockBody = node.body instanceof BlockStatement;
+
+    if (blockBody) {
+      this._pushBlockScope();
+    }
+
+    // inject declaration from for loop
+    if (node.init instanceof DeclarationStatement) {
+      this.scope.define(node.init);
+    }
+
+    // visit for body
+    node.body.accept(this, false);
+
+    if (blockBody) {
+      this._popScope();
+    }
   }
 
   visitForInStatement (node) {
+    this._pushFunctionScope();
+
     node.left.accept(this);
     node.right.accept(this);
+
+    this._popScope();
+
+    // create block scope for body
+    var blockBody = node.body instanceof BlockStatement;
+
+    if (blockBody) {
+      this._pushBlockScope();
+    }
+
+    // inject declaration from for loop
+    if (node.left instanceof DeclarationStatement) {
+      this.scope.define(node.left);
+    }
+
+    // visit for body
     node.body.accept(this);
+
+    if (blockBody) {
+      this._popScope();
+    }
   }
 
   visitDebuggerStatement (node) {
@@ -355,7 +439,8 @@ export default class ValidationVisitor extends AbstractVisitor {
     node.block.accept(this);
 
     for (var handler of node.handlers) {
-      handler.accept(this);
+      // parse catch clause
+      handler.accept(this, false);
     }
 
     if (node.finalizer) {
@@ -364,8 +449,21 @@ export default class ValidationVisitor extends AbstractVisitor {
   }
 
   visitCatchClause (node) {
-    node.param.accept(this);
+    // create catch param declaration
+    var paramDeclaration = new DeclarationStatement(Keyword.Var);
+    paramDeclaration.addDeclarator(node.param, null);
+
+    // visit param
+    node.param.accept(this, false);
+
+    this._pushBlockScope();
+    // inject param declaration into scope
+    this.scope.define(paramDeclaration);
+
+    // parse catch block
     node.body.accept(this);
+
+    this._popScope();
   }
 
   visitUnaryExpression (node) {

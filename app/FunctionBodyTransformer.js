@@ -4,12 +4,21 @@ import {
 } from './Lexer';
 import Program from './Program';
 import FunctionExpression from './expressions/FunctionExpression';
+import { DeclarationStatement } from './statements/DeclarationStatement';
 import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
+import AssignmentExpression from './expressions/AssignmentExpression';
 
 export default class FunctionBodyTransformer {
+  static transform (node) {
+    var transformer = new this(node)
+
+    return transformer.transform();
+  }
+
   constructor (node) {
     this._node = node;
-    this._declarations = [];
+
+    this._results = [];
   }
 
   /**
@@ -37,8 +46,7 @@ export default class FunctionBodyTransformer {
       stmt.accept(this);
     }
 
-    // TODO: remove
-    //console.log(this._declarations);
+    return this._results;
   }
 
   visitBlockStatement (node) {
@@ -58,7 +66,15 @@ export default class FunctionBodyTransformer {
   visitDeclarationStatement (node) {
     // only vars can be hoisted
     if (node.kind == Keyword.Var) {
-      this._declarations.push(node);
+      let asssignments = this._transformDeclToAssignmentExpr(node);
+
+      // delete init expressions
+      node.declarations.forEach((decl) => decl.init = null);
+
+      this._results.push({
+        asssignments,
+        declaration: node
+      });
     }
   }
 
@@ -100,8 +116,24 @@ export default class FunctionBodyTransformer {
     }
   }
 
-  _transformDeclaration (decl) {
+  _transformDeclToAssignmentExpr (declarationStatement) {
+    var transformed = [];
 
+    if (declarationStatement instanceof DeclarationStatement) {
+      for (let declarator of declarationStatement.declarations) {
+        if (declarator.init) {
+          var assignment = new AssignmentExpression(Punctuator.Assign, declarator.id, declarator.init);
+
+          transformed.push(assignment);
+        }
+        //console.log('decl:', declarator);
+      }
+    }
+    else {
+      throw new Error('Bad declaration statement.');
+    }
+
+    return transformed;
   }
 
   /**

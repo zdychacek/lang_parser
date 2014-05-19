@@ -41,7 +41,6 @@ export class Scope {
     }
 
     if (declarationStatement instanceof DeclarationStatement) {
-      //debugger;
       for (let declarator of declarationStatement.declarations) {
         this._defineDeclarator(declarator, scope);
       }

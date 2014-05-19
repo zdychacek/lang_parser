@@ -37,11 +37,7 @@ export default class BreakStatementParser extends StatementParser {
         parser.throw('Unexpected break label');
       }
 
-      label = IdentifierExpressionParser.parse(parser, true);
-
-      /*if (!parser.scope.hasLabel(label.name)) {
-        parser.throw(`Undefined label ${label.name}`, ReferenceError);
-      }*/
+      label = IdentifierExpressionParser.parse(parser);
     }
 
     if (!inLoop) {

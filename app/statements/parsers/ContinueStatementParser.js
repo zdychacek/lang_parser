@@ -32,11 +32,7 @@ export default class ContinueStatementParser extends StatementParser {
     var label = null;
 
     if (parser.matchType(TokenType.Identifier)) {
-      label = IdentifierExpressionParser.parse(parser, true);
-
-      /*if (!parser.scope.hasLabel(label.name)) {
-        parser.throw(`Undefined label ${label.name}`, ReferenceError);
-      }*/
+      label = IdentifierExpressionParser.parse(parser);
     }
 
     if (!inLoop) {

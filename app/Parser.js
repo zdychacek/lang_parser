@@ -4,17 +4,13 @@ import {
   Keyword,
   Precedence
 } from './Lexer';
-import {
-  Scope,
-  ScopeType
-} from './Scope';
 import ParserState from './ParserState';
 import Program from './Program';
 import BlockStatement from './statements/BlockStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
 import LabeledStatementParser from './statements/parsers/LabeledStatementParser';
 import IdentifierExpressionParser from './expressions/parsers/IdentifierExpressionParser';
-
+import ValidationVisitor from './ValidationVisitor';
 /**
  * Represents parser.
  */
@@ -32,11 +28,8 @@ export default class Parser {
     // statements parsers
     this._statements = new Map();
 
-    // parser will ignore these globals
-    this._globals = {};
-
-    // set globals
-    this.globals = globals;
+    // validator
+    this._astValidator = new ValidationVisitor(globals);
   }
 
   /**
@@ -45,9 +38,7 @@ export default class Parser {
   reset () {
     // parser state
     this._state = new ParserState();
-
-    // list of accumulated warnings
-    this._warnings = [];
+    this._astValidator.reset();
   }
 
   /**
@@ -58,19 +49,17 @@ export default class Parser {
   }
 
   /**
-   * Returns list of warnings.
+   * Gets warnings from AST validator.
    */
   get warnings () {
-    return this._warnings;
+    return this._astValidator._warnings;
   }
 
   /**
-   * Adds and formats warning message.
+   * Gets errors from AST validator.
    */
-  addWarning (message) {
-    message = this._formatMessage(message);
-
-    this._warnings.push(message);
+  get errors () {
+    return this._astValidator._errors;
   }
 
   /**
@@ -212,23 +201,15 @@ export default class Parser {
   }
 
   /**
-   * Parses block of statements. Optionally creates new function/block scope and inject some variables into it.
+   * Parses block of statements.
    */
-  parseBlock (scopeType, injectables) {
+  parseBlock () {
     var token = this.peek();
 
     // block starts with opening curly bracket
     this.consume(Punctuator.OpenCurly);
 
-    /*if (scopeType) {
-      this.pushScope(scopeType, injectables);
-    }*/
-
     let body = this.parseStatements();
-
-    /*if (scopeType) {
-      this.popScope();
-    }*/
 
     // block ends with closing curly bracket
     this.consume(Punctuator.CloseCurly);
@@ -238,29 +219,14 @@ export default class Parser {
 
   /**
    * Parse and return expression statement or block statement.
-   * @injectables - variables which should be injected into scope being created
-   * @forceScopeCreation - force new scope creation even if we are not parsing block statement (useful for FOR statement)
    */
-  parseBlockOrExpression (injectables, forceScopeCreation = false) {
-    var ret = null;
-
-    // if we are parsing block, than we must create new block scope
+  parseBlockOrExpression () {
     if (this.match(Punctuator.OpenCurly)) {
-      ret = this.parseBlock(ScopeType.Block, injectables);
+      return this.parseBlock();
     }
     else {
-      if (forceScopeCreation) {
-        this.pushScope(ScopeType.Block, injectables);
-      }
-
-      ret = this.parseStatement();
-
-      /*if (forceScopeCreation) {
-        this.popScope();
-      }*/
+      return this.parseStatement();
     }
-
-    return ret;
   }
 
   /**
@@ -275,7 +241,7 @@ export default class Parser {
 
     // parse parameters
     do {
-      let param = IdentifierExpressionParser.parse(this, true);
+      let param = IdentifierExpressionParser.parse(this);
       let defaultValue = null;
 
       // try to parse parameter default value
@@ -303,7 +269,7 @@ export default class Parser {
   /**
    * Starts parsing program.
    */
-  parseProgram () {
+  parseProgram (validate) {
     var start = new Date();
 
     this.reset();
@@ -315,11 +281,18 @@ export default class Parser {
       this.throw(`Unexpected token '${token.value}'`);
     }
 
+    var ast = new Program(body);
+
+    // validate AST
+    if (validate) {
+      this._astValidator.visitProgram(ast);
+    }
+
     var time = (new Date() - start) / 1000;
 
     console.log(`parsing: ${time} s`);
 
-    return new Program(body);
+    return ast;
   }
 
   /**
