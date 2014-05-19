@@ -6,7 +6,9 @@ import Program from './Program';
 import FunctionExpression from './expressions/FunctionExpression';
 import { DeclarationStatement } from './statements/DeclarationStatement';
 import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
+import ExpressionStatement from './statements/ExpressionStatement';
 import AssignmentExpression from './expressions/AssignmentExpression';
+import SequenceExpression from './expressions/SequenceExpression';
 
 export default class FunctionBodyTransformer {
   static transform (node) {
@@ -18,7 +20,8 @@ export default class FunctionBodyTransformer {
   constructor (node) {
     this._node = node;
 
-    this._results = [];
+    this._state = {};
+    this._declarations = [];
   }
 
   /**
@@ -28,30 +31,42 @@ export default class FunctionBodyTransformer {
    */
   transform () {
     var node = this._node;
-
-    if (!(node instanceof FunctionExpression)
-      && !(node instanceof FunctionDeclarationStatement)
-      && !(node instanceof Program))
-    {
-      throw new Error('Cannot operate on this node.');
-    }
-
     var body = node.body;
 
-    if (!Array.isArray(body)) {
-      body = [ body ];
+    for (var stmt of body) {
+      let index = body.indexOf(stmt);
+      let nodeReplacement = stmt.accept(this);
+
+      if (nodeReplacement === null) {
+        body.splice(index, 1);
+      }
+      else if (nodeReplacement && index > -1) {
+        body.splice(index, 1, ...nodeReplacement);
+      }
     }
 
-    for (let stmt of body) {
-      stmt.accept(this);
-    }
+    var variables = [];
+    var functions = [];
 
-    return this._results;
+    this._declarations.forEach((decl) => {
+      if (decl instanceof DeclarationStatement) {
+        variables.push(decl);
+      }
+      else {
+        functions.push(decl);
+      }
+    });
+
+    return { variables, functions };
   }
 
   visitBlockStatement (node) {
-    for (let stmt of node.body) {
-      stmt.accept(this);
+    for (var stmt of node.body) {
+      let replacement = stmt.accept(this);
+
+      if (replacement) {
+        node.replace(stmt, replacement);
+      }
     }
   }
 
@@ -68,27 +83,53 @@ export default class FunctionBodyTransformer {
     if (node.kind == Keyword.Var) {
       let asssignments = this._transformDeclToAssignmentExpr(node);
 
-      // delete init expressions
+      // clear init expressions (these were expanded to assignment expressions)
       node.declarations.forEach((decl) => decl.init = null);
 
-      this._results.push({
-        asssignments,
-        declaration: node
-      });
+      // remember declaration for hoisting
+      this._declarations.push(node);
+
+      return asssignments;
     }
   }
 
   visitFunctionDeclarationStatement (node) {
     this._declarations.push(node);
+
+    return null;
   }
 
   visitForStatement (node) {
-    node.init.accept(this);
+    this._state.inForDeclaration = true;
+
+    var initReplacement = node.init.accept(this);
+
+    this._state.inForDeclaration = false;
+
+    if (initReplacement) {
+      if (initReplacement.length > 1) {
+        // we must remap ExpressionStatement to Expression
+        node.init = new SequenceExpression(initReplacement.map((repl) => repl.expression));
+      }
+      else if (initReplacement.length) {
+        node.init = initReplacement[0].expression;
+      }
+    }
+
     node.body.accept(this);
   }
 
   visitForInStatement (node) {
-    node.left.accept(this);
+    this._state.inForDeclaration = true;
+
+    var leftReplacement = node.left.accept(this);
+
+    this._state.inForDeclaration = false;
+
+    if (leftReplacement && leftReplacement.length) {
+      node.left = leftReplacement[0];
+    }
+
     node.body.accept(this);
   }
 
@@ -119,18 +160,19 @@ export default class FunctionBodyTransformer {
   _transformDeclToAssignmentExpr (declarationStatement) {
     var transformed = [];
 
-    if (declarationStatement instanceof DeclarationStatement) {
-      for (let declarator of declarationStatement.declarations) {
-        if (declarator.init) {
-          var assignment = new AssignmentExpression(Punctuator.Assign, declarator.id, declarator.init);
+    for (var declarator of declarationStatement.declarations) {
+      if (declarator.init) {
+        var assignment = new ExpressionStatement(
+          new AssignmentExpression(Punctuator.Assign, declarator.id, declarator.init)
+        );
 
-          transformed.push(assignment);
-        }
-        //console.log('decl:', declarator);
+        transformed.push(assignment);
       }
-    }
-    else {
-      throw new Error('Bad declaration statement.');
+      else {
+        if (this._state.inForDeclaration) {
+          transformed.push(declarator.id)
+        }
+      }
     }
 
     return transformed;

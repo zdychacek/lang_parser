@@ -1,4 +1,5 @@
 import Statement from './Statement';
+import { Keyword } from '../Lexer';
 
 export class Declarator extends Statement {
   constructor (id, init) {
@@ -22,8 +23,13 @@ export class DeclarationStatement extends Statement {
     this.kind = kind;
   }
 
-  addDeclarator (id, init) {
-    this.declarations.push(new Declarator(id, init));
+  addDeclarator (idOrDeclarator, init) {
+    if (idOrDeclarator instanceof Declarator) {
+      this.declarations.push(idOrDeclarator);
+    }
+    else {
+      this.declarations.push(new Declarator(idOrDeclarator, init));
+    }
   }
 
   get names () {
@@ -32,5 +38,20 @@ export class DeclarationStatement extends Statement {
 
   expandToSeparateDeclarations () {
     return this.declarations.map((declarator) => new DeclarationStatement(this.kind, [ declarator ]));
+  }
+
+  /**
+   * Merge more DeclarationStatements into one.
+   */
+  static merge (...declarations) {
+    var mergeDeclaration = new this(Keyword.Var);
+
+    for (var declaration of declarations) {
+      for (var declarator of declaration.declarations) {
+        mergeDeclaration.addDeclarator(declarator);
+      }
+    }
+
+    return mergeDeclaration;
   }
 }

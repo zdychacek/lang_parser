@@ -193,8 +193,8 @@ export default class Transformer {
     return `${id}(${args})`;
   }
 
-  visitAssignmentExpression (node) {
-    return `${node.left.accept(this)} ${node.operator} ${node.right.accept(this)}`;
+  visitAssignmentExpression (node, indent = true) {
+    return `${node.left.accept(this)} ${node.operator} ${node.right.accept(this, false)}`;
   }
 
   visitArrayExpression (node) {
@@ -480,8 +480,8 @@ export default class Transformer {
     }
   }
 
-  visitSequenceExpression (node) {
-    return node.expressions.map((expr) => expr.accept(this)).join(', ');
+  visitSequenceExpression (node, indent = true) {
+    return node.expressions.map((expr) => expr.accept(this, indent)).join(', ');
   }
 
   visitSwitchStatement (node) {

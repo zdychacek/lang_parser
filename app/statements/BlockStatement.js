@@ -22,4 +22,15 @@ export default class BlockStatement extends Statement {
 
     this.body = this.body.concat(stmtOrExpression);
   }
+
+  replace (stmtToReplace, replacement) {
+    var index = this.body.indexOf(stmtToReplace);
+
+    if (index > -1) {
+      this.body.splice(index, 1, ...replacement);
+    }
+    else {
+      throw new Error('Cannot replace. Node to replace doesn\'t exist.');
+    }
+  }
 }
