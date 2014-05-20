@@ -40,6 +40,7 @@ import SwitchStatementParser from './statements/parsers/SwitchStatementParser';
 import ThrowStatementParser from './statements/parsers/ThrowStatementParser';
 import DebuggerStatementParser from './statements/parsers/DebuggerStatementParser';
 import TryStatementParser from './statements/parsers/TryStatementParser';
+import WithStatementParser from './statements/parsers/WithStatementParser';
 
 /**
  * Implements specific parser
@@ -146,6 +147,7 @@ export default class MyParser extends Parser {
     this.registerStatement(Keyword.Throw, new ThrowStatementParser());
     this.registerStatement(Keyword.Debugger, new DebuggerStatementParser());
     this.registerStatement(Keyword.Try, new TryStatementParser());
+    this.registerStatement(Keyword.With, new WithStatementParser());
   }
 
   /**

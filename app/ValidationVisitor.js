@@ -18,6 +18,7 @@ import BlockStatement from './statements/BlockStatement';
 export default class ValidationVisitor extends AbstractVisitor {
   constructor (globals) {
     this._globals = globals;
+    this._state = {};
 
     this.reset();
   }
@@ -119,6 +120,10 @@ export default class ValidationVisitor extends AbstractVisitor {
   }
 
   visitIdentifier (node, checkIfDefined = true) {
+    if (this._state.inWith) {
+      return;
+    }
+
     if (checkIfDefined && !this.scope.isVariableDefined(node.name)) {
       this._warnings.push(`Variable '${node.name}' is not defined.`);
     }
@@ -499,6 +504,18 @@ export default class ValidationVisitor extends AbstractVisitor {
     if (node.test) {
       node.test.accept(this);
     }
+  }
+
+  visitWithStatement (node) {
+    node.object.accept(this);
+
+    var oldState = this._state.inWith;
+    this._state.inWith = true;
+
+    this._warnings.push('Don\'t use with.');
+    node.body.accept(this);
+
+    this._state.inWith = oldState;
   }
 
   visitAny (node) {

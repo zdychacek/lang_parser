@@ -506,6 +506,13 @@ export default class Transpiler {
     }
   }
 
+  visitWithStatement (node) {
+    var object = node.object.accept(this);
+    var body = node.body.accept(this, false);
+
+    return `${this._indent()}with (${object}) ${body}`;
+  }
+
   visitAny (node) {
     return `${this._indent()}${node.type}_not_implemented`;
   }

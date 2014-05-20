@@ -17,7 +17,6 @@ TODO
 -----------------------
 - variables hoisting (hoist ```var``` declarations to nearest function scope)
 - reqular expressions support
-- ```with``` support
 - include comments into AST tree
 - add bitwise operators support (a & b)
 - add support for ES5 getters and setters
