@@ -1,6 +1,6 @@
 import { Lexer } from './Lexer';
 import MyParser from './MyParser';
-import Transformer from './Transformer';
+import Transpiler from './Transpiler';
 
 // import some code for textarea
 import defaultCode from './code';
@@ -20,7 +20,7 @@ var LOCAL_STORAGE_KEY_SEL_TAB = 'lang_parser_sel_tab';
 
 var lexer = new Lexer();
 var parser = new MyParser(lexer);
-var transformer = new Transformer();
+var transpiler = new Transpiler();
 
 function loadCode () {
   var fromStorage = localStorage.getItem(LOCAL_STORAGE_KEY_CODE);
@@ -87,9 +87,9 @@ function process () {
     return;
   }
 
-  // transforming
+  // transpiling
   try {
-    output = transformer.transform(ast);
+    output = transpiler.visitProgram(ast);
     outputArea.innerHTML = output;
   }
   catch (ex) {

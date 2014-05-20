@@ -33,4 +33,12 @@ export default class BlockStatement extends Statement {
       throw new Error('Cannot replace. Node to replace doesn\'t exist.');
     }
   }
+
+  remove (stmt) {
+    var index = this.body.indexOf(stmt);
+
+    if (index > -1) {
+      this.body.splice(index, 1);
+    }
+  }
 }

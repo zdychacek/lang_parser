@@ -7,7 +7,7 @@ import {
   ScopeType
 } from './Scope';
 import AbstractVisitor from './AbstractVisitor';
-import FunctionBodyTransformer from './FunctionBodyTransformer';
+import HoistingTransformer from './HoistingTransformer';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
 import IdentifierExpression from './expressions/IdentifierExpression';
 import BlockStatement from './statements/BlockStatement';
@@ -65,21 +65,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     return this._currentAst;
   }
 
-  _hoist (node) {
-    var { variables, functions } = FunctionBodyTransformer.transform(node);
-
-    //console.log(variables, functions)
-
-    if (variables.length) {
-      variables = DeclarationStatement.merge(...variables);
-      node.body.splice(0, 0, variables);
-    }
-
-    if (functions.length) {
-      node.body.splice(0, 0, ...functions);
-    }
-  }
-
   visitProgram (node) {
     this.reset();
 
@@ -87,7 +72,8 @@ export default class ValidationVisitor extends AbstractVisitor {
     this._currentAst = node;
 
     var globalsDeclarations = new DeclarationStatement(Keyword.Var);
-    this._hoist(node);
+
+    //HoistingTransformer.hoist(node);
 
     // create globals
     if (this._globals) {
@@ -203,7 +189,7 @@ export default class ValidationVisitor extends AbstractVisitor {
       this._warnings.push(ex.message);
     }
 
-    this._hoist(node.body);
+    //HoistingTransformer.hoist(node.body);
 
     // visit function name
     node.id.accept(this);
@@ -225,12 +211,7 @@ export default class ValidationVisitor extends AbstractVisitor {
   visitFunctionExpression (node) {
     var functionNameDeclaration = null;
 
-    this._hoist(node.body);
-    /*var declsToHoist = DeclarationStatement.merge(...FunctionBodyTransformer.transform(node.body));
-
-    if (declsToHoist.declarations.length) {
-      node.body.body.splice(0, 0, declsToHoist);
-    }*/
+    //HoistingTransformer.hoist(node.body);
 
     // optional function name
     if (node.id) {
@@ -415,8 +396,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     if (blockBody) {
       this._pushBlockScope();
     }
-
-    console.log(node.init)
 
     // inject declaration from for loop
     if (node.init instanceof DeclarationStatement) {

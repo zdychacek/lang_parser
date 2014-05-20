@@ -10,16 +10,12 @@ import ExpressionStatement from './statements/ExpressionStatement';
 import AssignmentExpression from './expressions/AssignmentExpression';
 import SequenceExpression from './expressions/SequenceExpression';
 
-export default class FunctionBodyTransformer {
-  static transform (node) {
-    var transformer = new this(node)
-
-    return transformer.transform();
+export default class HoistingTransformer {
+  static hoist (node) {
+    return new this().hoist(node);
   }
 
-  constructor (node) {
-    this._node = node;
-
+  constructor () {
     this._state = {};
     this._declarations = [];
   }
@@ -27,26 +23,17 @@ export default class FunctionBodyTransformer {
   /**
    * Find declarations and hoist them to the of function.
    * 1. Find declaration and transform it to assignment expression.
-   * 2. Create new declaration and save it to the stack.
+   * 2. Remember this declaration.
    */
-  transform () {
-    var node = this._node;
-    var body = node.body;
-
-    for (var stmt of body) {
-      let index = body.indexOf(stmt);
-      let nodeReplacement = stmt.accept(this);
-
-      if (nodeReplacement === null) {
-        body.splice(index, 1);
-      }
-      else if (nodeReplacement && index > -1) {
-        body.splice(index, 1, ...nodeReplacement);
-      }
-    }
-
+  hoist (node) {
     var variables = [];
     var functions = [];
+
+    if (!node.body) {
+      throw new Error('Node must contain body of statements.');
+    }
+
+    this._transformStatements(node);
 
     this._declarations.forEach((decl) => {
       if (decl instanceof DeclarationStatement) {
@@ -57,17 +44,36 @@ export default class FunctionBodyTransformer {
       }
     });
 
-    return { variables, functions };
+    if (functions.length) {
+      node.body.splice(0, 0, ...functions);
+    }
+
+    if (variables.length) {
+      variables = DeclarationStatement.merge(...variables);
+      node.body.splice(0, 0, variables);
+    }
+  }
+
+  _transformStatements (node, prop = 'body') {
+    var newBody = [];
+
+    for (var stmt of node[prop]) {
+      let index = node[prop].indexOf(stmt);
+      let nodeReplacement = stmt.accept(this);
+
+      if (nodeReplacement) {
+        newBody.push(...nodeReplacement);
+      }
+      else if (nodeReplacement !== null){
+        newBody.push(stmt);
+      }
+    }
+
+    node[prop] = newBody;
   }
 
   visitBlockStatement (node) {
-    for (var stmt of node.body) {
-      let replacement = stmt.accept(this);
-
-      if (replacement) {
-        node.replace(stmt, replacement);
-      }
-    }
+    this._transformStatements(node);
   }
 
   visitIfStatement (node) {
@@ -140,9 +146,7 @@ export default class FunctionBodyTransformer {
   }
 
   visitSwitchCase (node) {
-    for (let stmt of node.consequent) {
-      stmt.accept(this);
-    }
+    this._transformStatements(node, 'consequent');
   }
 
   visitTryStatement (node) {

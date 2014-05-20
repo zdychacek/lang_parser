@@ -45,10 +45,15 @@ export class DeclarationStatement extends Statement {
    */
   static merge (...declarations) {
     var mergeDeclaration = new this(Keyword.Var);
+    var nameMap = Object.create(null);
 
     for (var declaration of declarations) {
       for (var declarator of declaration.declarations) {
-        mergeDeclaration.addDeclarator(declarator);
+        if (!(declarator.id.name in nameMap)) {
+          mergeDeclaration.addDeclarator(declarator);
+
+          nameMap[declarator.id.name] = true;
+        }
       }
     }
 

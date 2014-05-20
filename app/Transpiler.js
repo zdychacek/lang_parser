@@ -14,7 +14,7 @@ import MemberExpression from './expressions/MemberExpression';
 /**
  * Transforms AST to JavaScript code.
  */
-export default class Transformer {
+export default class Transpiler {
   constructor () {
     // some state information
     this._state = {};
@@ -30,7 +30,7 @@ export default class Transformer {
     return '   '.repeat(this._indentationLevel);
   }
 
-  transform (node) {
+  visitProgram (node) {
     // reset indentation level
     this._indentationLevel = 0;
 
@@ -187,7 +187,7 @@ export default class Transformer {
    * Transforms CallExpression.
    */
   visitCallExpression (node) {
-    var id = node.callee.accept(this);
+    var id = node.callee.accept(this, false);
     var args = node.args.map((param) => param.accept(this)).join(', ');
 
     return `${id}(${args})`;
@@ -288,7 +288,7 @@ export default class Transformer {
   }
 
   visitGroupExpression (node) {
-    return `(${node.expression.accept(this)})`;
+    return `(${node.expression.accept(this, false)})`;
   }
 
   visitObjectProperty (node) {
@@ -463,7 +463,7 @@ export default class Transformer {
   }
 
   visitUnaryExpression (node) {
-    var argument = node.argument.accept(this);
+    var argument = node.argument.accept(this, false);
 
     if (node.prefix) {
       switch (node.operator) {
