@@ -1,4 +1,4 @@
-JavaScript like language parser
+JavaScript language parser
 =====================
 Builds AST tree from JavaScript code in same format like esprima produces. Transpiles that code back to JavaScript. Supports some ES6 features.
 
