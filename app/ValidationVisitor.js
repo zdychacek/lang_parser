@@ -405,4 +405,10 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     this._state.inWith = oldState;
   }
+
+  visitMemberExpression (node) {
+    if (node.computed) {
+      node.property.accept(this);
+    }
+  }
 }

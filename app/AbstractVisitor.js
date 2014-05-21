@@ -238,6 +238,16 @@ export default class AbstractVisitor {
     node.body.accept(this);
   }
 
+  visitMemberExpression (node) {
+    node.object.accept(this);
+    node.property.accept(this);
+  }
+
+  visitWithStatement (node) {
+    node.object.accept(this);
+    node.body.accept(this);
+  }
+
   visitAny (node) {
     console.log(`AbstractVisitor#visitAny called with node type ${node.type}.`);
   }
