@@ -11,12 +11,15 @@ import HoistingTransformer from './HoistingTransformer';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
 import IdentifierExpression from './expressions/IdentifierExpression';
 import BlockStatement from './statements/BlockStatement';
+import ScopeVisitor from './ScopeVisitor';
 
 /**
  * Validates AST.
  */
 export default class ValidationVisitor extends AbstractVisitor {
   constructor (globals) {
+    super();
+
     this._globals = globals;
     this._state = {};
 
@@ -75,6 +78,7 @@ export default class ValidationVisitor extends AbstractVisitor {
     var globalsDeclarations = new DeclarationStatement(Keyword.Var);
 
     //HoistingTransformer.hoist(node);
+    var declarations = ScopeVisitor.getScopeDeclarations(node);
 
     // create globals
     if (this._globals) {
@@ -86,6 +90,8 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     // extend global scope with globals
     this.scope.define(globalsDeclarations);
+
+    declarations.forEach((decl) => this.scope.define(decl));
 
     // visit program body
     for (var stmt of node.body) {
@@ -110,15 +116,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     }
   }
 
-  visitExpressionStatement (node) {
-    node.expression.accept(this);
-  }
-
-  visitBinaryExpression (node) {
-    node.left.accept(this);
-    node.right.accept(this);
-  }
-
   visitIdentifier (node, checkIfDefined = true) {
     if (this._state.inWith) {
       return;
@@ -127,10 +124,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     if (checkIfDefined && !this.scope.isVariableDefined(node.name)) {
       this._warnings.push(`Variable '${node.name}' is not defined.`);
     }
-  }
-
-  visitLiteral (node) {
-
   }
 
   visitDeclarationStatement (node) {
@@ -143,14 +136,6 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     for (var decl of node.declarations) {
       decl.accept(this);
-    }
-  }
-
-  visitDeclarator (node) {
-    node.id.accept(this);
-
-    if (node.init) {
-      node.init.accept(this);
     }
   }
 
@@ -245,58 +230,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     this._popScope();
   }
 
-  visitEmptyStatement (node) {
-
-  }
-
-  visitReturnStatement (node) {
-    if (node.argument) {
-      node.argument.accept(this);
-    }
-  }
-
-  visitCallExpression (node) {
-    node.callee.accept(this);
-
-    for (var arg of node.args) {
-      arg.accept(this);
-    }
-  }
-
-  visitAssignmentExpression (node) {
-    node.left.accept(this);
-    node.right.accept(this);
-  }
-
-  visitArrayExpression (node) {
-    for (var el of node.elements) {
-      el.accept(this);
-    }
-  }
-
-  visitConditionalExpression (node) {
-    node.test.accept(this);
-    node.consequent.accept(this);
-    node.alternate.accept(this);
-  }
-
-  visitMemberExpression (node) {
-    node.object.accept(this);
-    node.property.accept(this, false);
-  }
-
-  visitNewExpression (node) {
-    node.callee.accept(this);
-
-    for (var arg of node.args) {
-      arg.accept(this);
-    }
-  }
-
-  visitGroupExpression (node) {
-    node.expression.accept(this);
-  }
-
   visitObjectProperty (node) {
     node.value.accept(this);
   }
@@ -346,37 +279,6 @@ export default class ValidationVisitor extends AbstractVisitor {
       }
       node.label.accept(this, false);
     }
-  }
-
-  visitWhileStatement (node) {
-    node.test.accept(this);
-    node.body.accept(this);
-  }
-
-  visitDoWhileStatement (node) {
-    node.test.accept(this);
-    node.body.accept(this);
-  }
-
-  visitThrowStatement (node) {
-    node.argument.accept(this);
-  }
-
-  visitUpdateExpression (node) {
-    node.argument.accept(this);
-  }
-
-  visitIfStatement (node) {
-    node.test.accept(this);
-    node.consequent.accept(this);
-
-    if (node.alternate) {
-      node.alternate.accept(this);
-    }
-  }
-
-  visitThisExpression (node) {
-
   }
 
   visitForStatement (node) {
@@ -443,23 +345,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     }
   }
 
-  visitDebuggerStatement (node) {
-
-  }
-
-  visitTryStatement (node) {
-    node.block.accept(this);
-
-    for (var handler of node.handlers) {
-      // parse catch clause
-      handler.accept(this, false);
-    }
-
-    if (node.finalizer) {
-      node.finalizer.accept(this);
-    }
-  }
-
   visitCatchClause (node) {
     // create catch param declaration
     var paramDeclaration = new DeclarationStatement(Keyword.Var);
@@ -478,34 +363,6 @@ export default class ValidationVisitor extends AbstractVisitor {
     this._popScope();
   }
 
-  visitUnaryExpression (node) {
-    node.argument.accept(this);
-  }
-
-  visitSequenceExpression (node) {
-    for (var expr of node.expressions) {
-      expr.accept(this);
-    }
-  }
-
-  visitSwitchStatement (node) {
-    for (var ccase of node.cases) {
-      ccase.accept(this);
-    }
-
-    node.discriminant.accept(this);
-  }
-
-  visitSwitchCase (node) {
-    for (var stmt of node.consequent) {
-      stmt.accept(this);
-    }
-
-    if (node.test) {
-      node.test.accept(this);
-    }
-  }
-
   visitWithStatement (node) {
     node.object.accept(this);
 
@@ -516,9 +373,5 @@ export default class ValidationVisitor extends AbstractVisitor {
     node.body.accept(this);
 
     this._state.inWith = oldState;
-  }
-
-  visitAny (node) {
-    console.log('Not implemented: ', node);
   }
 }

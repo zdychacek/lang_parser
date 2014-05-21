@@ -2,6 +2,7 @@ import {
   Keyword,
   Punctuator
 } from './Lexer';
+import AbstractVisitor from './AbstractVisitor';
 import EmptyStatement from './statements/EmptyStatement';
 import BlockStatement from './statements/BlockStatement';
 import { DeclarationStatement, Declarator } from './statements/DeclarationStatement';
@@ -14,8 +15,10 @@ import MemberExpression from './expressions/MemberExpression';
 /**
  * Transforms AST to JavaScript code.
  */
-export default class Transpiler {
+export default class Transpiler extends AbstractVisitor {
   constructor () {
+    super();
+
     // some state information
     this._state = {};
 

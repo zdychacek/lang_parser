@@ -1,7 +1,5 @@
 export default class AbstractVisitor {
-  constructor () {
-
-  }
+  constructor () {}
 
   visitProgram (node) {
     for (var stmt of node.body) {
@@ -24,13 +22,9 @@ export default class AbstractVisitor {
     node.right.accept(this);
   }
 
-  visitIdentifier (node) {
+  visitIdentifier (node) {}
 
-  }
-
-  visitLiteral (node) {
-
-  }
+  visitLiteral (node) {}
 
   visitDeclarationStatement (node) {
     for (var decl of node.declarations) {
@@ -68,9 +62,7 @@ export default class AbstractVisitor {
     node.body.accept(this);
   }
 
-  visitEmptyStatement (node) {
-
-  }
+  visitEmptyStatement (node) {}
 
   visitReturnStatement (node) {
     if (node.argument) {
@@ -101,11 +93,6 @@ export default class AbstractVisitor {
     node.test.accept(this);
     node.consequent.accept(this);
     node.alternate.accept(this);
-  }
-
-  visitMemberExpression (node) {
-    node.object.accept(this);
-    node.property.accept(this);
   }
 
   visitNewExpression (node) {
@@ -175,9 +162,7 @@ export default class AbstractVisitor {
     }
   }
 
-  visitThisExpression (node) {
-
-  }
+  visitThisExpression (node) {}
 
   visitForStatement (node) {
     if (node.init) {
@@ -201,9 +186,7 @@ export default class AbstractVisitor {
     node.body.accept(this);
   }
 
-  visitDebuggerStatement (node) {
-
-  }
+  visitDebuggerStatement (node) {}
 
   visitTryStatement (node) {
     node.block.accept(this);
@@ -250,7 +233,12 @@ export default class AbstractVisitor {
     }
   }
 
-  visitAny (node) {
+  visitWithStatment (node) {
+    node.object.accept(this);
+    node.body.accept(this);
+  }
 
+  visitAny (node) {
+    console.log(`AbstractVisitor#visitAny called with node type ${node.type}.`);
   }
 }

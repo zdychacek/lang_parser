@@ -2,20 +2,21 @@ import {
   Keyword,
   Punctuator
 } from './Lexer';
-import Program from './Program';
-import FunctionExpression from './expressions/FunctionExpression';
+import AbstractVisitor from './AbstractVisitor';
 import { DeclarationStatement } from './statements/DeclarationStatement';
 import FunctionDeclarationStatement from './statements/FunctionDeclarationStatement';
 import ExpressionStatement from './statements/ExpressionStatement';
 import AssignmentExpression from './expressions/AssignmentExpression';
 import SequenceExpression from './expressions/SequenceExpression';
 
-export default class HoistingTransformer {
+export default class HoistingTransformer extends AbstractVisitor {
   static hoist (node) {
     return new this().hoist(node);
   }
 
   constructor () {
+    super();
+
     this._state = {};
     this._declarations = [];
   }
@@ -149,18 +150,6 @@ export default class HoistingTransformer {
     this._transformStatements(node, 'consequent');
   }
 
-  visitTryStatement (node) {
-    node.block.accept(this);
-
-    for (let handler of node.handlers) {
-      handler.accept(this);
-    }
-
-    if (node.finalizer) {
-      node.finalizer.accept(this);
-    }
-  }
-
   _transformDeclToAssignmentExpr (declarationStatement) {
     var transformed = [];
 
@@ -180,15 +169,5 @@ export default class HoistingTransformer {
     }
 
     return transformed;
-  }
-
-  /**
-   * Generic visit method.
-   * Traverses only body prop, if exists.
-   */
-  visitAny (node) {
-    if (node.body) {
-      node.body.accept(this);
-    }
   }
 }
