@@ -143,5 +143,9 @@ myLabel:
   };
 })();
 
+with(window) {
+  console.log(document)
+}
+
 // illegal statement
 //return;`;

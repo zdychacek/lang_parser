@@ -45,10 +45,6 @@ export default class ScopeVisitor extends AbstractVisitor {
 
   visitForStatement (node) {
     if (node.init) {
-      if (node.init instanceof DeclarationStatement) {
-        this._declarations.push(node.init);
-      }
-
       node.init.accept(this);
     }
 
@@ -56,10 +52,6 @@ export default class ScopeVisitor extends AbstractVisitor {
   }
 
   visitForInStatement (node) {
-    if (node.left instanceof DeclarationStatement) {
-      this._declarations.push(node.left);
-    }
-
     node.left.accept(this);
     node.body.accept(this);
   }

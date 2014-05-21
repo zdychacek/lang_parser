@@ -15,7 +15,6 @@ Features
 
 TODO
 -----------------------
-- variables hoisting (hoist ```var``` declarations to nearest function scope)
 - reqular expressions support
 - include comments into AST tree
 - add bitwise operators support (a & b)

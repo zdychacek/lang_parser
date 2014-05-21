@@ -77,9 +77,6 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     var globalsDeclarations = new DeclarationStatement(Keyword.Var);
 
-    //HoistingTransformer.hoist(node);
-    var declarations = ScopeVisitor.getScopeDeclarations(node);
-
     // create globals
     if (this._globals) {
       globalsDeclarations.declarations = this._globals.map((gl) => new Declarator(new IdentifierExpression(gl), null));
@@ -89,9 +86,8 @@ export default class ValidationVisitor extends AbstractVisitor {
     this._pushFunctionScope();
 
     // extend global scope with globals
-    this.scope.define(globalsDeclarations);
-
-    declarations.forEach((decl) => this.scope.define(decl));
+    this.scope.declare(globalsDeclarations);
+    this._injectCurrentScopeDeclarations(node);
 
     // visit program body
     for (var stmt of node.body) {
@@ -100,6 +96,19 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     // destroy global scope
     this._popScope();
+  }
+
+  _injectCurrentScopeDeclarations (node) {
+    var scopeDeclarations = ScopeVisitor.getScopeDeclarations(node);
+
+    try {
+      for (var decl of scopeDeclarations) {
+        this.scope.declare(decl);
+      }
+    }
+    catch (ex) {
+      this._warnings.push(ex.message);
+    }
   }
 
   visitBlockStatement (node, pushNewScope = true) {
@@ -121,21 +130,31 @@ export default class ValidationVisitor extends AbstractVisitor {
       return;
     }
 
-    if (checkIfDefined && !this.scope.isVariableDefined(node.name)) {
+    if (checkIfDefined && !this.scope.isDeclared(node.name)) {
       this._warnings.push(`Variable '${node.name}' is not defined.`);
     }
   }
 
   visitDeclarationStatement (node) {
-    try {
-      this.scope.define(node);
-    }
-    catch (ex) {
-      this._warnings.push(ex.message);
-    }
-
     for (var decl of node.declarations) {
       decl.accept(this);
+    }
+  }
+
+  visitDeclarator (node) {
+    if (!this.scope.isDeclared(node, true)) {
+      try {
+        this.scope.declare(node);
+      }
+      catch (ex) {
+        this._warnings.push(ex.message);
+      }
+    }
+
+    node.id.accept(this);
+
+    if (node.init) {
+      node.init.accept(this);
     }
   }
 
@@ -151,7 +170,7 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     // create temporary scope for parameters (for default values expressions)
     this._pushFunctionScope();
-    this.scope.define(paramsDeclaration);
+    this.scope.declare(paramsDeclaration);
 
     // visit params and default values
     for (let i = 0; i < node.params.length; i++) {
@@ -172,14 +191,14 @@ export default class ValidationVisitor extends AbstractVisitor {
 
   visitFunctionDeclarationStatement (node) {
     // define function
-    try {
-      this.scope.define(node);
+    if (!this.scope.isDeclared(node, true)) {
+      try {
+        this.scope.declare(node);
+      }
+      catch (ex) {
+        this._warnings.push(ex.message);
+      }
     }
-    catch (ex) {
-      this._warnings.push(ex.message);
-    }
-
-    //HoistingTransformer.hoist(node.body);
 
     // visit function name
     node.id.accept(this);
@@ -190,7 +209,9 @@ export default class ValidationVisitor extends AbstractVisitor {
     // create scope for function body
     this._pushFunctionScope();
     // ... and inject parameters declaration
-    this.scope.define(paramsDeclaration);
+    this.scope.declare(paramsDeclaration);
+
+    this._injectCurrentScopeDeclarations(node.body);
 
     // visit function body
     node.body.accept(this, false);
@@ -200,8 +221,6 @@ export default class ValidationVisitor extends AbstractVisitor {
 
   visitFunctionExpression (node) {
     var functionNameDeclaration = null;
-
-    //HoistingTransformer.hoist(node.body);
 
     // optional function name
     if (node.id) {
@@ -219,10 +238,18 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     // define function name
     if (functionNameDeclaration) {
-      this.scope.define(functionNameDeclaration);
+      this.scope.declare(functionNameDeclaration);
     }
+
     // ... and inject parameters declaration
-    this.scope.define(paramsDeclaration);
+    try {
+      this.scope.declare(paramsDeclaration);
+    }
+    catch (ex) {
+      this._warnings.push(ex.message);
+    }
+
+    this._injectCurrentScopeDeclarations(node.body);
 
     // visit function body
     node.body.accept(this, false);
@@ -306,7 +333,9 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     // inject declaration from for loop
     if (node.init instanceof DeclarationStatement) {
-      this.scope.define(node.init);
+      if (!this.scope.isDeclared(node.init.declarations[0], true)) {
+        this.scope.declare(node.init);
+      }
     }
 
     // visit for body
@@ -334,7 +363,9 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     // inject declaration from for loop
     if (node.left instanceof DeclarationStatement) {
-      this.scope.define(node.left);
+      if (!this.scope.isDeclared(node.left.declarations[0], true)) {
+        this.scope.declare(node.left);
+      }
     }
 
     // visit for body
@@ -355,7 +386,7 @@ export default class ValidationVisitor extends AbstractVisitor {
 
     this._pushBlockScope();
     // inject param declaration into scope
-    this.scope.define(paramDeclaration);
+    this.scope.declare(paramDeclaration);
 
     // parse catch block
     node.body.accept(this);

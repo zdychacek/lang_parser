@@ -31,43 +31,60 @@ export class Scope {
   /**
    * Define variable in current scope (disabling variable redefinition).
    */
-  define (declarationStatement) {
-    var scope = this;
+  declare (declarationStatement) {
+    var targetScope = this;
     var kind = declarationStatement.kind;
 
     // if we are about to define variable with var, we must find nearest function scope first
     if (kind == Keyword.Var) {
-      scope = this._findFunctionScope();
+      targetScope = this._findFunctionScope();
     }
 
     if (declarationStatement instanceof DeclarationStatement) {
       for (let declarator of declarationStatement.declarations) {
-        this._defineDeclarator(declarator, scope);
+        this._declare(declarator, targetScope);
       }
     }
-    else if (declarationStatement instanceof Declarator) {
-      this._defineDeclarator(declarationStatement, scope);
-    }
-    else if (declarationStatement instanceof FunctionDeclarationStatement) {
-      let declaratorName = declarationStatement.id.name;
-
-      scope._vars[declaratorName] = declarationStatement;
-    }
     else {
-      throw new Error('You shall not pass.');
+      this._declare(declarationStatement, targetScope);
     }
   }
 
-  _defineDeclarator (declarator, scope) {
+  _declare (declarator, scope) {
     let declaratorName = declarator.id.name;
 
     // if variable is not defined, then define it
-    if (!(declaratorName in scope._vars)) {
-      scope._vars[declaratorName] = declarator;
-    }
-    else {
+    if (declaratorName in scope._vars) {
       throw new Error(`Variable '${declaratorName}' already defined in current scope.`);
     }
+    else {
+      scope._vars[declaratorName] = declarator;
+    }
+  }
+
+  getVar (nameOrDeclarator, checkInstance = false) {
+    var currScope = this;
+    var name = nameOrDeclarator;
+    var isStringDeclarator = true;
+
+    if (typeof nameOrDeclarator !== 'string') {
+      name = nameOrDeclarator.id.name;
+      isStringDeclarator = false;
+    }
+
+    do {
+      if (checkInstance && !isStringDeclarator) {
+        if (currScope._vars[name] && nameOrDeclarator === currScope._vars[name]) {
+          return currScope._vars[name];
+        }
+      }
+      else if (currScope._vars[name]) {
+        return currScope._vars[name];
+      }
+    }
+    while (currScope = currScope._parent);
+
+    return null;
   }
 
   /**
@@ -87,17 +104,8 @@ export class Scope {
   /**
    * Check if variable is defined (traverses scope chain)
    */
-  isVariableDefined (name) {
-    var currScope = this;
-
-    do {
-      if (name in currScope._vars) {
-        return true;
-      }
-    }
-    while (currScope = currScope._parent);
-
-    return false;
+  isDeclared (nameOrDeclarator, checkInstance = false) {
+    return !!this.getVar(nameOrDeclarator, checkInstance);
   }
 
   /**
