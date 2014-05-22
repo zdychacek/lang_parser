@@ -236,6 +236,7 @@ export default class Parser {
     var params = [];
     // array of default parameter values
     var defaults = [];
+    var rest = null;
     // if at least one parameter has default value
     var hasDefaultValue = false;
 
@@ -260,10 +261,7 @@ export default class Parser {
       defaults = null;
     }
 
-    return {
-      params,
-      defaults
-    }
+    return { params, defaults, rest };
   }
 
   /**

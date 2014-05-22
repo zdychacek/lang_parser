@@ -41,4 +41,10 @@ export default class BlockStatement extends Statement {
       this.body.splice(index, 1);
     }
   }
+
+  *[Symbol.iterator]() {
+    for (var stmt of this.body) {
+      yield stmt;
+    }
+  }
 }

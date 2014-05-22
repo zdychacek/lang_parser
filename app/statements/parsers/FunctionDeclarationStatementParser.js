@@ -22,7 +22,7 @@ export default class FunctionDeclarationStatementParser extends StatementParser 
 
     // parse parameters
     if (!parser.match(Punctuator.CloseParen)) {
-      let { params, defaults } = parser.parseArguments();
+      let { params, defaults, rest } = parser.parseArguments();
 
       functionDeclStmt.params = params;
       functionDeclStmt.defaults = defaults || [];

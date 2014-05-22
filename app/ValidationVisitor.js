@@ -161,15 +161,24 @@ export default class ValidationVisitor extends AbstractVisitor {
   _processFunctionParameters (node) {
     // create params declaration statement
     var paramsDeclaration = new DeclarationStatement();
+    var paramsNamesMap = Object.create(null);
 
-    paramsDeclaration.declarations = node.params.map((param, i) => {
+    node.params.forEach((param, i) => {
       var defaultValue = node.defaults[i];
 
-      return new Declarator(param, defaultValue);
+      if (!paramsNamesMap[param.name]) {
+        paramsDeclaration.declarations.push(new Declarator(param, defaultValue));
+
+        paramsNamesMap[param.name] = true;
+      }
+      else {
+        this._warnings.push(`Duplicate parameter name '${param.name}'.`);
+      }
     });
 
     // create temporary scope for parameters (for default values expressions)
     this._pushFunctionScope();
+
     this.scope.declare(paramsDeclaration);
 
     // visit params and default values
@@ -404,6 +413,18 @@ export default class ValidationVisitor extends AbstractVisitor {
     node.body.accept(this);
 
     this._state.inWith = oldState;
+  }
+
+  visitSwitchStatement (node) {
+    node.discriminant.accept(this);
+
+    this._pushBlockScope();
+
+    for (var ccase of node.cases) {
+      ccase.accept(this);
+    }
+
+    this._popScope();
   }
 
   visitMemberExpression (node) {

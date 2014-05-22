@@ -55,7 +55,8 @@ export var Punctuator = {
   Dot: '.',
   Increment: '++',
   Decrement: '--',
-  Modulus: '%'
+  Modulus: '%',
+  Rest: '...'
 };
 
 /**
@@ -621,6 +622,20 @@ export class Lexer {
         }
 
         break;
+      case Punctuator.Dot:
+        punctuator = this._getNextChar();
+        nextToken = this._peekNextChar();
+
+        if (nextToken == '.') {
+          punctuator += this._getNextChar();
+          nextToken = this._peekNextChar();
+
+          if (nextToken == '.') {
+            punctuator += this._getNextChar();
+          }
+        }
+
+        break;
       case Punctuator.Question:
       case Punctuator.Tilde:
       case Punctuator.Colon:
@@ -632,7 +647,6 @@ export class Lexer {
       case Punctuator.OpenSquare:
       case Punctuator.CloseSquare:
       case Punctuator.Comma:
-      case Punctuator.Dot:
       case Punctuator.Modulus:
         // one char operators
         punctuator += this._getNextChar();

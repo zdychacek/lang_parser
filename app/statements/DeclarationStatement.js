@@ -40,6 +40,12 @@ export class DeclarationStatement extends Statement {
     return this.declarations.map((declarator) => new DeclarationStatement(this.kind, [ declarator ]));
   }
 
+  *[Symbol.iterator]() {
+    for (var declarator of this.declarations) {
+      yield declarator;
+    }
+  }
+
   /**
    * Merge more DeclarationStatements into one.
    */
